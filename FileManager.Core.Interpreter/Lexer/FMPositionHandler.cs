@@ -1,17 +1,47 @@
-﻿using HB.Code.Interpreter.Location;
+﻿using HB.Code.Interpreter.Exceptions;
+using HB.Code.Interpreter.Lexer;
+using HB.Code.Interpreter.Location;
 
 namespace FileManager.Core.Interpreter.Lexer;
 public class FMPositionHandler : IPositionHandler<FMPosition> {
-    public FMPosition CurrentPosition { get; private set; }
+    public FMPosition CurrentPosition { get; private set; } = FMPosition.CreateNull();
+    public string Content { get; private set; } = "";
 
-    public FMPositionHandler() {
-        CurrentPosition = new FMPosition(null, -1, 0, "Start");
+
+    public void Init(string content) {
+        Content = content;
+        CurrentPosition = FMPosition.CreateStart();
     }
 
     public void MoveNext(int steps) {
         FMPosition old = CurrentPosition;
-        CurrentPosition = new FMPosition(old, CurrentPosition.Value + steps, CurrentPosition.Line);
+        CurrentPosition = FMPosition.CreateFrom(old, CurrentPosition.Index + steps, CurrentPosition.Line, CurrentPosition.LineIndex + steps);
     }
 
-    public void NewLine() => CurrentPosition.Line++;
+    public void NewLine() {
+        CurrentPosition.Line += 1;
+        CurrentPosition.LineIndex = -1;
+    }
+
+    public void MoveNextWhile(int steps, Predicate<FMPosition> predicate) {
+        FMPosition old = CurrentPosition;
+        CurrentPosition = FMPosition.CreateFrom(old, CurrentPosition.Index, CurrentPosition.Line, CurrentPosition.LineIndex);
+
+        while (predicate.Invoke(CurrentPosition)) {
+            if (CurrentPosition.GetValue(Content) == CommonCharCollection.NULL)
+                return;
+
+            CurrentPosition.Index += steps;
+            CurrentPosition.LineIndex += steps;
+        }
+    }
+
+    public void Skip(int steps) {
+        CurrentPosition.Index += steps;
+        CurrentPosition.LineIndex += steps;
+    }
+
+    public void Reset() {
+        CurrentPosition = FMPosition.CreateNull();
+    }
 }

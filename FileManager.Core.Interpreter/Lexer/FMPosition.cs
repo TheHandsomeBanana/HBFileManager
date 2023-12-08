@@ -1,36 +1,56 @@
-﻿using HB.Code.Interpreter.Location;
+﻿using HB.Code.Interpreter.Exceptions;
+using HB.Code.Interpreter.Lexer;
+using HB.Code.Interpreter.Location;
+using System.Numerics;
 using System.Text;
 
 namespace FileManager.Core.Interpreter.Lexer;
 public class FMPosition : IPosition {
     public FMPosition? Previous { get; set; }
-    public int Value { get; set; }
+    public int Index { get; set; }
     public int Line { get; set; }
-    public string? Tag { get; set; }
+    public int LineIndex { get; set; }
 
-    public FMPosition(FMPosition? previous, int value, int line, string? tag = null) {
-        if (previous is null && (value > -1 || line > 0))
+
+    private FMPosition(FMPosition? previous, int index, int line, int lineIndex) {
+        if (previous is null && (index > -1 || line > 0))
             ArgumentNullException.ThrowIfNull(nameof(previous));
 
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(previous!.Value, Value);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(previous!.Index, index);
 
         Previous = previous;
-        Value = value;
+        Index = index;
         Line = line;
-        Tag = tag;
+        LineIndex = lineIndex;
     }
 
-    public TextSpan? GetSpanFromPrevious() => Previous is null ? null : new TextSpan(Previous.Value, Value);
-    public char[] GetCharsFromPrevious(string fileContent) => Previous is null
-        ? Array.Empty<char>()
-        : ReadFromPrevious(fileContent).ToCharArray();
+    private FMPosition(int index, int line, int lineIndex) {
+        Previous = null;
+        Index = index;
+        Line = line;
+        LineIndex = lineIndex;
+    }
 
+    public static FMPosition CreateNull() => new FMPosition(-1, 1, -1);
+    public static FMPosition CreateStart() => new FMPosition(-1, 1, -1);
+    public static FMPosition CreateFrom(FMPosition position, int index, int line, int lineIndex)
+        => new FMPosition(position, index, line, lineIndex);
 
-    private string ReadFromPrevious(string fileContent) {
+    public TextSpan GetSpanFromPrevious() => new TextSpan(Previous?.Index ?? Index, Index - (Previous?.Index ?? Index));
+    public char[] GetCharsFromPrevious(string content) => GetStringFromPrevious(content).ToCharArray();
+
+    public string GetStringFromPrevious(string content) {
         StringBuilder sb = new StringBuilder();
-        for (int i = Previous!.Value; i <= Value; i++)
-            sb.Append(fileContent[i]);
+        for (int i = Previous!.Index; i < Index; i++)
+            sb.Append(content[i]);
 
         return sb.ToString();
+    }
+
+    public char GetValue(string content) {
+        if (Index == -1 || Index >= content.Length)
+            return CommonCharCollection.NULL;
+
+        return content[Index];
     }
 }

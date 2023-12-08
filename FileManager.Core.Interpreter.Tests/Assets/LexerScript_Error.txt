@@ -1,0 +1,1 @@
+﻿COPY FROM "this is a string" TO DefinetilyASyntaxError;

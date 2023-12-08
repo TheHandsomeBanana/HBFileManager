@@ -1,2 +1,2 @@
 ﻿COPY FROM "this is a string" TO "this is a second string";
-MOVE FROM "testMove lololo" aa TO "anotherString";
+MOVE FROM "testMove lololo" TO "anotherString";
