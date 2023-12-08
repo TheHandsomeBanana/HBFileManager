@@ -25,7 +25,7 @@ public class FMPositionHandler : IPositionHandler<FMPosition> {
 
     public void MoveNextWhile(int steps, Predicate<FMPosition> predicate) {
         FMPosition old = CurrentPosition;
-        CurrentPosition = FMPosition.CreateFrom(old, CurrentPosition.Index, CurrentPosition.Line, CurrentPosition.LineIndex);
+        CurrentPosition = FMPosition.CreateFrom(old);
 
         while (predicate.Invoke(CurrentPosition)) {
             if (CurrentPosition.GetValue(Content) == CommonCharCollection.NULL)
@@ -36,6 +36,19 @@ public class FMPositionHandler : IPositionHandler<FMPosition> {
         }
     }
 
+    public void MoveNextDoWhile(int steps, Predicate<FMPosition> predicate) {
+        FMPosition old = CurrentPosition;
+        CurrentPosition = FMPosition.CreateFrom(old);
+
+        do {
+            if (CurrentPosition.GetValue(Content) == CommonCharCollection.NULL)
+                return;
+
+            CurrentPosition.Index += steps;
+            CurrentPosition.LineIndex += steps;
+        } while (predicate.Invoke(CurrentPosition));
+    }
+
     public void Skip(int steps) {
         CurrentPosition.Index += steps;
         CurrentPosition.LineIndex += steps;
@@ -44,4 +57,6 @@ public class FMPositionHandler : IPositionHandler<FMPosition> {
     public void Reset() {
         CurrentPosition = FMPosition.CreateNull();
     }
+
+
 }

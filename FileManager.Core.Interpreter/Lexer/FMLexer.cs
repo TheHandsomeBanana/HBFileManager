@@ -49,10 +49,10 @@ public class FMLexer : ILexer<FMSyntaxToken> {
 
         // Check NewLine
         if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR) {
-            PositionHandler.MoveNext(1);
+            PositionHandler.MoveNext(0);
+            PositionHandler.Skip(2);
             InternalPositionHandler.NewLine();
             FMSyntaxToken token = new FMSyntaxToken("\n\r", SyntaxTokenKind.EndOfLine, PositionHandler.CurrentPosition.GetSpanFromPrevious());
-            PositionHandler.MoveNext(1);
             return token;
         }
         
@@ -87,14 +87,13 @@ public class FMLexer : ILexer<FMSyntaxToken> {
                 PositionHandler.MoveNext(1);
                 return token;
             case '"':
-                PositionHandler.Skip(1); // Skip first "
+                PositionHandler.Skip(1); // Skip '"'
                 PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) != '"');
                 if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
                     return null;
 
-                token = new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanFromPrevious());
-                PositionHandler.Skip(1); // Skip second "
-                return token;
+                PositionHandler.Skip(1); // Skip '"'
+                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content).TrimStart('"').TrimEnd('"'), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanFromPrevious());
         }
 
         return null;

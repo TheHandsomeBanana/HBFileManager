@@ -1,7 +1,9 @@
 ﻿using HB.Code.Interpreter.Exceptions;
 using HB.Code.Interpreter.Lexer;
 using HB.Code.Interpreter.Location;
+using System;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 
 namespace FileManager.Core.Interpreter.Lexer;
@@ -24,6 +26,13 @@ public class FMPosition : IPosition {
         LineIndex = lineIndex;
     }
 
+    public FMPosition(FMPosition previous) {
+        Previous = previous;
+        Index = previous.Index;
+        Line = previous.Line;
+        LineIndex = previous.LineIndex;
+    }
+
     private FMPosition(int index, int line, int lineIndex) {
         Previous = null;
         Index = index;
@@ -35,6 +44,9 @@ public class FMPosition : IPosition {
     public static FMPosition CreateStart() => new FMPosition(-1, 1, -1);
     public static FMPosition CreateFrom(FMPosition position, int index, int line, int lineIndex)
         => new FMPosition(position, index, line, lineIndex);
+
+    public static FMPosition CreateFrom(FMPosition position)
+        => new FMPosition(position);
 
     public TextSpan GetSpanFromPrevious() => new TextSpan(Previous?.Index ?? Index, Index - (Previous?.Index ?? Index));
     public char[] GetCharsFromPrevious(string content) => GetStringFromPrevious(content).ToCharArray();

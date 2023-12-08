@@ -2,6 +2,7 @@ using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Syntax;
 using FileManager.TestBase;
 using HB.Code.Interpreter.Lexer;
+using HB.Code.Interpreter.Location;
 using System.Collections.Immutable;
 using Unity;
 
@@ -21,6 +22,8 @@ public class LexerTests : TestBase.TestBase {
     public void Lex_Positive() {
         ILexer<FMSyntaxToken> lexer = UnityContainer.Resolve<ILexer<FMSyntaxToken>>();
         ImmutableArray<FMSyntaxToken> foundTokens = lexer.Lex(scriptNoError);
+        TextSpan[] spans = foundTokens.Select(e => e.Span).ToArray();
+        
     }
 
     [TestMethod]
