@@ -1,1 +1,2 @@
 ﻿COPY FROM "this is a string" TO DefinetilyASyntaxError;
+AnotherSyntaxError COPY FROM "anotherString" TO ERROR;

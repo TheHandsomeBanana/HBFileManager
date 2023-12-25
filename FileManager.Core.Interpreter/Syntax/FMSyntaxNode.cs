@@ -7,8 +7,8 @@ public class FMSyntaxNode : ISyntaxNode<FMSyntaxNode, FMSyntaxToken> {
     IReadOnlyList<ISyntaxNode> ISyntaxNode.ChildNodes => ChildNodes;
     IReadOnlyList<ISyntaxToken> ISyntaxNode.ChildTokens => ChildTokens.Cast<ISyntaxToken>().ToList();
 
-    public TextSpan Span { get; set; }
-    public FMSyntaxNode? Parent { get; init; }
+    public TextSpan Span { get; }
+    public FMSyntaxNode? Parent { get; }
 
     private readonly List<FMSyntaxNode> childNodes = [];
     public IReadOnlyList<FMSyntaxNode> ChildNodes => childNodes;
@@ -16,7 +16,10 @@ public class FMSyntaxNode : ISyntaxNode<FMSyntaxNode, FMSyntaxToken> {
     private readonly List<FMSyntaxToken> childTokens = [];
     public IReadOnlyList<FMSyntaxToken> ChildTokens => childTokens;
 
-
+    public FMSyntaxNode(TextSpan span, FMSyntaxNode? parent = null) {
+        this.Span = span;
+        this.Parent = parent;
+    }
 
     public void AddChildNode(FMSyntaxNode node) {
         childNodes.Add(node);

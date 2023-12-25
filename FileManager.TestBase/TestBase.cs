@@ -1,6 +1,7 @@
 using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Syntax;
 using HB.Code.Interpreter.Lexer;
+using HB.Code.Interpreter.Lexer.Default;
 using HB.DependencyInjection.Unity;
 using Unity;
 
@@ -12,6 +13,6 @@ public abstract class TestBase {
 
     public TestBase() {
         UnityContainer = UnityBase.CreateOrGetChildContainer("TestContainer");
-        UnityContainer.RegisterType(typeof(ILexer<FMSyntaxToken>), typeof(FMLexer));
+        UnityContainer.RegisterType(typeof(ILexer<FMSyntaxToken, DefaultSyntaxError>), typeof(FMLexer));
     }
 }
