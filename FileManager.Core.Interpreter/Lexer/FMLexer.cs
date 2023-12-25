@@ -9,7 +9,7 @@ using Unity;
 
 namespace FileManager.Core.Interpreter.Lexer;
 public class FMLexer : ILexer<FMSyntaxToken> {
-    private DefaultPositionHandler PositionHandler = new DefaultPositionHandler();
+    private readonly DefaultPositionHandler PositionHandler = new DefaultPositionHandler();
     public ImmutableArray<FMSyntaxToken> Lex(string input) {
         PositionHandler.Init(input);
 
