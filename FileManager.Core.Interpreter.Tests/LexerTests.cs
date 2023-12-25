@@ -12,13 +12,12 @@ namespace FileManager.Core.Interpreter.Tests;
 
 [TestClass]
 public class LexerTests : TestBase.TestBase {
-    private readonly string scriptNoError = File.ReadAllText("../../../Assets/LexerScript_NoError.txt");
-    private readonly string scriptError = File.ReadAllText("../../../Assets/LexerScript_Error.txt");
+    
 
     [TestMethod]
     public void Lex_Positive() {
         FMLexer lexer = new FMLexer();
-        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(scriptNoError);
+        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(ScriptNoError);
         TextSpan[] spans = foundTokens.Select(e => e.Span).ToArray();
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
         Assert.AreEqual(0, foundSyntaxErrors.Length);
@@ -27,7 +26,7 @@ public class LexerTests : TestBase.TestBase {
     [TestMethod]
     public void Lex_Negative() {
         FMLexer lexer = new FMLexer();
-        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(scriptError);
+        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(ScriptError);
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
 
     }
