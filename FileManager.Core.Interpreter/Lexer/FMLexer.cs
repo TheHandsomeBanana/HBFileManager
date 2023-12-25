@@ -83,7 +83,7 @@ public class FMLexer : ILexer<FMSyntaxToken> {
                     return null;
 
                 PositionHandler.Skip(1); // Add second '"' to GetStringToParent value
-                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content).TrimStart('"').TrimEnd('"'), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
+                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
         }
 
         return null;
