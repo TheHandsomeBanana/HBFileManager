@@ -13,6 +13,6 @@ public abstract class TestBase {
 
     public TestBase() {
         UnityContainer = UnityBase.CreateOrGetChildContainer("TestContainer");
-        UnityContainer.RegisterType(typeof(ILexer<FMSyntaxToken, DefaultSyntaxError>), typeof(FMLexer));
+        UnityContainer.RegisterType(typeof(ILexer<SyntaxToken, DefaultSyntaxError>), typeof(FMLexer));
     }
 }

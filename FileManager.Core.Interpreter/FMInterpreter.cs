@@ -15,7 +15,7 @@ public class FMInterpreter : IInterpreter {
     private readonly FMParser parser = new FMParser();
 
     public void Run(string input) {
-        ImmutableArray<FMSyntaxToken> tokens = lexer!.Lex(input);
+        ImmutableArray<SyntaxToken> tokens = lexer!.Lex(input);
         ImmutableArray<DefaultSyntaxError> errors = lexer.GetSyntaxErrors();
         if (errors.Length > 0) {
 
@@ -23,7 +23,7 @@ public class FMInterpreter : IInterpreter {
         }
 
 
-        FMSyntaxTree syntaxTree = parser!.Parse(tokens);
+        SyntaxTree syntaxTree = parser!.Parse(tokens);
 
 
     }

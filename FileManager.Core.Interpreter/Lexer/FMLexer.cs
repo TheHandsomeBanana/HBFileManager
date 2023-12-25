@@ -9,18 +9,18 @@ using System.Text;
 using Unity;
 
 namespace FileManager.Core.Interpreter.Lexer;
-public class FMLexer : ILexer<FMSyntaxToken, DefaultSyntaxError> {
+public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
     private readonly List<DefaultSyntaxError> syntaxErrors = new List<DefaultSyntaxError>();
     private readonly DefaultPositionHandler PositionHandler = new DefaultPositionHandler();
-    public ImmutableArray<FMSyntaxToken> Lex(string input) {
+    public ImmutableArray<SyntaxToken> Lex(string input) {
         syntaxErrors.Clear();
         PositionHandler.Init(input);
 
-        List<FMSyntaxToken> tokens = [];
+        List<SyntaxToken> tokens = [];
 
         PositionHandler.MoveNext(1);
         while (PositionHandler.CurrentPosition.Index < PositionHandler.Content.Length) {
-            FMSyntaxToken? token = GetNextToken();
+            SyntaxToken? token = GetNextToken();
 
             if (!token.HasValue) {
                 TextSpan lineSpan = PositionHandler.CurrentPosition.Line > (PositionHandler.CurrentPosition.Parent?.Line ?? 1)
@@ -37,70 +37,96 @@ public class FMLexer : ILexer<FMSyntaxToken, DefaultSyntaxError> {
                 tokens.Add(token.Value);
         }
 
-        tokens.Add(new FMSyntaxToken("EndOfFile", SyntaxTokenKind.EndOfFile, new TextSpan(PositionHandler.CurrentPosition.Index, 0)));
+        tokens.Add(new SyntaxToken("", SyntaxTokenKind.EndOfFile, new TextSpan(PositionHandler.CurrentPosition.Index, 0)));
         return [.. tokens];
     }
 
     public ImmutableArray<DefaultSyntaxError> GetSyntaxErrors() => syntaxErrors.ToImmutableArray();
+
     #region Lexing
 
-    private FMSyntaxToken? GetNextToken() {
+    private SyntaxToken? GetNextToken() {
         // First check for null
         if (PositionHandler!.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
             return null;
 
         // Check Whitespace
-        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE) {
-            PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE);
-            return new FMSyntaxToken(" ", SyntaxTokenKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent());
-        }
+        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE)
+            return GetWhitespace();
 
         // Check NewLine
-        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR) {
-            PositionHandler.NewLine();
-            return new FMSyntaxToken("\n\r", SyntaxTokenKind.EndOfLine, PositionHandler.CurrentPosition.GetSpanToParent());
-        }
+        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR)
+            return GetNewLine();
 
         // Check commands
-        if (char.IsAsciiLetter(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content))) {
-            PositionHandler.MoveNextWhile(1, e => char.IsAsciiLetter(e.GetValue(PositionHandler.Content)));
-
-            return PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content) switch {
-                "COPY" => (FMSyntaxToken?)new FMSyntaxToken("COPY", SyntaxTokenKind.CopyKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                "MOVE" => (FMSyntaxToken?)new FMSyntaxToken("MOVE", SyntaxTokenKind.MoveKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                "FROM" => (FMSyntaxToken?)new FMSyntaxToken("FROM", SyntaxTokenKind.FromKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                "TO" => (FMSyntaxToken?)new FMSyntaxToken("TO", SyntaxTokenKind.ToKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                "FILE" => (FMSyntaxToken?)new FMSyntaxToken("FILE", SyntaxTokenKind.FileKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                "DIR" => (FMSyntaxToken?)new FMSyntaxToken("DIR", SyntaxTokenKind.DirectoryKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
-                _ => null,
-            };
-        }
+        if (char.IsAsciiLetter(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)))
+            return GetCommand();
 
         // Check numbers
-        if (char.IsAsciiDigit(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content))) {
-            PositionHandler.MoveNextWhile(1, e => char.IsAsciiDigit(e.GetValue(PositionHandler.Content)));
-            if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
-                return null;
-
-            return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.NumericLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
-        }
+        if (char.IsAsciiDigit(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)))
+            return GetNumericLiteral();
 
         // Check single chars
         switch (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)) {
             case ';':
-                FMSyntaxToken token = new FMSyntaxToken(";", SyntaxTokenKind.Semicolon, new TextSpan(PositionHandler.CurrentPosition.Index, 1));
-                PositionHandler.MoveNext(1);
-                return token;
+                return GetSemicolon();
             case '"':
-                PositionHandler.MoveNextDoWhile(1, e => e.GetValue(PositionHandler.Content) != '"');
-                if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
-                    return null;
-
-                PositionHandler.Skip(1); // Add second '"' to GetStringToParent value
-                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
+                return GetStringLiteral();
+            case '-':
+                return GetCommandModifier();
         }
 
         return null;
+    }
+
+    private SyntaxToken GetWhitespace() {
+        PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE);
+        return new SyntaxToken(" ", SyntaxTokenKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent());
+    }
+    private SyntaxToken GetNewLine() {
+        PositionHandler.NewLine();
+        return new SyntaxToken("\n\r", SyntaxTokenKind.EndOfLine, PositionHandler.CurrentPosition.GetSpanToParent());
+    }
+    private SyntaxToken GetSemicolon() {
+        SyntaxToken token = new SyntaxToken(";", SyntaxTokenKind.Semicolon, new TextSpan(PositionHandler.CurrentPosition.Index, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+    private SyntaxToken GetStringLiteral() {
+        PositionHandler.MoveNextDoWhile(1, e => e.GetValue(PositionHandler.Content) != '"');
+        PositionHandler.Skip(1); // Add second '"' to GetStringToParent value
+        return new SyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
+    }
+    private SyntaxToken GetNumericLiteral() {
+        PositionHandler.MoveNextWhile(1, e => char.IsAsciiDigit(e.GetValue(PositionHandler.Content)));
+        return new SyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.NumericLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
+    }
+    private SyntaxToken? GetCommand() {
+        PositionHandler.MoveNextWhile(1, e => char.IsAsciiLetter(e.GetValue(PositionHandler.Content)));
+        string value = PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content);
+        return value.ToLower() switch {
+            "copy" => new SyntaxToken(value, SyntaxTokenKind.CopyKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+            "move" => new SyntaxToken(value, SyntaxTokenKind.MoveKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+            "replace" => new SyntaxToken(value, SyntaxTokenKind.ReplaceKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+            "to" => new SyntaxToken(value, SyntaxTokenKind.ToKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+            _ => null,
+        };
+    }
+    private SyntaxToken? GetCommandModifier() {
+        PositionHandler.MoveNextWhile(1, 1, e => char.IsAsciiLetter(e.GetValue(PositionHandler.Content)));
+        string value = PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content);
+
+        switch (value.ToLower()) {
+            case "-file":
+            case "-f":
+                return new SyntaxToken(value, SyntaxTokenKind.FileModifierKeyword, PositionHandler.CurrentPosition.GetSpanToParent());
+            case "-directory":
+            case "-dir":
+            case "-d":
+                return new SyntaxToken(value, SyntaxTokenKind.DirectoryModifierKeyword, PositionHandler.CurrentPosition.GetSpanToParent());
+            default: 
+                return null;
+        }
     }
     #endregion
 

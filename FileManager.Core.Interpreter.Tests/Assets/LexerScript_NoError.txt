@@ -1,2 +1,2 @@
-﻿COPY FROM "this is a string" TO "this is a second string";
-MOVE FROM "testMove lololo" TO "anotherString";
+﻿COPY -f "this is a string" tO -dir "this is a second string";
+move -dir "testMove lololo" To -File "anotherString";

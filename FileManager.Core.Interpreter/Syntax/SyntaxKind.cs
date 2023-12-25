@@ -7,11 +7,11 @@ public enum SyntaxTokenKind {
     NumericLiteral,
     StringLiteral,
     ToKeyword,
-    FromKeyword,
-    FileKeyword,
-    DirectoryKeyword,
+    FileModifierKeyword,
+    DirectoryModifierKeyword,
     CopyKeyword,
-    MoveKeyword
+    MoveKeyword,
+    ReplaceKeyword
 }
 
 public enum SyntaxNodeKind {

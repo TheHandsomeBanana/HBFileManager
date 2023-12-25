@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
-public class LiteralExpressionSyntax : SyntaxNode {
-    public LiteralExpressionSyntax(TextSpan span, SyntaxNode parent) : base(span, parent) {
+public class InterpreterUnitSyntax : SyntaxNode {
+    public InterpreterUnitSyntax(TextSpan span, SyntaxNode? parent = null) : base(span, parent) {
     }
 }

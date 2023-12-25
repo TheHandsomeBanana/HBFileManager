@@ -18,16 +18,16 @@ public class LexerTests : TestBase.TestBase {
     [TestMethod]
     public void Lex_Positive() {
         FMLexer lexer = new FMLexer();
-        ImmutableArray<FMSyntaxToken> foundTokens = lexer.Lex(scriptNoError);
+        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(scriptNoError);
         TextSpan[] spans = foundTokens.Select(e => e.Span).ToArray();
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
         Assert.AreEqual(0, foundSyntaxErrors.Length);
-     }
+    }
 
     [TestMethod]
     public void Lex_Negative() {
         FMLexer lexer = new FMLexer();
-        ImmutableArray<FMSyntaxToken> foundTokens = lexer.Lex(scriptError);
+        ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(scriptError);
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
 
     }
