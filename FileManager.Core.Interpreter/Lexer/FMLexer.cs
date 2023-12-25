@@ -1,22 +1,16 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
+using HB.Code.Interpreter;
 using HB.Code.Interpreter.Exceptions;
 using HB.Code.Interpreter.Lexer;
-using HB.Code.Interpreter.Location;
+using HB.Code.Interpreter.Lexer.Default;
 using System.Collections.Immutable;
 using System.Text;
 using Unity;
 
 namespace FileManager.Core.Interpreter.Lexer;
 public class FMLexer : ILexer<FMSyntaxToken> {
-
-    [Dependency]
-    public IPositionHandler<FMPosition>? PositionHandler { get; set; }
-
-    private FMPositionHandler InternalPositionHandler => (FMPositionHandler)PositionHandler!;
+    private DefaultPositionHandler PositionHandler = new DefaultPositionHandler();
     public ImmutableArray<FMSyntaxToken> Lex(string input) {
-        if (PositionHandler is null)
-            return [];
-
         PositionHandler.Init(input);
 
         List<FMSyntaxToken> tokens = [];
@@ -25,8 +19,8 @@ public class FMLexer : ILexer<FMSyntaxToken> {
         while (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) != CommonCharCollection.NULL) {
             FMSyntaxToken token = GetNextToken() 
                 ?? throw new LexerException($"Syntax error at [Line {PositionHandler.CurrentPosition.Line} " 
-                + $"{GetTextSpan(PositionHandler.CurrentPosition.Previous?.LineIndex ?? 0, PositionHandler.CurrentPosition.LineIndex)}]: "
-                + $"{PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content)}");
+                + $"{GetTextSpan(PositionHandler.CurrentPosition.Parent?.LineIndex ?? 0, PositionHandler.CurrentPosition.LineIndex)}]: "
+                + $"{PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content)}");
             tokens.Add(token);
         }
 
@@ -44,29 +38,26 @@ public class FMLexer : ILexer<FMSyntaxToken> {
         // Check Whitespace
         if(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE) {
             PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE);
-            return new FMSyntaxToken(" ", SyntaxTokenKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanFromPrevious());
+            return new FMSyntaxToken(" ", SyntaxTokenKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent());
         }
 
         // Check NewLine
         if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR) {
-            PositionHandler.MoveNext(0);
-            PositionHandler.Skip(2);
-            InternalPositionHandler.NewLine();
-            FMSyntaxToken token = new FMSyntaxToken("\n\r", SyntaxTokenKind.EndOfLine, PositionHandler.CurrentPosition.GetSpanFromPrevious());
-            return token;
+            PositionHandler.NewLine();
+            return new FMSyntaxToken("\n\r", SyntaxTokenKind.EndOfLine, PositionHandler.CurrentPosition.GetSpanToParent());
         }
         
         // Check commands
         if (char.IsAsciiLetter(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content))) {
             PositionHandler.MoveNextWhile(1, e => char.IsAsciiLetter(e.GetValue(PositionHandler.Content)));
 
-            return PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content) switch {
-                "COPY" => (FMSyntaxToken?)new FMSyntaxToken("COPY", SyntaxTokenKind.CopyKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
-                "MOVE" => (FMSyntaxToken?)new FMSyntaxToken("MOVE", SyntaxTokenKind.MoveKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
-                "FROM" => (FMSyntaxToken?)new FMSyntaxToken("FROM", SyntaxTokenKind.FromKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
-                "TO" => (FMSyntaxToken?)new FMSyntaxToken("TO", SyntaxTokenKind.ToKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
-                "FILE" => (FMSyntaxToken?)new FMSyntaxToken("FILE", SyntaxTokenKind.FileKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
-                "DIR" => (FMSyntaxToken?)new FMSyntaxToken("DIR", SyntaxTokenKind.DirectoryKeyword, PositionHandler.CurrentPosition.GetSpanFromPrevious()),
+            return PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content) switch {
+                "COPY" => (FMSyntaxToken?)new FMSyntaxToken("COPY", SyntaxTokenKind.CopyKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+                "MOVE" => (FMSyntaxToken?)new FMSyntaxToken("MOVE", SyntaxTokenKind.MoveKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+                "FROM" => (FMSyntaxToken?)new FMSyntaxToken("FROM", SyntaxTokenKind.FromKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+                "TO" => (FMSyntaxToken?)new FMSyntaxToken("TO", SyntaxTokenKind.ToKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+                "FILE" => (FMSyntaxToken?)new FMSyntaxToken("FILE", SyntaxTokenKind.FileKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
+                "DIR" => (FMSyntaxToken?)new FMSyntaxToken("DIR", SyntaxTokenKind.DirectoryKeyword, PositionHandler.CurrentPosition.GetSpanToParent()),
                 _ => null,
             };
         }
@@ -77,7 +68,7 @@ public class FMLexer : ILexer<FMSyntaxToken> {
             if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
                 return null;
 
-            return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content), SyntaxTokenKind.NumericLiteral, PositionHandler.CurrentPosition.GetSpanFromPrevious());
+            return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content), SyntaxTokenKind.NumericLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
         }
 
         // Check single chars
@@ -87,13 +78,12 @@ public class FMLexer : ILexer<FMSyntaxToken> {
                 PositionHandler.MoveNext(1);
                 return token;
             case '"':
-                PositionHandler.Skip(1); // Skip '"'
-                PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) != '"');
+                PositionHandler.MoveNextDoWhile(1, e => e.GetValue(PositionHandler.Content) != '"');
                 if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
                     return null;
 
-                PositionHandler.Skip(1); // Skip '"'
-                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringFromPrevious(PositionHandler.Content).TrimStart('"').TrimEnd('"'), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanFromPrevious());
+                PositionHandler.Skip(1); // Add second '"' to GetStringToParent value
+                return new FMSyntaxToken(PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content).TrimStart('"').TrimEnd('"'), SyntaxTokenKind.StringLiteral, PositionHandler.CurrentPosition.GetSpanToParent());
         }
 
         return null;

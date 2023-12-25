@@ -1,7 +1,6 @@
 using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Syntax;
 using HB.Code.Interpreter.Lexer;
-using HB.Code.Interpreter.Location;
 using HB.DependencyInjection.Unity;
 using Unity;
 
@@ -13,7 +12,6 @@ public abstract class TestBase {
 
     public TestBase() {
         UnityContainer = UnityBase.CreateOrGetChildContainer("TestContainer");
-        UnityContainer.RegisterType(typeof(ILexer<FMSyntaxToken>), typeof(FMLexer))
-            .RegisterType(typeof(IPositionHandler<FMPosition>), typeof(FMPositionHandler));
+        UnityContainer.RegisterType(typeof(ILexer<FMSyntaxToken>), typeof(FMLexer));
     }
 }

@@ -1,4 +1,4 @@
-﻿using HB.Code.Interpreter.Location;
+﻿using HB.Code.Interpreter;
 using HB.Code.Interpreter.Syntax;
 
 namespace FileManager.Core.Interpreter.Syntax;
