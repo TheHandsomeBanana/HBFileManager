@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public class ExpressionSyntax : SyntaxNode {
-    public ExpressionSyntax(TextSpan span, SyntaxNode parent) : base(span, parent) {
+    public ExpressionSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
     }
 }

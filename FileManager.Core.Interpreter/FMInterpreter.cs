@@ -14,17 +14,29 @@ public class FMInterpreter : IInterpreter {
     private readonly FMLexer lexer = new FMLexer();
     private readonly FMParser parser = new FMParser();
 
-    public void Run(string input) {
+    private IEnumerable<string> errors = Enumerable.Empty<string>();
+
+    public void Run(string input) => RunInternal(input);
+
+    public void RunFromFile(string filePath) {
+        string input = File.ReadAllText(filePath);
+        RunInternal(input, filePath);
+    }
+    public ImmutableArray<string> GetErrors() => errors.ToImmutableArray();
+
+    private void RunInternal(string input, string? filePath = null) {
         ImmutableArray<SyntaxToken> tokens = lexer!.Lex(input);
-        ImmutableArray<DefaultSyntaxError> errors = lexer.GetSyntaxErrors();
-        if (errors.Length > 0) {
-
+        errors = lexer.GetSyntaxErrors().Select(e => e.ToString()!);
+        if (errors.Any())
             return;
-        }
-
 
         SyntaxTree syntaxTree = parser!.Parse(tokens);
+        syntaxTree.FilePath = filePath;
+        errors = parser.GetSyntaxErrors().Select(e => e.ToString()!);
 
+        if (errors.Any())
+            return;
 
+        
     }
 }

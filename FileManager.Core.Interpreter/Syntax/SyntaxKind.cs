@@ -15,10 +15,15 @@ public enum SyntaxTokenKind {
 }
 
 public enum SyntaxNodeKind {
+    InterpreterUnit,
     NumericLiteral,
     StringLiteral,
-    CommandStatement,
-
+    CopyCommand,
+    CopyCommandStatement,
+    MoveCommand,
+    MoveCommandStatement,
+    ReplaceCommand,
+    ReplaceCommandStatement,
 }
 
 

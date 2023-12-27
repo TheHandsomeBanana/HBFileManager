@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public class InterpreterUnitSyntax : SyntaxNode {
-    public InterpreterUnitSyntax(TextSpan span, SyntaxNode? parent = null) : base(span, parent) {
+    public InterpreterUnitSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
     }
 }
