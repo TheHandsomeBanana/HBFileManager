@@ -1,7 +1,9 @@
-﻿using FileManager.Core.Interpreter.Lexer;
+﻿using FileManager.Core.Interpreter.Evaluator;
+using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Parser;
 using FileManager.Core.Interpreter.Syntax;
 using HB.Code.Interpreter;
+using HB.Code.Interpreter.Evaluator.Default;
 using HB.Code.Interpreter.Lexer;
 using HB.Code.Interpreter.Lexer.Default;
 using HB.Code.Interpreter.Parser;
@@ -11,8 +13,9 @@ using Unity;
 
 namespace FileManager.Core.Interpreter;
 public class FMInterpreter : IInterpreter {
-    private readonly FMLexer lexer = new FMLexer();
-    private readonly FMParser parser = new FMParser();
+    private readonly static FMLexer lexer = new FMLexer();
+    private readonly static FMParser parser = new FMParser();
+    private readonly static FMSemanticEvaluator evaluator = new FMSemanticEvaluator();
 
     private IEnumerable<string> errors = Enumerable.Empty<string>();
 
@@ -40,6 +43,9 @@ public class FMInterpreter : IInterpreter {
         if (errors.Any())
             return;
 
-        
+        ImmutableArray<DefaultSemanticError> semanticErrors = evaluator.Evaluate(syntaxTree, input);
+        errors = semanticErrors.Select(e => e.ToString()!);
+        if(semanticErrors.Any())
+            return;
     }
 }

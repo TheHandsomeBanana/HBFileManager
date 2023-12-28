@@ -13,7 +13,7 @@ namespace FileManager.Core.Interpreter.Tests;
 [TestClass]
 public class ParserTests : TestBase.TestBase {
     [TestMethod]
-    public void Parse_Positive() {
+    public void Parse_PositiveTest() {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptNoError);
 
@@ -30,7 +30,7 @@ public class ParserTests : TestBase.TestBase {
     }
 
     [TestMethod]
-    public void Parse_Negative() {
+    public void Parse_NegativeTest() {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptError);
 
