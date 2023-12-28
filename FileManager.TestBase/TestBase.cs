@@ -9,8 +9,10 @@ namespace FileManager.TestBase;
 
 [TestClass]
 public abstract class TestBase {
-    protected readonly string ScriptNoError = File.ReadAllText("../../../Assets/LexerScript_NoError.txt");
-    protected readonly string ScriptError = File.ReadAllText("../../../Assets/LexerScript_Error.txt");
+    protected readonly string LexerScriptNoError = File.ReadAllText("../../../Assets/LexerScript_NoError.txt");
+    protected readonly string LexerScriptError = File.ReadAllText("../../../Assets/LexerScript_Error.txt");
+    protected readonly string ParserScriptNoError = File.ReadAllText("../../../Assets/ParserScript_NoError.txt");
+    protected readonly string ParserScriptError = File.ReadAllText("../../../Assets/ParserScript_Error.txt");
     protected IUnityContainer UnityContainer { get; }
 
     public TestBase() {

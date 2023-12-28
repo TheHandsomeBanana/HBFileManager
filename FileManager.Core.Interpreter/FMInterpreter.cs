@@ -32,8 +32,11 @@ public class FMInterpreter : IInterpreter {
 
         SyntaxTree syntaxTree = parser!.Parse(tokens);
         syntaxTree.FilePath = filePath;
-        errors = parser.GetSyntaxErrors().Select(e => e.ToString()!);
-
+        errors = parser.GetSyntaxErrors().Select(e => {
+            e.SetAffected(input);
+            return e.ToString();
+        });
+        
         if (errors.Any())
             return;
 

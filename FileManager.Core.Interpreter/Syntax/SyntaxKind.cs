@@ -1,29 +1,36 @@
 ﻿namespace FileManager.Core.Interpreter.Syntax;
-public enum SyntaxTokenKind {
+public enum SyntaxTriviaKind {
     WhiteSpace,
     EndOfLine,
+}
+
+public enum SyntaxTokenKind {
+    BlockStart,
+    BlockEnd,
     EndOfFile,
     Semicolon,
     NumericLiteral,
     StringLiteral,
     ToKeyword,
-    FileModifierKeyword,
-    DirectoryModifierKeyword,
     CopyKeyword,
     MoveKeyword,
-    ReplaceKeyword
+    ReplaceKeyword,
+    FileModifierKeyword,
+    DirectoryModifierKeyword,
+    ModifiedOnlyModifierKeyword,
 }
 
 public enum SyntaxNodeKind {
     InterpreterUnit,
     NumericLiteral,
     StringLiteral,
-    CopyCommand,
-    CopyCommandStatement,
-    MoveCommand,
-    MoveCommandStatement,
-    ReplaceCommand,
-    ReplaceCommandStatement,
+    CommandBlock,
+    ExpressionStatement,
+    CopyCommandExpression,
+    MoveCommandExpression,
+    ReplaceCommandExpression,
+    ToCommandExpression,
+    CommandModifierList
 }
 
 

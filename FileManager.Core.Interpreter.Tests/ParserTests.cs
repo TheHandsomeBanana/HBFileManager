@@ -1,6 +1,7 @@
 ﻿using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Parser;
 using FileManager.Core.Interpreter.Syntax;
+using HB.Code.Interpreter.Lexer.Default;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -14,10 +15,16 @@ public class ParserTests : TestBase.TestBase {
     [TestMethod]
     public void Parse_Positive() {
         FMLexer lexer = new FMLexer();
-        ImmutableArray<SyntaxToken> tokens = lexer.Lex(ScriptNoError);
+        ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptNoError);
 
         FMParser parser = new FMParser();
-        parser.Parse(tokens);
-        
+        SyntaxTree tree = parser.Parse(tokens);
+
+        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors().Select(e => {
+            e.SetAffected(ParserScriptNoError);
+            return e.ToString();
+        }).ToImmutableArray();
+
+        Assert.IsNotNull(tree);
     }
 }

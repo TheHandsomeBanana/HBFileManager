@@ -1,8 +1,9 @@
 ﻿using HB.Code.Interpreter;
 
 namespace FileManager.Core.Interpreter.Syntax;
-public class ExpressionStatementSyntax : SyntaxNode {
-
-    public ExpressionStatementSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
+public sealed class ExpressionStatementSyntax : SyntaxNode {
+    public ExpressionSyntax? Expression { get; set; }
+    public ExpressionStatementSyntax(SyntaxNodeKind kind) : base(kind) {
     }
+
 }

@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
-public class CommandStatementSyntax : ExpressionStatementSyntax {
-    public CommandSyntax[] Commands { get; set; } = [];
-    
-    public CommandStatementSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
+public class BlockSyntax : SyntaxNode {
+    public ExpressionStatementSyntax[] Statements => ChildNodes.OfType<ExpressionStatementSyntax>().ToArray();
+    public BlockSyntax(SyntaxNodeKind kind) : base(kind) {
     }
-    
+
+
 }

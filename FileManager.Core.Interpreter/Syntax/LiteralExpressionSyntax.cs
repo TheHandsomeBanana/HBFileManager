@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public class LiteralExpressionSyntax : SyntaxNode {
-    public LiteralExpressionSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
+    public SyntaxToken Literal { get; }
+    public LiteralExpressionSyntax(SyntaxNodeKind kind) : base(kind) {
     }
 }

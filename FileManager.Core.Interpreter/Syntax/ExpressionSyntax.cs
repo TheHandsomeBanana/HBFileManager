@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
-public class ExpressionSyntax : SyntaxNode {
-    public ExpressionSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
+public abstract class ExpressionSyntax : SyntaxNode {
+    protected ExpressionSyntax(SyntaxNodeKind kind) : base(kind) {
     }
 }

@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax;
-public class CommandSyntax : ExpressionSyntax {
-    public CommandSyntax(TextSpan span, SyntaxNodeKind kind) : base(span, kind) {
+public sealed class CommandModifierListSyntax : SyntaxNode {
+    public SyntaxToken[] CommandModifiers => ChildTokens.ToArray();
+    public CommandModifierListSyntax(SyntaxNodeKind kind) : base(kind) {
     }
 }

@@ -1,0 +1,8 @@
+﻿COPY -f "this is a string";
+TO -dir "this is a second string";
+
+{
+	COPY -f "this is a string";
+	MOVE -dir "testMove lololo";
+	TO -dir "directory";
+}
