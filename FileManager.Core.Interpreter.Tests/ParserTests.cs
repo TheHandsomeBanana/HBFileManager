@@ -26,5 +26,22 @@ public class ParserTests : TestBase.TestBase {
         }).ToImmutableArray();
 
         Assert.IsNotNull(tree);
+        Assert.AreEqual(0, syntaxErrors.Length);
+    }
+
+    [TestMethod]
+    public void Parse_Negative() {
+        FMLexer lexer = new FMLexer();
+        ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptError);
+
+        FMParser parser = new FMParser();
+        SyntaxTree tree = parser.Parse(tokens);
+
+        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors().Select(e => {
+            e.SetAffected(ParserScriptError);
+            return e.ToString();
+        }).ToImmutableArray();
+
+        Assert.IsNotNull(tree);
     }
 }
