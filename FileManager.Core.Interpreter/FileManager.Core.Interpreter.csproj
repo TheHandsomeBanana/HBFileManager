@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\HB\HB.Code.Interpreter\HB.Code.Interpreter.csproj" />
+    <ProjectReference Include="..\..\HB\HB.Common\HB.Common.csproj" />
     <ProjectReference Include="..\..\HB\HB.DependencyInjection.Unity\HB.DependencyInjection.Unity.csproj" />
   </ItemGroup>
 

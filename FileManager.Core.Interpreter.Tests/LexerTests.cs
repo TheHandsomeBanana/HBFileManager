@@ -18,9 +18,13 @@ public class LexerTests : TestBase.TestBase {
     public void Lex_PositiveTest() {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(LexerScriptNoError);
-        TextSpan[] spans = foundTokens.Select(e => e.FullSpan).ToArray();
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
         Assert.AreEqual(0, foundSyntaxErrors.Length);
+
+        Assert.AreEqual(15, foundTokens.Length);
+        Assert.AreEqual(SyntaxTokenKind.CopyKeyword, foundTokens[0].Kind);
+        Assert.AreEqual(SyntaxTokenKind.Semicolon, foundTokens[6].Kind);
+        Assert.AreEqual(SyntaxTokenKind.EndOfFile, foundTokens[14].Kind);
     }
 
     [TestMethod]
@@ -28,6 +32,15 @@ public class LexerTests : TestBase.TestBase {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> foundTokens = lexer.Lex(LexerScriptError);
         ImmutableArray<DefaultSyntaxError> foundSyntaxErrors = lexer.GetSyntaxErrors();
+        Assert.AreEqual(11, foundTokens.Length);
+        Assert.AreEqual(6, foundSyntaxErrors.Length);
 
+        Assert.AreEqual("-", foundSyntaxErrors[0].Affected);
+        Assert.AreEqual(new TextSpan(5, 1), foundSyntaxErrors[0].FullSpan);
+        Assert.AreEqual(new LineSpan(1, 5, 1), foundSyntaxErrors[0].LineSpan);
+
+        Assert.AreEqual("ERROR", foundSyntaxErrors[5].Affected);
+        Assert.AreEqual(new TextSpan(107, 5), foundSyntaxErrors[5].FullSpan);
+        Assert.AreEqual(new LineSpan(2, 47, 5), foundSyntaxErrors[5].LineSpan);
     }
 }

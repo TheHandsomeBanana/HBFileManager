@@ -22,6 +22,11 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         while (PositionHandler.CurrentPosition.Index < PositionHandler.Content.Length) {
             SyntaxToken? token = GetNextToken();
 
+            // Skip last iteration token check
+            // --> would be empty syntax error, need last iteration for possible trivia
+            if(PositionHandler.CurrentPosition.Index >= PositionHandler.Content.Length)
+                continue;
+            
             if (!token.HasValue) {
                 syntaxErrors.Add(new DefaultSyntaxError(
                     PositionHandler.CurrentPosition.GetSpanToParent(),

@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Evaluator;
-public class FMSemanticEvaluator : ISemanticEvaluator<SyntaxTree, DefaultSemanticError> {
+public class FMEvaluator : ISemanticEvaluator<SyntaxTree, DefaultSemanticError> {
     public ImmutableArray<DefaultSemanticError> Evaluate(SyntaxTree syntaxTree, string content) {
         throw new NotImplementedException();
     }
