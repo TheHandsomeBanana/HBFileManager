@@ -22,12 +22,13 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         while (PositionHandler.CurrentPosition.Index < PositionHandler.Content.Length) {
             SyntaxToken? token = GetNextToken();
 
-            // Skip last iteration token check
-            // --> would be empty syntax error, need last iteration for possible trivia
-            if(PositionHandler.CurrentPosition.Index >= PositionHandler.Content.Length)
-                continue;
-            
+
+
             if (!token.HasValue) {
+                // Skip last iteration syntax error --> would be empty
+                if (PositionHandler.CurrentPosition.Index >= PositionHandler.Content.Length)
+                    continue;
+
                 syntaxErrors.Add(new DefaultSyntaxError(
                     PositionHandler.CurrentPosition.GetSpanToParent(),
                     PositionHandler.CurrentPosition.GetLineSpanToParent(),
@@ -53,31 +54,34 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         // First check for null
         if (PositionHandler!.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.NULL)
             return null;
-        
-        // Check Whitespace
-        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE)
-            AddWhitespaceTrivia();
 
-        // Check Tab
-        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.TAB)
-            AddWhitespaceTriviaFromTab();
+        char currentValue = PositionHandler.CurrentPosition.GetValue(PositionHandler.Content);
+        while (currentValue == CommonCharCollection.SPACE || currentValue == CommonCharCollection.TAB || currentValue == CommonCharCollection.CR) {
+            // Check Whitespace
+            if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.SPACE)
+                AddWhitespaceTrivia();
 
-        // Check NewLine
-        if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR)
-            AddNewLineTrivia();
+            // Check Tab
+            if (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.TAB)
+                AddTabTrivia();
 
+            // Check NewLine
+            while (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content) == CommonCharCollection.CR)
+                AddNewLineTrivia();
 
+            currentValue = PositionHandler.CurrentPosition.GetValue(PositionHandler.Content);
+        }
 
         // Check commands
-        if (char.IsAsciiLetter(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)))
+        if (char.IsAsciiLetter(currentValue))
             return GetCommand();
 
         // Check numbers
-        if (char.IsAsciiDigit(PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)))
+        if (char.IsAsciiDigit(currentValue))
             return GetNumericLiteral();
 
         // Check single chars
-        switch (PositionHandler.CurrentPosition.GetValue(PositionHandler.Content)) {
+        switch (currentValue) {
             case ';':
                 return GetSemicolon();
             case '"':
@@ -89,6 +93,9 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
             case '}':
                 return GetBlockEnd();
         }
+
+
+
 
         PositionHandler.MoveNext(1);
         return null;
@@ -118,13 +125,13 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
 
         last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent()));
     }
-    private void AddWhitespaceTriviaFromTab() {
-        PositionHandler.MoveNext(4);
+    private void AddTabTrivia() {
+        PositionHandler.MoveNext(1);
         SyntaxToken? last = tokens.LastOrDefault();
         if (!last.HasValue)
             return;
 
-        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent()));
+        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.Tab, PositionHandler.CurrentPosition.GetSpanToParent()));
     }
     private void AddNewLineTrivia() {
         PositionHandler.NewLine();

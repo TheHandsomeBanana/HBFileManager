@@ -16,6 +16,7 @@ public class ParserTests : TestBase.TestBase {
     public void Parse_PositiveTest() {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptNoError);
+        Assert.AreEqual(0, lexer.GetSyntaxErrors().Length);
 
         FMParser parser = new FMParser();
         SyntaxTree tree = parser.Parse(tokens);
@@ -33,6 +34,7 @@ public class ParserTests : TestBase.TestBase {
     public void Parse_NegativeTest() {
         FMLexer lexer = new FMLexer();
         ImmutableArray<SyntaxToken> tokens = lexer.Lex(ParserScriptError);
+        Assert.AreEqual(0, lexer.GetSyntaxErrors().Length);
 
         FMParser parser = new FMParser();
         SyntaxTree tree = parser.Parse(tokens);

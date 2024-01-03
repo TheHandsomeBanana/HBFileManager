@@ -1,6 +1,7 @@
 ﻿namespace FileManager.Core.Interpreter.Syntax;
 public enum SyntaxTriviaKind {
     WhiteSpace,
+    Tab,
     EndOfLine,
 }
 
