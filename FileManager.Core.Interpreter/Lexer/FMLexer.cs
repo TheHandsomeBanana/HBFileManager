@@ -126,7 +126,7 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.WhiteSpace, PositionHandler.CurrentPosition.GetSpanToParent()));
     }
     private void AddTabTrivia() {
-        PositionHandler.MoveNext(1);
+        PositionHandler.MoveNextWhile(1, e => e.GetValue(PositionHandler.Content) == CommonCharCollection.TAB);
         SyntaxToken? last = tokens.LastOrDefault();
         if (!last.HasValue)
             return;
