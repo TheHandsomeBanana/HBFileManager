@@ -6,32 +6,40 @@ public enum SyntaxTriviaKind {
 }
 
 public enum SyntaxTokenKind {
-    BlockStart,
-    BlockEnd,
     EndOfFile,
+    OpenBrace,
+    CloseBrace,
+    OpenParenthesis,
+    CloseParenthesis,
+    Comma,
+    Pipe,
+    Equals,
     Semicolon,
     NumericLiteral,
     StringLiteral,
-    ToKeyword,
     CopyKeyword,
     MoveKeyword,
     ReplaceKeyword,
-    FileModifierKeyword,
-    DirectoryModifierKeyword,
-    ModifiedOnlyModifierKeyword,
+    SourceParameter,
+    TargetParameter,
+    ModifiedOnlyParameter,
 }
 
 public enum SyntaxNodeKind {
     InterpreterUnit,
     NumericLiteral,
     StringLiteral,
-    CommandBlock,
-    ExpressionStatement,
-    CopyCommandExpression,
-    MoveCommandExpression,
-    ReplaceCommandExpression,
-    ToCommandExpression,
-    CommandModifierList
+    Argument,
+    ArgumentList,
+    CommandStatement,
+    CopyCommand,
+    MoveCommand,
+    ReplaceCommand,
+    CommandParameterList,
+    CommandSourceParameter,
+    CommandTargetParameter,
+    CommandModifiedOnlyParamater,
+    CommandParameterAssignment
 }
 
 

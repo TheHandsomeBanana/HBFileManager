@@ -17,12 +17,10 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         syntaxErrors.Clear();
         tokens.Clear();
         PositionHandler.Init(input);
-        
+
         PositionHandler.MoveNext(1);
         while (PositionHandler.CurrentPosition.Index < PositionHandler.Content.Length) {
             SyntaxToken? token = GetNextToken();
-
-
 
             if (!token.HasValue) {
                 // Skip last iteration syntax error --> would be empty
@@ -32,17 +30,18 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
                 syntaxErrors.Add(new DefaultSyntaxError(
                     PositionHandler.CurrentPosition.GetSpanToParent(),
                     PositionHandler.CurrentPosition.GetLineSpanToParent(),
-                    PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content)));
+                    PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content),
+                    "Invalid input"));
             }
             else
                 tokens.Add(token.Value);
         }
 
         tokens.Add(new SyntaxToken("",
-            SyntaxTokenKind.EndOfFile, 
+            SyntaxTokenKind.EndOfFile,
             new TextSpan(PositionHandler.CurrentPosition.Index, 0),
             new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 0)));
-        
+
         return [.. tokens];
     }
 
@@ -84,14 +83,24 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         switch (currentValue) {
             case ';':
                 return GetSemicolon();
+            case ',':
+                return GetComma();
             case '"':
                 return GetStringLiteral();
             case '-':
                 return GetCommandModifier();
             case '{':
-                return GetBlockStart();
+                return GetOpenBrace();
             case '}':
-                return GetBlockEnd();
+                return GetCloseBrace();
+            case '(':
+                return GetOpenParen();
+            case ')':
+                return GetCloseParen();
+            case '|':
+                return GetPipe();
+            case '=':
+                return GetEquals();
         }
 
 
@@ -101,17 +110,60 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         return null;
     }
 
-    private SyntaxToken GetBlockStart() {
-        SyntaxToken token = new SyntaxToken("{", 
-            SyntaxTokenKind.BlockStart, 
+    private SyntaxToken? GetEquals() {
+        SyntaxToken token = new SyntaxToken("=",
+                                  SyntaxTokenKind.Equals,
+                                  new TextSpan(PositionHandler.CurrentPosition.Index, 1),
+                                  new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+
+    private SyntaxToken? GetPipe() {
+        SyntaxToken token = new SyntaxToken("|",
+                           SyntaxTokenKind.Pipe,
+                           new TextSpan(PositionHandler.CurrentPosition.Index, 1),
+                           new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+
+    private SyntaxToken GetComma() {
+        SyntaxToken token = new SyntaxToken(",",
+                    SyntaxTokenKind.Comma,
+                    new TextSpan(PositionHandler.CurrentPosition.Index, 1),
+                    new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+
+    private SyntaxToken GetOpenBrace() {
+        SyntaxToken token = new SyntaxToken("{",
+            SyntaxTokenKind.OpenBrace,
             new TextSpan(PositionHandler.CurrentPosition.Index, 1),
             new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
         PositionHandler.MoveNext(1);
         return token;
     }
-    private SyntaxToken GetBlockEnd() {
-        SyntaxToken token = new SyntaxToken("}", 
-            SyntaxTokenKind.BlockEnd, 
+    private SyntaxToken GetCloseBrace() {
+        SyntaxToken token = new SyntaxToken("}",
+            SyntaxTokenKind.CloseBrace,
+            new TextSpan(PositionHandler.CurrentPosition.Index, 1),
+            new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+    private SyntaxToken GetOpenParen() {
+        SyntaxToken token = new SyntaxToken("(",
+            SyntaxTokenKind.OpenParenthesis,
+            new TextSpan(PositionHandler.CurrentPosition.Index, 1),
+            new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
+        PositionHandler.MoveNext(1);
+        return token;
+    }
+    private SyntaxToken GetCloseParen() {
+        SyntaxToken token = new SyntaxToken(")",
+            SyntaxTokenKind.CloseParenthesis,
             new TextSpan(PositionHandler.CurrentPosition.Index, 1),
             new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
         PositionHandler.MoveNext(1);
@@ -143,7 +195,7 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
     }
     private SyntaxToken GetSemicolon() {
         SyntaxToken token = new SyntaxToken(";",
-            SyntaxTokenKind.Semicolon, 
+            SyntaxTokenKind.Semicolon,
             new TextSpan(PositionHandler.CurrentPosition.Index, 1),
             new LineSpan(PositionHandler.CurrentPosition.Line, PositionHandler.CurrentPosition.LineIndex, 1));
 
@@ -181,10 +233,6 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
                 SyntaxTokenKind.ReplaceKeyword,
                 PositionHandler.CurrentPosition.GetSpanToParent(),
                 PositionHandler.CurrentPosition.GetLineSpanToParent()),
-            "to" => new SyntaxToken(value,
-                SyntaxTokenKind.ToKeyword,
-                PositionHandler.CurrentPosition.GetSpanToParent(),
-                PositionHandler.CurrentPosition.GetLineSpanToParent()),
             _ => null,
         };
     }
@@ -192,28 +240,23 @@ public class FMLexer : ILexer<SyntaxToken, DefaultSyntaxError> {
         PositionHandler.MoveNextWhile(1, 1, e => char.IsAsciiLetter(e.GetValue(PositionHandler.Content)));
         string value = PositionHandler.CurrentPosition.GetStringToParent(PositionHandler.Content);
 
-        switch (value.ToLower()) {
-            case "-file":
-            case "-f":
-                return new SyntaxToken(value, 
-                    SyntaxTokenKind.FileModifierKeyword, 
-                    PositionHandler.CurrentPosition.GetSpanToParent(),
-                    PositionHandler.CurrentPosition.GetLineSpanToParent());
-            case "-directory":
-            case "-dir":
-            case "-d":
-                return new SyntaxToken(value, 
-                    SyntaxTokenKind.DirectoryModifierKeyword, 
-                    PositionHandler.CurrentPosition.GetSpanToParent(),
-                    PositionHandler.CurrentPosition.GetLineSpanToParent());
-            case "-mo":
-                return new SyntaxToken(value,
-                    SyntaxTokenKind.ModifiedOnlyModifierKeyword,
-                    PositionHandler.CurrentPosition.GetSpanToParent(),
-                    PositionHandler.CurrentPosition.GetLineSpanToParent());
-            default:
-                return null;
-        }
+        return value.ToLower() switch {
+            "-s" or
+            "-source" => (SyntaxToken?)new SyntaxToken(value,
+                                SyntaxTokenKind.SourceParameter,
+                                PositionHandler.CurrentPosition.GetSpanToParent(),
+                                PositionHandler.CurrentPosition.GetLineSpanToParent()),
+            "-t" or
+            "-target" => (SyntaxToken?)new SyntaxToken(value,
+                                SyntaxTokenKind.TargetParameter,
+                                PositionHandler.CurrentPosition.GetSpanToParent(),
+                                PositionHandler.CurrentPosition.GetLineSpanToParent()),
+            "-mo" => (SyntaxToken?)new SyntaxToken(value,
+                                SyntaxTokenKind.ModifiedOnlyParameter,
+                                PositionHandler.CurrentPosition.GetSpanToParent(),
+                                PositionHandler.CurrentPosition.GetLineSpanToParent()),
+            _ => null,
+        };
     }
     #endregion
 

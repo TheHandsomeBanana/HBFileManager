@@ -2,6 +2,7 @@
 using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Parser;
 using FileManager.Core.Interpreter.Syntax;
+using FileManager.Core.Interpreter.Syntax.Commands;
 using HB.Code.Interpreter;
 using HB.Code.Interpreter.Evaluator.Default;
 using HB.Code.Interpreter.Lexer;
@@ -56,15 +57,10 @@ public class FMInterpreter : IInterpreter {
     }
 
     private void RunByNode(SyntaxNode node) {
-        switch (node) {
-            case CommandBlockSyntax commandBlock:
-                break;
-            case ExpressionStatementSyntax expressionStatement:
-                break;
-        }
+        
     }
 
-    private void RunCommand(CommandExpressionSyntax commandExpression) {
+    private void RunCommand(CommandStatementSyntax commandExpression) {
 
     }
 }

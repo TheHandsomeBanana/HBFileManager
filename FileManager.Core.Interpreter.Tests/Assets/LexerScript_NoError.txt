@@ -1,2 +1,3 @@
-﻿COPY -f "this is a string" tO -dir "this is a second string";
-move -dir "testMove lololo" To -File "anotherString";
+﻿COPY -f "this is a string" | -dir "this is a second string";
+move -dir "testMove lololo" | -File "anotherString";
+replace -fl ("file1", "file2") | -f "file3";

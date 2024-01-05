@@ -13,20 +13,24 @@ public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
     private readonly List<SyntaxToken> childTokens = [];
     public IReadOnlyList<SyntaxToken> ChildTokens => childTokens;
 
-    public SyntaxNode(SyntaxNodeKind kind) {
-        this.Kind = kind;
+    public SyntaxNode(SyntaxNodeKind kind)
+    {
+        Kind = kind;
     }
 
-    public virtual void AddChildNode(SyntaxNode node) {
+    public virtual void AddChildNode(SyntaxNode node)
+    {
         node.Parent = this;
         childNodes.Add(node);
     }
 
-    public virtual void AddChildToken(SyntaxToken token) {
+    public virtual void AddChildToken(SyntaxToken token)
+    {
         childTokens.Add(token);
     }
 
-    public SyntaxNode GetRoot() {
+    public SyntaxNode GetRoot()
+    {
         SyntaxNode temp = this;
         while (temp.Parent != null)
             temp = temp.Parent;
@@ -34,9 +38,25 @@ public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
         return temp;
     }
 
-    public bool IsKind(SyntaxNodeKind nodeKind) => this.Kind == nodeKind;
+    public bool IsKind(SyntaxNodeKind nodeKind) => Kind == nodeKind;
 
-    public override string ToString() {
+    public override string ToString()
+    {
         return $"{Kind} {Span}";
+    }
+
+    public SyntaxNode[] GetDescendantNodes() {
+        return [.. GetDescendentNodesInternal(this)];
+    }
+
+    private static List<SyntaxNode> GetDescendentNodesInternal(SyntaxNode current) {
+        List<SyntaxNode> temp = [];
+
+        foreach (SyntaxNode child in current.ChildNodes) {
+            temp.Add(child);
+            temp.AddRange(GetDescendentNodesInternal(child));
+        }
+
+        return temp;
     }
 }

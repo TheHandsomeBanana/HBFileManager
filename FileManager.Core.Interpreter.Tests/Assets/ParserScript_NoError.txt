@@ -1,8 +1,3 @@
-﻿COPY -f "this is a string";
-TO -dir "this is a second string";
-
-{
-	COPY -f "this is a string";
-	MOVE -dir "testMove lololo";
-	TO -dir "directory";
-}
+﻿COPY -s="C:\test.txt" -t="C:\test";
+MOVE -mo -s=("C:\test1.txt", "C:\test2.txt", "C:\test3.txt") -t="C:\test";
+COPY -mo -s=("C:\test1.txt", "C:\test2.txt") -t=("C:\test", "D:\test");

@@ -1,10 +1,15 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
+using FileManager.Core.Interpreter.Syntax.Arguments;
+using FileManager.Core.Interpreter.Syntax.Commands;
+using FileManager.Core.Interpreter.Syntax.Expressions;
 using HB.Code.Interpreter;
 using HB.Code.Interpreter.Lexer.Default;
 using HB.Code.Interpreter.Parser;
 using HB.Code.Interpreter.Parser.Default;
 using HB.Code.Interpreter.Syntax;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 
 namespace FileManager.Core.Interpreter.Parser;
 public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
@@ -20,19 +25,10 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
         root.Span = new TextSpan(tokens.First().FullSpan.Start, tokens.Last().FullSpan.End);
 
         while (tokenReader.CanMoveNext()) {
-            SyntaxToken? startToken = tokenReader.CurrentToken;
-            if (startToken is null)
-                break;
-
-            SyntaxNode? nextNode = BuildNextNode(tokenReader.CurrentToken);
+            SyntaxNode? nextNode = BuildNextNode();
 
             if (nextNode != null)
                 root.AddChildNode(nextNode);
-            else {
-                SyntaxToken? endToken = tokenReader.CurrentToken;
-                endToken ??= tokenReader.GetLastValidToken();
-                syntaxErrors.Add(new DefaultSyntaxError(GetTextSpan(startToken.Value, endToken.Value)));
-            }
 
             tokenReader.MoveNext();
         }
@@ -44,172 +40,217 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
 
     #region Parsing
     // Build nodes that are direct childs from InterpreterUnitSyntax
-    private SyntaxNode? BuildNextNode(SyntaxToken current) {
-        switch (current.Kind) {
-            case SyntaxTokenKind.BlockStart:
-                return BuildCommandBlockSyntax();
-            case SyntaxTokenKind.CopyKeyword:
-                return BuildExpressionStatement();
-            case SyntaxTokenKind.MoveKeyword:
-                return BuildExpressionStatement();
-            case SyntaxTokenKind.ReplaceKeyword:
-                return BuildExpressionStatement();
-            case SyntaxTokenKind.ToKeyword:
-                return BuildExpressionStatement();
-        }
-
-        return null;
+    private SyntaxNode? BuildNextNode() {
+        return tokenReader.CurrentToken.Kind switch {
+            SyntaxTokenKind.CopyKeyword or
+            SyntaxTokenKind.MoveKeyword or
+            SyntaxTokenKind.ReplaceKeyword => BuildCommandStatement(),
+            _ => null,
+        };
     }
 
-    private CommandBlockSyntax? BuildCommandBlockSyntax() {
-        CommandBlockSyntax commandBlock = new CommandBlockSyntax(SyntaxNodeKind.CommandBlock);
-        commandBlock.AddChildToken(tokenReader.CurrentToken);
+    private CommandStatementSyntax? BuildCommandStatement() {
+        CommandStatementSyntax commandStatement = new CommandStatementSyntax(SyntaxNodeKind.CommandStatement);
         TextSpan? start = tokenReader.GetCurrentFullSpan();
-        if (!start.HasValue)
+
+        CommandSyntax? command = BuildCommandSyntax();
+        if (command is null)
             return null;
 
+
+        commandStatement.AddChildNode(command);
+        TextSpan? end = tokenReader.GetCurrentFullSpan();
+
+        // BuildCommandSyntax advances tokenReader 1 step after last command parameter
+        // --> CurrentToken should be ';' at this point
+        if (!tokenReader.CurrentToken.IsKind(SyntaxTokenKind.Semicolon)) {
+            syntaxErrors.Add(new DefaultSyntaxError(
+                GetTextSpan(start!.Value, end!.Value),
+                tokenReader.CurrentToken.LineSpan,
+                null,
+                "';' expected"
+            ));
+            return null;
+        }
+
+        commandStatement.AddChildToken(tokenReader.CurrentToken);
+
+        commandStatement.Span = GetTextSpan(start!.Value, end!.Value);
+        return commandStatement;
+    }
+
+    private CommandSyntax? BuildCommandSyntax() {
+        CommandSyntax? command = tokenReader.CurrentToken.Kind switch {
+            SyntaxTokenKind.MoveKeyword or
+            SyntaxTokenKind.CopyKeyword or
+            SyntaxTokenKind.ReplaceKeyword => new CommandSyntax(tokenReader.CurrentToken.GetNodeKind()),
+            _ => null
+        };
+
+        TextSpan? start = tokenReader.GetCurrentFullSpan();
+
+        if (command is null) {
+            AddSyntaxErrorWithCurrentSpan("Command [COPY, MOVE, ..] expected");
+            return null;
+        }
+
+
+        command.AddChildToken(tokenReader.CurrentToken);
         SyntaxToken? nextToken = tokenReader.GetNextToken();
 
-        while (nextToken != null && nextToken.Value.Kind.IsCommandTokenKind()) {
-            ExpressionStatementSyntax? expressionStatement = BuildExpressionStatement();
-            if (expressionStatement is null)
-                return null;
-
-            commandBlock.AddChildNode(expressionStatement);
-            nextToken = tokenReader.GetNextToken();
+        if (!nextToken?.Kind.IsCommandParameterTokenKind() ?? true) {
+            AddSyntaxErrorWithCurrentSpan("Command parameter [-source, -target, ..] expected");
+            return null;
         }
 
-        SyntaxToken? endToken = nextToken ??= tokenReader.GetLastValidToken();
-
-        if (!endToken.Value.IsKind(SyntaxTokenKind.BlockEnd))
+        CommandParameterListSyntax? commandParameterList = BuildCommandParameterList();
+        if (commandParameterList is null)
             return null;
 
-        commandBlock.AddChildToken(endToken.Value);
-        commandBlock.Span = GetTextSpan(start.Value, endToken.Value.FullSpan);
-        return commandBlock;
+        command.AddChildNode(commandParameterList);
+        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        command.Span = GetTextSpan(start!.Value, end!.Value);
+        return command;
     }
 
-    private ExpressionStatementSyntax? BuildExpressionStatement() {
+    private CommandParameterListSyntax? BuildCommandParameterList() {
         TextSpan? start = tokenReader.GetCurrentFullSpan();
-        ExpressionStatementSyntax expressionStatement = new ExpressionStatementSyntax(SyntaxNodeKind.ExpressionStatement);
+        CommandParameterListSyntax commandArgumentList = new CommandParameterListSyntax(SyntaxNodeKind.CommandParameterList);
 
-        if (tokenReader.CurrentToken.Kind.IsCommandTokenKind()) {
-            CommandExpressionSyntax? commandExpression = BuildCommandExpression();
-            if (commandExpression is null)
+        while (tokenReader.CanMoveNext() && tokenReader.CurrentToken.Kind.IsCommandParameterTokenKind()) {
+            CommandParameterSyntax? commandArgument = BuildCommandParameter();
+            if (commandArgument is null)
                 return null;
 
-            expressionStatement.AddChildNode(commandExpression);
+            commandArgumentList.AddChildNode(commandArgument);
+            tokenReader.MoveNext();
         }
 
-        switch (tokenReader.GetNextToken().Kind) {
-            case SyntaxTokenKind.ToKeyword:
-                CommandExpressionSyntax? commandExpression = BuildCommandExpression();
-                if (commandExpression is null)
+        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        commandArgumentList.Span = GetTextSpan(start!.Value, end!.Value);
+        return commandArgumentList;
+    }
+
+    private CommandParameterSyntax? BuildCommandParameter() {
+        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        CommandParameterSyntax commandParameter = new CommandParameterSyntax(tokenReader.CurrentToken.GetNodeKind());
+        commandParameter.AddChildToken(tokenReader.CurrentToken);
+        switch (tokenReader.CurrentToken.Kind) {
+            case SyntaxTokenKind.SourceParameter:
+            case SyntaxTokenKind.TargetParameter:
+                CommandParameterAssignmentSyntax? commandParameterAssignment = BuildCommandParameterAssignment();
+                if (commandParameterAssignment is null)
                     return null;
 
-                expressionStatement.AddChildNode(commandExpression);
+                commandParameter.AddChildNode(commandParameterAssignment);
                 break;
-            case SyntaxTokenKind.Semicolon:
-                expressionStatement.AddChildToken(tokenReader.CurrentToken);
+
+            case SyntaxTokenKind.ModifiedOnlyParameter:
                 break;
             default:
                 return null;
         }
 
         TextSpan? end = tokenReader.GetCurrentFullSpan();
-        expressionStatement.Span = GetTextSpan(start!.Value, end!.Value);
-        return expressionStatement;
+        commandParameter.Span = GetTextSpan(start!.Value, end!.Value);
+        return commandParameter;
     }
 
-    private CommandExpressionSyntax? BuildCommandExpression() {
+    private CommandParameterAssignmentSyntax? BuildCommandParameterAssignment() {
+        CommandParameterAssignmentSyntax commandParameterAssignment = new CommandParameterAssignmentSyntax(SyntaxNodeKind.CommandParameterAssignment);
         TextSpan? start = tokenReader.GetCurrentFullSpan();
 
-        CommandExpressionSyntax commandExpression;
-        switch (tokenReader.CurrentToken.Kind) {
-            case SyntaxTokenKind.ReplaceKeyword:
-                commandExpression = new CommandExpressionSyntax(SyntaxNodeKind.ReplaceCommandExpression);
-                break;
-            case SyntaxTokenKind.CopyKeyword:
-                commandExpression = new CommandExpressionSyntax(SyntaxNodeKind.CopyCommandExpression);
-                break;
-            case SyntaxTokenKind.MoveKeyword:
-                commandExpression = new CommandExpressionSyntax(SyntaxNodeKind.MoveCommandExpression);
-                break;
-            case SyntaxTokenKind.ToKeyword:
-                commandExpression = new CommandExecutorExpressionSyntax(SyntaxNodeKind.ToCommandExpression);
-                break;
-            default:
-                return null;
+        SyntaxToken? nextToken = tokenReader.GetNextToken();
+
+        if (!nextToken?.IsKind(SyntaxTokenKind.Equals) ?? true) {
+            AddSyntaxErrorWithCurrentSpan("'=' expected");
+            return null;
         }
 
-        commandExpression.AddChildToken(tokenReader.CurrentToken);
+        ArgumentListSyntax? argumentList = BuildArgumentList();
+        if (argumentList is null)
+            return null;
+
+        commandParameterAssignment.AddChildNode(argumentList);
+        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        commandParameterAssignment.Span = GetTextSpan(start!.Value, end!.Value);
+        return commandParameterAssignment;
+    }
+
+    private ArgumentListSyntax? BuildArgumentList() {
         SyntaxToken? nextToken = tokenReader.GetNextToken();
         if (nextToken is null)
             return null;
 
-        switch (nextToken.Value.Kind) {
-            // No command modifiers
-            case SyntaxTokenKind.StringLiteral:
-                LiteralExpressionSyntax? literal = BuildLiteralExpression();
-                if (literal is null)
-                    return null;
+        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        ArgumentListSyntax argumentList = new ArgumentListSyntax(SyntaxNodeKind.ArgumentList);
 
-                commandExpression.AddChildNode(literal);
-                break;
+        if (!nextToken.Value.IsKind(SyntaxTokenKind.OpenParenthesis)) {
+            ArgumentSyntax? argument = BuildArgument();
+            if (argument is null)
+                return null;
 
-            // Check command modifiers, and neighbouring literal
-            case SyntaxTokenKind.FileModifierKeyword:
-            case SyntaxTokenKind.DirectoryModifierKeyword:
-            case SyntaxTokenKind.ModifiedOnlyModifierKeyword:
-                CommandModifierListSyntax commandModifierList = BuildCommandModifierList();
-                commandExpression.AddChildNode(commandModifierList);
-
-                switch (tokenReader.GetNextToken().Kind) {
-                    case SyntaxTokenKind.StringLiteral:
-                        literal = BuildLiteralExpression();
-                        if (literal is null)
-                            return null;
-
-                        commandExpression.AddChildNode(literal);
-                        break;
-                }
-                break;
+            argumentList.AddChildNode(argument);
+            return argumentList;
         }
 
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        commandExpression.Span = GetTextSpan(start!.Value, end!.Value);
-        return commandExpression;
+        argumentList.AddChildToken(tokenReader.CurrentToken);
+        tokenReader.MoveNext();
+        while (tokenReader.CanMoveNext() && tokenReader.CurrentToken.Kind.IsArgumentTokenKind()) {
+
+            ArgumentSyntax? argument = BuildArgument();
+            if (argument is null)
+                return null;
+
+            argumentList.AddChildNode(argument);
+            nextToken = tokenReader.GetNextToken();
+
+            if (tokenReader.PeekNextToken().Kind.IsArgumentTokenKind()) {
+
+                if (!nextToken?.IsKind(SyntaxTokenKind.Comma) ?? true) {
+                    AddSyntaxErrorWithCurrentSpan("',' expected");
+                    return null;
+                }
+
+                argumentList.AddChildToken(tokenReader.CurrentToken);
+                tokenReader.MoveNext();
+            }
+            else if (!nextToken?.IsKind(SyntaxTokenKind.CloseParenthesis) ?? true) {
+                AddSyntaxErrorWithCurrentSpan("')' expected");
+                return null;
+            }
+        }
+
+        argumentList.AddChildToken(nextToken!.Value);
+        argumentList.Span = GetTextSpan(start!.Value, nextToken.Value.FullSpan);
+        return argumentList;
     }
 
-
-    private CommandModifierListSyntax BuildCommandModifierList() {
+    private ArgumentSyntax? BuildArgument() {
         TextSpan? start = tokenReader.GetCurrentFullSpan();
+        ArgumentSyntax argument = new ArgumentSyntax(SyntaxNodeKind.Argument);
+        LiteralExpressionSyntax? literalExpression = BuildLiteralExpression();
+        if (literalExpression is null)
+            return null;
 
-        CommandModifierListSyntax commandModifierList = new CommandModifierListSyntax(SyntaxNodeKind.CommandModifierList);
-
-        while (tokenReader.CanMoveNext() && tokenReader.CurrentToken.Kind.IsCommandModifierTokenKind()) {
-            commandModifierList.AddChildToken(tokenReader.CurrentToken);
-            tokenReader.MoveNext();
-        }
-
-        TextSpan? end = tokenReader.GetPreviousToken().FullSpan;
-        commandModifierList.Span = GetTextSpan(start!.Value, end!.Value);
-        return commandModifierList;
+        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        argument.AddChildNode(literalExpression);
+        argument.Span = GetTextSpan(start!.Value, end!.Value);
+        return argument;
     }
 
     private LiteralExpressionSyntax? BuildLiteralExpression() {
         TextSpan? start = tokenReader.GetCurrentFullSpan();
 
-        LiteralExpressionSyntax literalExpression;
-        switch (tokenReader.CurrentToken.Kind) {
-            case SyntaxTokenKind.NumericLiteral:
-                literalExpression = new LiteralExpressionSyntax(SyntaxNodeKind.NumericLiteral);
-                break;
-            case SyntaxTokenKind.StringLiteral:
-                literalExpression = new LiteralExpressionSyntax(SyntaxNodeKind.StringLiteral);
-                break;
-            default:
-                return null;
+        LiteralExpressionSyntax? literalExpression = tokenReader.CurrentToken.Kind switch {
+            SyntaxTokenKind.NumericLiteral or
+            SyntaxTokenKind.StringLiteral => new LiteralExpressionSyntax(tokenReader.CurrentToken.GetNodeKind()),
+            _ => null
+        };
+
+        if (literalExpression is null) {
+            AddSyntaxErrorWithCurrentSpan("Literal expression [strings, numbers, ..] expected");
+            return null;
         }
 
         literalExpression.AddChildToken(tokenReader.CurrentToken);
@@ -220,10 +261,16 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
     }
     #endregion
 
-
-
     #region Helper
     private static TextSpan GetTextSpan(SyntaxToken start, SyntaxToken end) => new TextSpan(start.FullSpan.Start, end.FullSpan.End - start.FullSpan.Start);
     private static TextSpan GetTextSpan(TextSpan start, TextSpan end) => new TextSpan(start.Start, end.End - start.Start);
+    private void AddSyntaxErrorWithCurrentSpan(string message) {
+        syntaxErrors.Add(new DefaultSyntaxError(
+                tokenReader.CurrentToken.FullSpan,
+                tokenReader.CurrentToken.LineSpan,
+                null,
+                message
+            ));
+    }
     #endregion
 }

@@ -21,13 +21,18 @@ public class ParserTests : TestBase.TestBase {
         FMParser parser = new FMParser();
         SyntaxTree tree = parser.Parse(tokens);
 
+        Assert.IsNotNull(tree);
+
         ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors().Select(e => {
             e.SetAffected(ParserScriptNoError);
             return e.ToString();
         }).ToImmutableArray();
 
-        Assert.IsNotNull(tree);
         Assert.AreEqual(0, syntaxErrors.Length);
+
+        SyntaxNode[] allNodes = tree.GetNodes();
+
+        Assert.AreEqual(49, allNodes.Length);
     }
 
     [TestMethod]

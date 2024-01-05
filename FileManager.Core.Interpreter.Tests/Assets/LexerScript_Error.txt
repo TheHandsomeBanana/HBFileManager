@@ -1,2 +1,2 @@
-﻿COPY --f "this is a string" TO --D DefinetilyASyntaxError;
-AnotherSyntaxError COPY -ff "anotherString" TO ERROR;
+﻿COPY --f "this is a string" --D DefinetilyASyntaxError;
+AnotherSyntaxError COPY -ff "anotherString" ERROR;
