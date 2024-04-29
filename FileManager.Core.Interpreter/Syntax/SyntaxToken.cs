@@ -1,5 +1,5 @@
-﻿using HB.Code.Interpreter;
-using HB.Code.Interpreter.Syntax;
+﻿using HBLibrary.Code.Interpreter;
+using HBLibrary.Code.Interpreter.Syntax;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FileManager.Core.Interpreter.Syntax;

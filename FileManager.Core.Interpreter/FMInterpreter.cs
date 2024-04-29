@@ -3,14 +3,9 @@ using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Parser;
 using FileManager.Core.Interpreter.Syntax;
 using FileManager.Core.Interpreter.Syntax.Commands;
-using HB.Code.Interpreter;
-using HB.Code.Interpreter.Evaluator.Default;
-using HB.Code.Interpreter.Lexer;
-using HB.Code.Interpreter.Lexer.Default;
-using HB.Code.Interpreter.Parser;
-using HB.Code.Interpreter.Syntax;
+using HBLibrary.Code.Interpreter;
+using HBLibrary.Code.Interpreter.Evaluator;
 using System.Collections.Immutable;
-using Unity;
 
 namespace FileManager.Core.Interpreter;
 public class FMInterpreter : IInterpreter {
@@ -44,7 +39,7 @@ public class FMInterpreter : IInterpreter {
         if (errors.Any())
             return;
 
-        ImmutableArray<DefaultSemanticError> semanticErrors = evaluator.Evaluate(syntaxTree, input);
+        ImmutableArray<SimpleError> semanticErrors = evaluator.Evaluate(syntaxTree, input);
         errors = semanticErrors.Select(e => e.ToString()!);
         if (semanticErrors.Any())
             return;

@@ -1,5 +1,4 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
-using HB.Common.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Exceptions;
-public class SyntaxBuilderException : InternalException {
+public class SyntaxBuilderException : Exception {
     public SyntaxBuilderException(string? message) : base(message) {
     }
 

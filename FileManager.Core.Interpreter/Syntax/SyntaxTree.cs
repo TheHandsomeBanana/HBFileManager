@@ -1,4 +1,4 @@
-﻿using HB.Code.Interpreter.Syntax;
+﻿using HBLibrary.Code.Interpreter.Syntax;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public class SyntaxTree(SyntaxNode root) : ISyntaxTree<SyntaxNode> {

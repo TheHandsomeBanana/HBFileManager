@@ -1,6 +1,5 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
 using FileManager.Core.Interpreter.Syntax.Commands;
-using HB.Code.Interpreter;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

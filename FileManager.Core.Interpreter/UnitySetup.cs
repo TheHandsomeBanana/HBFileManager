@@ -1,6 +1,6 @@
 ﻿using FileManager.Core.Interpreter.Lexer;
-using HB.Code.Interpreter;
-using HB.DependencyInjection.Unity;
+using HBLibrary.Code.Interpreter;
+using HBLibrary.Common.DI.Unity;
 using Unity;
 
 namespace FileManager.Core.Interpreter;

@@ -1,4 +1,4 @@
-﻿using HB.Common.IO;
+﻿using HBLibrary.Services.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Operations;
 public abstract class IOOperation {
-    public PathIndex Source { get; }
-    public PathIndex? Target { get; set; }
+    public ValidPath Source { get; }
+    public ValidPath? Target { get; set; }
 
-    protected IOOperation(PathIndex source) {
+    protected IOOperation(ValidPath source) {
         Source = source;
     }
 }

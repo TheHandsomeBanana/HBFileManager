@@ -17,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HB\HB.Code.Interpreter\HB.Code.Interpreter.csproj" />
-    <ProjectReference Include="..\..\HB\HB.DependencyInjection.Unity\HB.DependencyInjection.Unity.csproj" />
     <ProjectReference Include="..\FileManager.Core.Interpreter\FileManager.Core.Interpreter.csproj" />
   </ItemGroup>
 

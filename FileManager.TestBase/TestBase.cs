@@ -1,8 +1,7 @@
 using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Syntax;
-using HB.Code.Interpreter.Lexer;
-using HB.Code.Interpreter.Lexer.Default;
-using HB.DependencyInjection.Unity;
+using HBLibrary.Code.Interpreter.Lexer;
+using HBLibrary.Common.DI.Unity;
 using Unity;
 
 namespace FileManager.TestBase;
@@ -16,7 +15,7 @@ public abstract class TestBase {
     protected IUnityContainer UnityContainer { get; }
 
     public TestBase() {
-        UnityContainer = UnityBase.CreateOrGetChildContainer("TestContainer");
-        UnityContainer.RegisterType(typeof(ILexer<SyntaxToken, DefaultSyntaxError>), typeof(FMLexer));
+        UnityContainer = UnityBase.CreateChildContainer("TestContainer");
+        UnityContainer.RegisterType(typeof(ILexer<SyntaxToken>), typeof(FMLexer));
     }
 }

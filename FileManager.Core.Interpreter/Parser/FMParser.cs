@@ -2,19 +2,16 @@
 using FileManager.Core.Interpreter.Syntax.Arguments;
 using FileManager.Core.Interpreter.Syntax.Commands;
 using FileManager.Core.Interpreter.Syntax.Expressions;
-using HB.Code.Interpreter;
-using HB.Code.Interpreter.Lexer.Default;
-using HB.Code.Interpreter.Parser;
-using HB.Code.Interpreter.Parser.Default;
-using HB.Code.Interpreter.Syntax;
+using HBLibrary.Code.Interpreter;
+using HBLibrary.Code.Interpreter.Parser;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 
 namespace FileManager.Core.Interpreter.Parser;
-public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
-    private readonly List<DefaultSyntaxError> syntaxErrors = [];
-    private readonly DefaultTokenReader<SyntaxToken, SyntaxTokenKind> tokenReader = new();
+public class FMParser : IParser<SyntaxTree, SyntaxToken> {
+    private readonly List<SimpleError> syntaxErrors = [];
+    private readonly TokenReader<SyntaxToken, SyntaxTokenKind> tokenReader = new();
 
     public SyntaxTree Parse(ImmutableArray<SyntaxToken> tokens) {
         syntaxErrors.Clear();
@@ -36,7 +33,7 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
         return new SyntaxTree(root);
     }
 
-    public ImmutableArray<DefaultSyntaxError> GetSyntaxErrors() => syntaxErrors.ToImmutableArray();
+    public ImmutableArray<SimpleError> GetSyntaxErrors() => syntaxErrors.ToImmutableArray();
 
     #region Parsing
     // Build nodes that are direct childs from InterpreterUnitSyntax
@@ -64,7 +61,7 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
         // BuildCommandSyntax advances tokenReader 1 step after last command parameter
         // --> CurrentToken should be ';' at this point
         if (!tokenReader.CurrentToken.IsKind(SyntaxTokenKind.Semicolon)) {
-            syntaxErrors.Add(new DefaultSyntaxError(
+            syntaxErrors.Add(new SimpleError(
                 GetTextSpan(start!.Value, end!.Value),
                 tokenReader.CurrentToken.LineSpan,
                 null,
@@ -265,7 +262,7 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken, DefaultSyntaxError> {
     private static TextSpan GetTextSpan(SyntaxToken start, SyntaxToken end) => new TextSpan(start.FullSpan.Start, end.FullSpan.End - start.FullSpan.Start);
     private static TextSpan GetTextSpan(TextSpan start, TextSpan end) => new TextSpan(start.Start, end.End - start.Start);
     private void AddSyntaxErrorWithCurrentSpan(string message) {
-        syntaxErrors.Add(new DefaultSyntaxError(
+        syntaxErrors.Add(new SimpleError(
                 tokenReader.CurrentToken.FullSpan,
                 tokenReader.CurrentToken.LineSpan,
                 null,

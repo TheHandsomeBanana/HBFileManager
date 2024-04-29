@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HB\HB.Code.Interpreter\HB.Code.Interpreter.csproj" />
-    <ProjectReference Include="..\..\HB\HB.Common\HB.Common.csproj" />
-    <ProjectReference Include="..\..\HB\HB.DependencyInjection.Unity\HB.DependencyInjection.Unity.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Code.Interpreter\HBLibrary.Code.Interpreter.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Services.IO\HBLibrary.Services.IO.csproj" />
   </ItemGroup>
 
 </Project>
