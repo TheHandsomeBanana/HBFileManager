@@ -7,26 +7,26 @@ using System.Text;
 namespace FileManager.Core.Interpreter.Lexer;
 public class FMLexer : ILexer<SyntaxToken> {
     private readonly List<SimpleError> syntaxErrors = [];
-    private readonly PositionReader PositionReader = new PositionReader();
+    private readonly LexContentReader ContentReader = new LexContentReader();
     private readonly List<SyntaxToken> tokens = [];
     public ImmutableArray<SyntaxToken> Lex(string input) {
         syntaxErrors.Clear();
         tokens.Clear();
-        PositionReader.Init(input);
+        ContentReader.Init(input);
 
-        PositionReader.ReadSingle();
-        while (PositionReader.CurrentIndex < PositionReader.Content.Length) {
+        ContentReader.ReadSingle();
+        while (ContentReader.CurrentIndex < ContentReader.Content.Length) {
             SyntaxToken? token = GetNextToken();
 
             if (!token.HasValue) {
                 // Skip last iteration syntax error --> would be empty
-                if (PositionReader.CurrentIndex >= PositionReader.Content.Length)
+                if (ContentReader.CurrentIndex >= ContentReader.Content.Length)
                     continue;
 
                 syntaxErrors.Add(new SimpleError(
-                    PositionReader.GetSpan(),
-                    PositionReader.GetLineSpan(),
-                    PositionReader.GetString(),
+                    ContentReader.GetSpan(),
+                    ContentReader.GetLineSpan(),
+                    ContentReader.GetString(),
                     "Invalid input"));
             }
             else
@@ -35,8 +35,8 @@ public class FMLexer : ILexer<SyntaxToken> {
 
         tokens.Add(new SyntaxToken("",
             SyntaxTokenKind.EndOfFile,
-            new TextSpan(PositionReader.CurrentIndex, 0),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 0)));
+            new TextSpan(ContentReader.CurrentIndex, 0),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 0)));
 
         return [.. tokens];
     }
@@ -47,24 +47,24 @@ public class FMLexer : ILexer<SyntaxToken> {
 
     private SyntaxToken? GetNextToken() {
         // First check for null
-        if (PositionReader.GetChar() == CommonCharCollection.NULL)
+        if (ContentReader.GetChar() == CommonCharCollection.NULL)
             return null;
 
-        char currentValue = PositionReader.GetChar();
+        char currentValue = ContentReader.GetChar();
         while (currentValue == CommonCharCollection.SPACE || currentValue == CommonCharCollection.TAB || currentValue == CommonCharCollection.CR) {
             // Check Whitespace
-            if (PositionReader.GetChar() == CommonCharCollection.SPACE)
+            if (ContentReader.CanRead() && ContentReader.GetChar() == CommonCharCollection.SPACE)
                 AddWhitespaceTrivia();
 
             // Check Tab
-            if (PositionReader.GetChar() == CommonCharCollection.TAB)
+            if (ContentReader.CanRead() && ContentReader.GetChar() == CommonCharCollection.TAB)
                 AddTabTrivia();
 
             // Check NewLine
-            while (PositionReader.GetChar() == CommonCharCollection.CR)
+            while (ContentReader.CanRead() && ContentReader.GetChar() == CommonCharCollection.CR)
                 AddNewLineTrivia();
 
-            currentValue = PositionReader.GetChar();
+            currentValue = ContentReader.CanRead() ? ContentReader.GetChar() : CommonCharCollection.NULL;
         }
 
         // Check commands
@@ -99,161 +99,160 @@ public class FMLexer : ILexer<SyntaxToken> {
                 return GetEquals();
         }
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return null;
     }
 
     private SyntaxToken? GetEquals() {
         SyntaxToken token = new SyntaxToken("=",
                                   SyntaxTokenKind.Equals,
-                                  new TextSpan(PositionReader.CurrentIndex, 1),
-                                  new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+                                  new TextSpan(ContentReader.CurrentIndex, 1),
+                                  new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
 
     private SyntaxToken? GetPipe() {
         SyntaxToken token = new SyntaxToken("|",
                            SyntaxTokenKind.Pipe,
-                           new TextSpan(PositionReader.CurrentIndex, 1),
-                           new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+                           new TextSpan(ContentReader.CurrentIndex, 1),
+                           new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
 
     private SyntaxToken GetComma() {
         SyntaxToken token = new SyntaxToken(",",
                     SyntaxTokenKind.Comma,
-                    new TextSpan(PositionReader.CurrentIndex, 1),
-                    new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+                    new TextSpan(ContentReader.CurrentIndex, 1),
+                    new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
 
     private SyntaxToken GetOpenBrace() {
         SyntaxToken token = new SyntaxToken("{",
             SyntaxTokenKind.OpenBrace,
-            new TextSpan(PositionReader.CurrentIndex, 1),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
     private SyntaxToken GetCloseBrace() {
         SyntaxToken token = new SyntaxToken("}",
             SyntaxTokenKind.CloseBrace,
-            new TextSpan(PositionReader.CurrentIndex, 1),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
     private SyntaxToken GetOpenParen() {
         SyntaxToken token = new SyntaxToken("(",
             SyntaxTokenKind.OpenParenthesis,
-            new TextSpan(PositionReader.CurrentIndex, 1),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
     private SyntaxToken GetCloseParen() {
         SyntaxToken token = new SyntaxToken(")",
             SyntaxTokenKind.CloseParenthesis,
-            new TextSpan(PositionReader.CurrentIndex, 1),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
     private void AddWhitespaceTrivia() {
-        PositionReader.ReadWhile(() => PositionReader.GetChar() == CommonCharCollection.SPACE);
+        ContentReader.ReadWhile(() => ContentReader.GetChar() == CommonCharCollection.SPACE);
         SyntaxToken? last = tokens.LastOrDefault();
         if (!last.HasValue)
             return;
 
-        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.WhiteSpace, PositionReader.GetSpan()));
+        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.WhiteSpace, ContentReader.GetSpan()));
     }
     private void AddTabTrivia() {
-        PositionReader.ReadWhile(() => PositionReader.GetChar() == CommonCharCollection.TAB);
+        ContentReader.ReadWhile(() => ContentReader.GetChar() == CommonCharCollection.TAB);
         SyntaxToken? last = tokens.LastOrDefault();
         if (!last.HasValue)
             return;
 
-        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.Tab, PositionReader.GetSpan()));
+        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.Tab, ContentReader.GetSpan()));
     }
     private void AddNewLineTrivia() {
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
+        ContentReader.SkipSingle();
         SyntaxToken? last = tokens.LastOrDefault();
         if (!last.HasValue)
             return;
 
-        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.EndOfLine, PositionReader.GetSpan()));
+        last.Value.AddSyntaxTrivia(new SyntaxTrivia(false, SyntaxTriviaKind.EndOfLine, ContentReader.GetSpan()));
     }
     private SyntaxToken GetSemicolon() {
         SyntaxToken token = new SyntaxToken(";",
             SyntaxTokenKind.Semicolon,
-            new TextSpan(PositionReader.CurrentIndex, 1),
-            new LineSpan(PositionReader.CurrentLine, PositionReader.CurrentLineIndex, 1));
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
 
-        PositionReader.ReadSingle();
+        ContentReader.ReadSingle();
         return token;
     }
     private SyntaxToken GetStringLiteral() {
-        PositionReader.ReadWhile(() => PositionReader.GetChar() != '"');
-        return new SyntaxToken(PositionReader.GetString(),
+        ContentReader.ReadWhile(() => ContentReader.GetChar() != '"', 1, 1);
+        return new SyntaxToken(ContentReader.GetString(),
             SyntaxTokenKind.StringLiteral,
-            PositionReader.GetSpan(),
-            PositionReader.GetLineSpan());
+            ContentReader.GetSpan(),
+            ContentReader.GetLineSpan());
     }
     private SyntaxToken GetNumericLiteral() {
-        PositionReader.ReadWhile(() => char.IsAsciiDigit(PositionReader.GetChar()));
-        return new SyntaxToken(PositionReader.GetString(),
+        ContentReader.ReadWhile(() => char.IsAsciiDigit(ContentReader.GetChar()));
+        return new SyntaxToken(ContentReader.GetString(),
             SyntaxTokenKind.StringLiteral,
-            PositionReader.GetSpan(),
-            PositionReader.GetLineSpan());
+            ContentReader.GetSpan(),
+            ContentReader.GetLineSpan());
     }
     private SyntaxToken? GetCommand() {
-        PositionReader.ReadWhile(() => char.IsAsciiLetter(PositionReader.GetChar()));
-        string value = PositionReader.GetString();
+        string value = ContentReader.ReadWhile(() => char.IsAsciiLetter(ContentReader.GetChar()));
         return value.ToLower() switch {
             "copy" => new SyntaxToken(value,
                 SyntaxTokenKind.CopyKeyword,
-                PositionReader.GetSpan(),
-                PositionReader.GetLineSpan()),
+                ContentReader.GetSpan(),
+                ContentReader.GetLineSpan()),
             "move" => new SyntaxToken(value,
                 SyntaxTokenKind.MoveKeyword,
-                PositionReader.GetSpan(),
-                PositionReader.GetLineSpan()),
+                ContentReader.GetSpan(),
+                ContentReader.GetLineSpan()),
             "replace" => new SyntaxToken(value,
                 SyntaxTokenKind.ReplaceKeyword,
-                PositionReader.GetSpan(),
-                PositionReader.GetLineSpan()),
+                ContentReader.GetSpan(),
+                ContentReader.GetLineSpan()),
             _ => null,
         };
     }
     private SyntaxToken? GetCommandModifier() {
-        PositionReader.ReadWhile(() => char.IsAsciiLetter(PositionReader.GetChar()));
-        string value = PositionReader.GetString();
+        string value = ContentReader.ReadWhile(() => char.IsAsciiLetter(ContentReader.GetChar()), 1);
 
         return value.ToLower() switch {
             "-s" or
             "-source" => (SyntaxToken?)new SyntaxToken(value,
                                 SyntaxTokenKind.SourceParameter,
-                                PositionReader.GetSpan(),
-                                PositionReader.GetLineSpan()),
+                                ContentReader.GetSpan(),
+                                ContentReader.GetLineSpan()),
             "-t" or
             "-target" => (SyntaxToken?)new SyntaxToken(value,
                                 SyntaxTokenKind.TargetParameter,
-                                PositionReader.GetSpan(),
-                                PositionReader.GetLineSpan()),
+                                ContentReader.GetSpan(),
+                                ContentReader.GetLineSpan()),
             "-mo" => (SyntaxToken?)new SyntaxToken(value,
                                 SyntaxTokenKind.ModifiedOnlyParameter,
-                                PositionReader.GetSpan(),
-                                PositionReader.GetLineSpan()),
+                                ContentReader.GetSpan(),
+                                ContentReader.GetLineSpan()),
             _ => null,
         };
     }
