@@ -22,10 +22,8 @@ public class ParserTests : TestBase.TestBase {
 
         Assert.IsNotNull(tree);
 
-        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors().Select(e => {
-            e.SetAffected(ParserScriptNoError);
-            return e.ToString();
-        }).ToImmutableArray();
+        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors(ParserScriptError)
+            .Select(s => s.ToString()).ToImmutableArray();
 
         Assert.AreEqual(0, syntaxErrors.Length);
 
@@ -43,10 +41,9 @@ public class ParserTests : TestBase.TestBase {
         FMParser parser = new FMParser();
         SyntaxTree tree = parser.Parse(tokens);
 
-        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors().Select(e => {
-            e.SetAffected(ParserScriptError);
-            return e.ToString();
-        }).ToImmutableArray();
+        ImmutableArray<string> syntaxErrors = parser.GetSyntaxErrors(ParserScriptError)
+            .Select(s => s.ToString()).ToImmutableArray();
+
 
         Assert.IsNotNull(tree);
     }

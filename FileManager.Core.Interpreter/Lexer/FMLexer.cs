@@ -26,8 +26,8 @@ public class FMLexer : ILexer<SyntaxToken> {
                 syntaxErrors.Add(new SimpleError(
                     ContentReader.GetSpan(),
                     ContentReader.GetLineSpan(),
-                    ContentReader.GetString(),
-                    "Invalid input"));
+                    "Invalid input",
+                    ContentReader.GetString()));
             }
             else
                 tokens.Add(token.Value);
@@ -36,7 +36,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         tokens.Add(new SyntaxToken("",
             SyntaxTokenKind.EndOfFile,
             new TextSpan(ContentReader.CurrentIndex, 0),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 0)));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 0)));
 
         return [.. tokens];
     }
@@ -44,7 +44,6 @@ public class FMLexer : ILexer<SyntaxToken> {
     public ImmutableArray<SimpleError> GetSyntaxErrors() => syntaxErrors.ToImmutableArray();
 
     #region Lexing
-
     private SyntaxToken? GetNextToken() {
         // First check for null
         if (ContentReader.GetChar() == CommonCharCollection.NULL)
@@ -105,9 +104,9 @@ public class FMLexer : ILexer<SyntaxToken> {
 
     private SyntaxToken? GetEquals() {
         SyntaxToken token = new SyntaxToken("=",
-                                  SyntaxTokenKind.Equals,
-                                  new TextSpan(ContentReader.CurrentIndex, 1),
-                                  new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            SyntaxTokenKind.Equals,
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -115,9 +114,9 @@ public class FMLexer : ILexer<SyntaxToken> {
 
     private SyntaxToken? GetPipe() {
         SyntaxToken token = new SyntaxToken("|",
-                           SyntaxTokenKind.Pipe,
-                           new TextSpan(ContentReader.CurrentIndex, 1),
-                           new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            SyntaxTokenKind.Pipe,
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -125,9 +124,9 @@ public class FMLexer : ILexer<SyntaxToken> {
 
     private SyntaxToken GetComma() {
         SyntaxToken token = new SyntaxToken(",",
-                    SyntaxTokenKind.Comma,
-                    new TextSpan(ContentReader.CurrentIndex, 1),
-                    new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            SyntaxTokenKind.Comma,
+            new TextSpan(ContentReader.CurrentIndex, 1),
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -137,7 +136,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         SyntaxToken token = new SyntaxToken("{",
             SyntaxTokenKind.OpenBrace,
             new TextSpan(ContentReader.CurrentIndex, 1),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -146,7 +145,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         SyntaxToken token = new SyntaxToken("}",
             SyntaxTokenKind.CloseBrace,
             new TextSpan(ContentReader.CurrentIndex, 1),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -155,7 +154,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         SyntaxToken token = new SyntaxToken("(",
             SyntaxTokenKind.OpenParenthesis,
             new TextSpan(ContentReader.CurrentIndex, 1),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -164,7 +163,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         SyntaxToken token = new SyntaxToken(")",
             SyntaxTokenKind.CloseParenthesis,
             new TextSpan(ContentReader.CurrentIndex, 1),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -198,7 +197,7 @@ public class FMLexer : ILexer<SyntaxToken> {
         SyntaxToken token = new SyntaxToken(";",
             SyntaxTokenKind.Semicolon,
             new TextSpan(ContentReader.CurrentIndex, 1),
-            new LineSpan(ContentReader.CurrentLine, ContentReader.CurrentLineIndex, 1));
+            new LineSpan(ContentReader.CurrentLine, 0, ContentReader.CurrentLineIndex, 1));
 
         ContentReader.ReadSingle();
         return token;
@@ -232,6 +231,10 @@ public class FMLexer : ILexer<SyntaxToken> {
                 SyntaxTokenKind.ReplaceKeyword,
                 ContentReader.GetSpan(),
                 ContentReader.GetLineSpan()),
+            "archive" => new SyntaxToken(value,
+                SyntaxTokenKind.ArchiveKeyword,
+                ContentReader.GetSpan(),
+                ContentReader.GetLineSpan()),
             _ => null,
         };
     }
@@ -253,12 +256,12 @@ public class FMLexer : ILexer<SyntaxToken> {
                                 SyntaxTokenKind.ModifiedOnlyParameter,
                                 ContentReader.GetSpan(),
                                 ContentReader.GetLineSpan()),
+            "-type" => (SyntaxToken?)new SyntaxToken(value,
+                                SyntaxTokenKind.TypeParameter,
+                                ContentReader.GetSpan(),
+                                ContentReader.GetLineSpan()),
             _ => null,
         };
     }
-    #endregion
-
-    #region Helper
-    private static TextSpan GetTextSpan(int prevPosition, int currPosition) => new TextSpan(prevPosition, currPosition - prevPosition);
     #endregion
 }

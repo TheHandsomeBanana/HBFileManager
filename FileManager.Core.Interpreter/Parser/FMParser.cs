@@ -19,7 +19,10 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
 
         SyntaxNode root = new InterpreterUnitSyntax(SyntaxNodeKind.InterpreterUnit);
         root.AddChildToken(tokens.Last());
-        root.Span = new TextSpan(tokens.First().FullSpan.Start, tokens.Last().FullSpan.End);
+        SyntaxToken firstToken = tokens.First();
+        SyntaxToken lastToken = tokens.Last();
+
+        SetSpans(root, firstToken.FullSpan, lastToken.FullSpan, firstToken.LineSpan, lastToken.LineSpan);
 
         while (tokenReader.CanMoveNext()) {
             SyntaxNode? nextNode = BuildNextNode();
@@ -33,7 +36,10 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
         return new SyntaxTree(root);
     }
 
-    public ImmutableArray<SimpleError> GetSyntaxErrors() => syntaxErrors.ToImmutableArray();
+    public ImmutableArray<SimpleError> GetSyntaxErrors(string content) => syntaxErrors.Select(e => {
+        e.SetAffected(content);
+        return e;
+    }).ToImmutableArray();
 
     #region Parsing
     // Build nodes that are direct childs from InterpreterUnitSyntax
@@ -48,7 +54,9 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
 
     private CommandStatementSyntax? BuildCommandStatement() {
         CommandStatementSyntax commandStatement = new CommandStatementSyntax(SyntaxNodeKind.CommandStatement);
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
+
 
         CommandSyntax? command = BuildCommandSyntax();
         if (command is null)
@@ -56,15 +64,15 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
 
 
         commandStatement.AddChildNode(command);
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
 
         // BuildCommandSyntax advances tokenReader 1 step after last command parameter
         // --> CurrentToken should be ';' at this point
         if (!tokenReader.CurrentToken.IsKind(SyntaxTokenKind.Semicolon)) {
             syntaxErrors.Add(new SimpleError(
-                GetTextSpan(start!.Value, end!.Value),
-                tokenReader.CurrentToken.LineSpan,
-                null,
+                GetTextSpan(start, end),
+                GetLineSpan(startLine, endLine),
                 "';' expected"
             ));
             return null;
@@ -72,7 +80,7 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
 
         commandStatement.AddChildToken(tokenReader.CurrentToken);
 
-        commandStatement.Span = GetTextSpan(start!.Value, end!.Value);
+        SetSpans(commandStatement, start, end, startLine, endLine);
         return commandStatement;
     }
 
@@ -80,17 +88,18 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
         CommandSyntax? command = tokenReader.CurrentToken.Kind switch {
             SyntaxTokenKind.MoveKeyword or
             SyntaxTokenKind.CopyKeyword or
-            SyntaxTokenKind.ReplaceKeyword => new CommandSyntax(tokenReader.CurrentToken.GetNodeKind()),
+            SyntaxTokenKind.ReplaceKeyword or
+            SyntaxTokenKind.ArchiveKeyword => new CommandSyntax(tokenReader.CurrentToken.GetNodeKind()),
             _ => null
         };
 
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
 
         if (command is null) {
             AddSyntaxErrorWithCurrentSpan("Command [COPY, MOVE, ..] expected");
             return null;
         }
-
 
         command.AddChildToken(tokenReader.CurrentToken);
         SyntaxToken? nextToken = tokenReader.GetNextToken();
@@ -105,13 +114,17 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
             return null;
 
         command.AddChildNode(commandParameterList);
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        command.Span = GetTextSpan(start!.Value, end!.Value);
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+
+        SetSpans(command, start, end, startLine, endLine);
         return command;
     }
 
     private CommandParameterListSyntax? BuildCommandParameterList() {
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
+
         CommandParameterListSyntax commandArgumentList = new CommandParameterListSyntax(SyntaxNodeKind.CommandParameterList);
 
         while (tokenReader.CanMoveNext() && tokenReader.CurrentToken.Kind.IsCommandParameterTokenKind()) {
@@ -123,18 +136,23 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
             tokenReader.MoveNext();
         }
 
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        commandArgumentList.Span = GetTextSpan(start!.Value, end!.Value);
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+        SetSpans(commandArgumentList, start, end, startLine, endLine);
+
         return commandArgumentList;
     }
 
     private CommandParameterSyntax? BuildCommandParameter() {
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
+
         CommandParameterSyntax commandParameter = new CommandParameterSyntax(tokenReader.CurrentToken.GetNodeKind());
         commandParameter.AddChildToken(tokenReader.CurrentToken);
         switch (tokenReader.CurrentToken.Kind) {
             case SyntaxTokenKind.SourceParameter:
             case SyntaxTokenKind.TargetParameter:
+            case SyntaxTokenKind.TypeParameter:
                 CommandParameterAssignmentSyntax? commandParameterAssignment = BuildCommandParameterAssignment();
                 if (commandParameterAssignment is null)
                     return null;
@@ -148,14 +166,17 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
                 return null;
         }
 
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        commandParameter.Span = GetTextSpan(start!.Value, end!.Value);
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+        SetSpans(commandParameter, start, end, startLine, endLine);
+
         return commandParameter;
     }
 
     private CommandParameterAssignmentSyntax? BuildCommandParameterAssignment() {
         CommandParameterAssignmentSyntax commandParameterAssignment = new CommandParameterAssignmentSyntax(SyntaxNodeKind.CommandParameterAssignment);
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
 
         SyntaxToken? nextToken = tokenReader.GetNextToken();
 
@@ -169,8 +190,10 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
             return null;
 
         commandParameterAssignment.AddChildNode(argumentList);
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        commandParameterAssignment.Span = GetTextSpan(start!.Value, end!.Value);
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+        SetSpans(commandParameterAssignment, start, end, startLine, endLine);
+
         return commandParameterAssignment;
     }
 
@@ -179,7 +202,9 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
         if (nextToken is null)
             return null;
 
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
+        
         ArgumentListSyntax argumentList = new ArgumentListSyntax(SyntaxNodeKind.ArgumentList);
 
         if (!nextToken.Value.IsKind(SyntaxTokenKind.OpenParenthesis)) {
@@ -219,25 +244,31 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
         }
 
         argumentList.AddChildToken(nextToken!.Value);
-        argumentList.Span = GetTextSpan(start!.Value, nextToken.Value.FullSpan);
+
+        SetSpans(argumentList, start, nextToken.Value.FullSpan, startLine, nextToken.Value.LineSpan);
         return argumentList;
     }
 
     private ArgumentSyntax? BuildArgument() {
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
+
         ArgumentSyntax argument = new ArgumentSyntax(SyntaxNodeKind.Argument);
         LiteralExpressionSyntax? literalExpression = BuildLiteralExpression();
         if (literalExpression is null)
             return null;
 
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+
         argument.AddChildNode(literalExpression);
-        argument.Span = GetTextSpan(start!.Value, end!.Value);
+        SetSpans(argument, start, end, startLine, endLine);
         return argument;
     }
 
     private LiteralExpressionSyntax? BuildLiteralExpression() {
-        TextSpan? start = tokenReader.GetCurrentFullSpan();
+        TextSpan start = tokenReader.GetCurrentFullSpan();
+        LineSpan startLine = tokenReader.GetCurrentLineSpan();
 
         LiteralExpressionSyntax? literalExpression = tokenReader.CurrentToken.Kind switch {
             SyntaxTokenKind.NumericLiteral or
@@ -251,23 +282,30 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken> {
         }
 
         literalExpression.AddChildToken(tokenReader.CurrentToken);
-        TextSpan? end = tokenReader.GetCurrentFullSpan();
-        literalExpression.Span = GetTextSpan(start!.Value, end!.Value);
+        TextSpan end = tokenReader.GetCurrentFullSpan();
+        LineSpan endLine = tokenReader.GetCurrentLineSpan();
+        SetSpans(literalExpression, start, end, startLine, endLine);
 
         return literalExpression;
     }
     #endregion
 
     #region Helper
-    private static TextSpan GetTextSpan(SyntaxToken start, SyntaxToken end) => new TextSpan(start.FullSpan.Start, end.FullSpan.End - start.FullSpan.Start);
     private static TextSpan GetTextSpan(TextSpan start, TextSpan end) => new TextSpan(start.Start, end.End - start.Start);
+    private static LineSpan GetLineSpan(LineSpan start, LineSpan end) 
+        => new LineSpan(start.StartLine, end.EndLine - start.StartLine, GetTextSpan(start.Span, end.Span));
+
     private void AddSyntaxErrorWithCurrentSpan(string message) {
         syntaxErrors.Add(new SimpleError(
                 tokenReader.CurrentToken.FullSpan,
                 tokenReader.CurrentToken.LineSpan,
-                null,
                 message
             ));
+    }
+
+    private static void SetSpans(SyntaxNode node, TextSpan start, TextSpan end, LineSpan startLine, LineSpan endLine) {
+        node.Span = GetTextSpan(start, end);
+        node.LineSpan = GetLineSpan(startLine, endLine);
     }
     #endregion
 }

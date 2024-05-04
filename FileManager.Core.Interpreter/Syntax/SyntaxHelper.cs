@@ -11,7 +11,7 @@ public static class SyntaxHelper {
         || kind == SyntaxTokenKind.MoveKeyword
         || kind == SyntaxTokenKind.ReplaceKeyword;
 
-    public static bool IsCommandParameterTokenKind(this SyntaxTokenKind kind) 
+    public static bool IsCommandParameterTokenKind(this SyntaxTokenKind kind)
         => kind == SyntaxTokenKind.SourceParameter
         || kind == SyntaxTokenKind.TargetParameter
         || kind == SyntaxTokenKind.ModifiedOnlyParameter;
@@ -25,11 +25,29 @@ public static class SyntaxHelper {
             SyntaxTokenKind.MoveKeyword => SyntaxNodeKind.MoveCommand,
             SyntaxTokenKind.ReplaceKeyword => SyntaxNodeKind.ReplaceCommand,
             SyntaxTokenKind.CopyKeyword => SyntaxNodeKind.CopyCommand,
+            SyntaxTokenKind.ArchiveKeyword => SyntaxNodeKind.ArchiveCommand,
             SyntaxTokenKind.TargetParameter => SyntaxNodeKind.CommandTargetParameter,
             SyntaxTokenKind.SourceParameter => SyntaxNodeKind.CommandSourceParameter,
             SyntaxTokenKind.ModifiedOnlyParameter => SyntaxNodeKind.CommandModifiedOnlyParamater,
+            SyntaxTokenKind.TypeParameter => SyntaxNodeKind.CommandTypeParameter,
             SyntaxTokenKind.StringLiteral => SyntaxNodeKind.StringLiteral,
             SyntaxTokenKind.NumericLiteral => SyntaxNodeKind.NumericLiteral,
+            _ => throw new NotSupportedException($"{kind}")
+        };
+    }
+
+    public static SyntaxTokenKind GetTokenKind(this SyntaxNodeKind kind) {
+        return kind switch {
+            SyntaxNodeKind.MoveCommand => SyntaxTokenKind.MoveKeyword,
+            SyntaxNodeKind.ReplaceCommand => SyntaxTokenKind.ReplaceKeyword,
+            SyntaxNodeKind.CopyCommand => SyntaxTokenKind.CopyKeyword,
+            SyntaxNodeKind.ArchiveCommand => SyntaxTokenKind.ArchiveKeyword,
+            SyntaxNodeKind.CommandTargetParameter => SyntaxTokenKind.TargetParameter,
+            SyntaxNodeKind.CommandSourceParameter => SyntaxTokenKind.SourceParameter,
+            SyntaxNodeKind.CommandModifiedOnlyParamater => SyntaxTokenKind.ModifiedOnlyParameter,
+            SyntaxNodeKind.CommandTypeParameter => SyntaxTokenKind.TypeParameter,
+            SyntaxNodeKind.StringLiteral => SyntaxTokenKind.StringLiteral,
+            SyntaxNodeKind.NumericLiteral => SyntaxTokenKind.NumericLiteral,
             _ => throw new NotSupportedException($"{kind}")
         };
     }
@@ -37,4 +55,6 @@ public static class SyntaxHelper {
     public static SyntaxNodeKind GetNodeKind(this SyntaxToken token)
         => GetNodeKind(token.Kind);
 
+    public static SyntaxTokenKind GetTokenKind(this SyntaxNode node)
+        => GetTokenKind(node.Kind);
 }

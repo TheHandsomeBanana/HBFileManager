@@ -13,7 +13,7 @@ public class FMInterpreter : IInterpreter {
     private readonly static FMParser parser = new FMParser();
     private readonly static FMEvaluator evaluator = new FMEvaluator();
 
-    private IEnumerable<string> errors = Enumerable.Empty<string>();
+    private IEnumerable<string> errors = [];
 
     public void Run(string input) => RunInternal(input);
 
@@ -24,23 +24,20 @@ public class FMInterpreter : IInterpreter {
     public ImmutableArray<string> GetErrors() => errors.ToImmutableArray();
 
     private void RunInternal(string input, string? filePath = null) {
-        ImmutableArray<SyntaxToken> tokens = lexer!.Lex(input);
+        ImmutableArray<SyntaxToken> tokens = lexer.Lex(input);
         errors = lexer.GetSyntaxErrors().Select(e => e.ToString()!);
         if (errors.Any())
             return;
 
-        SyntaxTree syntaxTree = parser!.Parse(tokens);
+        SyntaxTree syntaxTree = parser.Parse(tokens);
         syntaxTree.FilePath = filePath;
-        errors = parser.GetSyntaxErrors().Select(e => {
-            e.SetAffected(input);
-            return e.ToString();
-        });
+        errors = parser.GetSyntaxErrors(input).Select(e => e.ToString());
 
         if (errors.Any())
             return;
 
         ImmutableArray<SimpleError> semanticErrors = evaluator.Evaluate(syntaxTree, input);
-        errors = semanticErrors.Select(e => e.ToString()!);
+        errors = semanticErrors.Select(e => e.ToString());
         if (semanticErrors.Any())
             return;
 

@@ -35,11 +35,11 @@ public class LexerTests : TestBase.TestBase {
         Assert.AreEqual(8, foundSyntaxErrors.Length);
 
         Assert.AreEqual("-", foundSyntaxErrors[0].Affected);
-        Assert.AreEqual(new TextSpan(5, 1), foundSyntaxErrors[0].Location);
-        Assert.AreEqual(new LineSpan(1, 5, 1), foundSyntaxErrors[0].LineSpan);
+        Assert.AreEqual(new TextSpan(5, 1), foundSyntaxErrors[0].Span);
+        Assert.AreEqual(new LineSpan(1, 0, 1, 5), foundSyntaxErrors[0].LineSpan);
 
         Assert.AreEqual("ERROR", foundSyntaxErrors[5].Affected);
-        Assert.AreEqual(new TextSpan(101, 5), foundSyntaxErrors[5].Location);
-        Assert.AreEqual(new LineSpan(2, 44, 5), foundSyntaxErrors[5].LineSpan);
+        Assert.AreEqual(new TextSpan(101, 5), foundSyntaxErrors[5].Span);
+        Assert.AreEqual(new LineSpan(5, 0, 2, 44), foundSyntaxErrors[5].LineSpan);
     }
 }

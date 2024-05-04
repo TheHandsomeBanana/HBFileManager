@@ -20,9 +20,11 @@ public enum SyntaxTokenKind {
     CopyKeyword,
     MoveKeyword,
     ReplaceKeyword,
+    ArchiveKeyword,
     SourceParameter,
     TargetParameter,
     ModifiedOnlyParameter,
+    TypeParameter,
 }
 
 public enum SyntaxNodeKind {
@@ -35,10 +37,12 @@ public enum SyntaxNodeKind {
     CopyCommand,
     MoveCommand,
     ReplaceCommand,
+    ArchiveCommand,
     CommandParameterList,
     CommandSourceParameter,
     CommandTargetParameter,
     CommandModifiedOnlyParamater,
+    CommandTypeParameter,
     CommandParameterAssignment
 }
 

@@ -6,6 +6,7 @@ using HBLibrary.Code.Interpreter.Syntax;
 namespace FileManager.Core.Interpreter.Syntax;
 public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
     public TextSpan Span { get; set; }
+    public LineSpan LineSpan { get; set; }
     public SyntaxNode? Parent { get; private set; }
     public SyntaxNodeKind Kind { get; }
 
@@ -44,7 +45,7 @@ public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
 
     public override string ToString()
     {
-        return $"{Kind} {Span}";
+        return $"{Kind} {Span} {LineSpan}";
     }
 
     public SyntaxNode[] GetDescendantNodes() {
