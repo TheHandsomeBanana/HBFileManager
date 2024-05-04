@@ -1,6 +1,4 @@
-﻿using FileManager.Core.Interpreter.Lexer;
-using FileManager.Core.Interpreter.Parser;
-using FileManager.Core.Interpreter.Syntax;
+﻿using FileManager.Core.Interpreter.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;

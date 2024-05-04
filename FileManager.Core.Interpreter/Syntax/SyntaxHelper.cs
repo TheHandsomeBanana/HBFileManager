@@ -9,12 +9,14 @@ public static class SyntaxHelper {
     public static bool IsCommandTokenKind(this SyntaxTokenKind kind)
         => kind == SyntaxTokenKind.CopyKeyword
         || kind == SyntaxTokenKind.MoveKeyword
-        || kind == SyntaxTokenKind.ReplaceKeyword;
+        || kind == SyntaxTokenKind.ReplaceKeyword
+        || kind == SyntaxTokenKind.ArchiveKeyword;
 
     public static bool IsCommandParameterTokenKind(this SyntaxTokenKind kind)
         => kind == SyntaxTokenKind.SourceParameter
         || kind == SyntaxTokenKind.TargetParameter
-        || kind == SyntaxTokenKind.ModifiedOnlyParameter;
+        || kind == SyntaxTokenKind.ModifiedOnlyParameter
+        || kind == SyntaxTokenKind.TypeParameter;
 
     public static bool IsArgumentTokenKind(this SyntaxTokenKind kind)
         => kind == SyntaxTokenKind.NumericLiteral

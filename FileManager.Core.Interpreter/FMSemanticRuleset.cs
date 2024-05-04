@@ -6,8 +6,55 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.Core.Interpreter.Evaluator;
+namespace FileManager.Core.Interpreter;
 public static class FMSemanticRuleset {
+    public readonly static Dictionary<SyntaxTokenKind, SyntaxTokenKind[]> TTFollowups = new() {
+        // Basic tokens
+        [SyntaxTokenKind.EndOfFile] = [],
+        [SyntaxTokenKind.OpenParenthesis] = [SyntaxTokenKind.StringLiteral,
+            SyntaxTokenKind.NumericLiteral],
+
+        [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral, 
+            SyntaxTokenKind.NumericLiteral],
+
+        [SyntaxTokenKind.Semicolon] = [SyntaxTokenKind.ArchiveKeyword,
+            SyntaxTokenKind.CopyKeyword,
+            SyntaxTokenKind.MoveKeyword,
+            SyntaxTokenKind.ReplaceKeyword,
+            SyntaxTokenKind.EndOfFile],
+
+        // Literals
+        [SyntaxTokenKind.NumericLiteral] = [SyntaxTokenKind.Comma,
+            SyntaxTokenKind.Semicolon,
+            SyntaxTokenKind.CloseParenthesis],
+
+        [SyntaxTokenKind.StringLiteral] = [SyntaxTokenKind.Comma,
+            SyntaxTokenKind.Semicolon,
+            SyntaxTokenKind.CloseParenthesis],
+
+        // Commands
+
+
+        // Command parameters
+    };
+
+    public readonly static Dictionary<SyntaxNodeKind, SyntaxTokenKind[]> NTFollowups = new() {
+        [SyntaxNodeKind.Argument] = [SyntaxTokenKind.Comma]
+    };
+
+    public readonly static Dictionary<SyntaxNodeKind, SyntaxNodeKind[]> NNFollowups = new() {
+
+    };
+
+    public static bool CheckTokenToTokenFollowup(SyntaxTokenKind tokenKind, SyntaxTokenKind followTokenKind)
+        => TTFollowups.ContainsKey(tokenKind) && TTFollowups[tokenKind].Contains(followTokenKind);
+
+    public static bool CheckTokenToNodeFollowup(SyntaxNodeKind nodeKind, SyntaxTokenKind followTokenKind)
+        => NTFollowups.ContainsKey(nodeKind) && NTFollowups[nodeKind].Contains(followTokenKind);
+
+    public static bool CheckNodeToNodeFollowup(SyntaxNodeKind nodeKind, SyntaxNodeKind followNodeKind)
+        => NNFollowups.ContainsKey(nodeKind) && NNFollowups[nodeKind].Contains(followNodeKind);
+
     public readonly static Dictionary<SyntaxNodeKind, SyntaxTokenKind[]> ValidCommandParameters = new() {
         [SyntaxNodeKind.ArchiveCommand] = [SyntaxTokenKind.SourceParameter,
             SyntaxTokenKind.TargetParameter,

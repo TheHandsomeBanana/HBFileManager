@@ -1,3 +1,6 @@
-﻿COPY -s="C:\test.txt", "C:\test2.txt" -t="C:\test"
+﻿COPY -s="C:\test.txt", "C:\test2.txt" -t="C:\test";
 MOVE -mo= -s=("C:\test1.txt", "C:\test2.txt", "C:\test3.txt") -t="C:\test";
 COPY -mo -s ("C:\test1.txt", "C:\test2.txt") -t=("C:\test" "D:\test");
+
+ARCHIVE -type="zip" -source=(, , 
+, , "abc")

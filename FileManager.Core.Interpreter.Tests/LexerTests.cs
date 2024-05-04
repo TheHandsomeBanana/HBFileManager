@@ -1,4 +1,3 @@
-using FileManager.Core.Interpreter.Lexer;
 using FileManager.Core.Interpreter.Syntax;
 using FileManager.TestBase;
 using HBLibrary.Code.Interpreter;

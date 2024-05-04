@@ -4,7 +4,7 @@ using HBLibrary.Code.Interpreter.Lexer;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace FileManager.Core.Interpreter.Lexer;
+namespace FileManager.Core.Interpreter;
 public class FMLexer : ILexer<SyntaxToken> {
     private readonly List<SimpleError> syntaxErrors = [];
     private readonly LexContentReader ContentReader = new LexContentReader();
