@@ -14,7 +14,7 @@ public static class FMSemanticRuleset {
         [SyntaxTokenKind.OpenParenthesis] = [SyntaxTokenKind.StringLiteral,
             SyntaxTokenKind.NumericLiteral],
 
-        [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral, 
+        [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral,
             SyntaxTokenKind.NumericLiteral],
 
         [SyntaxTokenKind.Semicolon] = [SyntaxTokenKind.ArchiveKeyword,
@@ -33,13 +33,41 @@ public static class FMSemanticRuleset {
             SyntaxTokenKind.CloseParenthesis],
 
         // Commands
+        [SyntaxTokenKind.ArchiveKeyword] = [SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.TypeParameter],
 
+        [SyntaxTokenKind.CopyKeyword] = [SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.ModifiedOnlyParameter],
+
+        [SyntaxTokenKind.MoveKeyword] = [SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.ModifiedOnlyParameter],
+
+        [SyntaxTokenKind.ReplaceKeyword] = [SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.ModifiedOnlyParameter],
 
         // Command parameters
+        [SyntaxTokenKind.TypeParameter] = [SyntaxTokenKind.Equals],
+
+        [SyntaxTokenKind.TargetParameter] = [SyntaxTokenKind.Equals],
+        
+        [SyntaxTokenKind.SourceParameter] = [SyntaxTokenKind.Equals],
+
+        [SyntaxTokenKind.ModifiedOnlyParameter] = [SyntaxTokenKind.Semicolon,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TypeParameter]
+
     };
 
     public readonly static Dictionary<SyntaxNodeKind, SyntaxTokenKind[]> NTFollowups = new() {
-        [SyntaxNodeKind.Argument] = [SyntaxTokenKind.Comma]
+        [SyntaxNodeKind.Argument] = [SyntaxTokenKind.Comma],
+        
+        // Commands
+        [SyntaxNodeKind.CommandStatement] = [SyntaxTokenKind.Semicolon],
     };
 
     public readonly static Dictionary<SyntaxNodeKind, SyntaxNodeKind[]> NNFollowups = new() {
