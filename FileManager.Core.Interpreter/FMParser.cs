@@ -61,7 +61,7 @@ public class FMParser : IParser<SyntaxTree, SyntaxToken>
 
     private CommandStatementSyntax? BuildCommandStatement()
     {
-        CommandStatementSyntax commandStatement = new CommandStatementSyntax(SyntaxNodeKind.CommandStatement);
+        CommandStatementSyntax commandStatement = new CommandStatementSyntax();
         TextSpan start = tokenReader.GetCurrentFullSpan();
         LineSpan startLine = tokenReader.GetCurrentLineSpan();
 

@@ -11,7 +11,7 @@ namespace FileManager.Core.Interpreter.Syntax.Commands;
 public class CommandStatementSyntax : StatementSyntax {
     public CommandSyntax? Command { get; private set; }
 
-    public CommandStatementSyntax(SyntaxNodeKind kind) : base(kind) {
+    public CommandStatementSyntax() : base(SyntaxNodeKind.CommandStatement) {
     }
 
     public override void AddChildNode(SyntaxNode node) {

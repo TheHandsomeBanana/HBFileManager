@@ -11,8 +11,15 @@ public static class FMSemanticRuleset {
     public readonly static Dictionary<SyntaxTokenKind, SyntaxTokenKind[]> TTFollowups = new() {
         // Basic tokens
         [SyntaxTokenKind.EndOfFile] = [],
+
         [SyntaxTokenKind.OpenParenthesis] = [SyntaxTokenKind.StringLiteral,
             SyntaxTokenKind.NumericLiteral],
+
+        [SyntaxTokenKind.CloseParenthesis] = [SyntaxTokenKind.Semicolon,
+            SyntaxTokenKind.TargetParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TypeParameter,
+            SyntaxTokenKind.ModifiedOnlyParameter],
 
         [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral, 
             SyntaxTokenKind.NumericLiteral],
@@ -22,6 +29,10 @@ public static class FMSemanticRuleset {
             SyntaxTokenKind.MoveKeyword,
             SyntaxTokenKind.ReplaceKeyword,
             SyntaxTokenKind.EndOfFile],
+
+        [SyntaxTokenKind.Equals] = [SyntaxTokenKind.OpenParenthesis,
+            SyntaxTokenKind.StringLiteral,
+            SyntaxTokenKind.NumericLiteral],
 
         // Literals
         [SyntaxTokenKind.NumericLiteral] = [SyntaxTokenKind.Comma,
@@ -33,17 +44,58 @@ public static class FMSemanticRuleset {
             SyntaxTokenKind.CloseParenthesis],
 
         // Commands
+        [SyntaxTokenKind.CopyKeyword] = [SyntaxTokenKind.ModifiedOnlyParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter],
+
+        [SyntaxTokenKind.MoveKeyword] = [SyntaxTokenKind.ModifiedOnlyParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter],
+
+        [SyntaxTokenKind.ReplaceKeyword] = [SyntaxTokenKind.ModifiedOnlyParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter],
+
+        [SyntaxTokenKind.ArchiveKeyword] = [SyntaxTokenKind.TypeParameter,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TargetParameter],
 
 
         // Command parameters
+        [SyntaxTokenKind.TargetParameter] = [SyntaxTokenKind.Equals],
+
+        [SyntaxTokenKind.SourceParameter] = [SyntaxTokenKind.Equals],
+
+        [SyntaxTokenKind.TypeParameter] = [SyntaxTokenKind.Equals],
+
+        [SyntaxTokenKind.ModifiedOnlyParameter] = [SyntaxTokenKind.Semicolon,
+            SyntaxTokenKind.SourceParameter,
+            SyntaxTokenKind.TypeParameter,
+            SyntaxTokenKind.TargetParameter]
     };
 
     public readonly static Dictionary<SyntaxNodeKind, SyntaxTokenKind[]> NTFollowups = new() {
-        [SyntaxNodeKind.Argument] = [SyntaxTokenKind.Comma]
+        // Commands
+        [SyntaxNodeKind.ArchiveCommand] = [SyntaxTokenKind.Semicolon],
+
+        [SyntaxNodeKind.CopyCommand] = [SyntaxTokenKind.Semicolon],
+
+        [SyntaxNodeKind.MoveCommand] = [SyntaxTokenKind.Semicolon],
+
+        [SyntaxNodeKind.ReplaceCommand] = [SyntaxTokenKind.Semicolon],
+
+        // Command parameters
+        [SyntaxNodeKind.CommandParameterList] = [],
+        [SyntaxNodeKind.CommandParameterAssignment] = [],
+
+        // Others
+        [SyntaxNodeKind.InterpreterUnit] = [],
+
+        [SyntaxNodeKind.Argument] = [SyntaxTokenKind.Comma],
     };
 
     public readonly static Dictionary<SyntaxNodeKind, SyntaxNodeKind[]> NNFollowups = new() {
-
+        [SyntaxNodeKind.CommandStatement] = [SyntaxNodeKind.CommandStatement]
     };
 
     public static bool CheckTokenToTokenFollowup(SyntaxTokenKind tokenKind, SyntaxTokenKind followTokenKind)

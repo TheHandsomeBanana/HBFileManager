@@ -1,5 +1,4 @@
-﻿using FileManager.Core.Interpreter.Parser;
-using FileManager.Core.Interpreter.Syntax;
+﻿using FileManager.Core.Interpreter.Syntax;
 using FileManager.Core.Interpreter.Syntax.Commands;
 using HBLibrary.Code.Interpreter;
 using HBLibrary.Code.Interpreter.Evaluator;
@@ -50,7 +49,7 @@ public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
     private List<SimpleError> CheckParameter(CommandParameterSyntax commandParameter)
     {
         CommandSyntax parentCommand = (CommandSyntax)commandParameter.Parent!;
-        if (FMSyntaxRuleset.CheckValidCommandParameter(parentCommand.Kind, commandParameter.Kind))
+        if (FMSemanticRuleset.CheckValidCommandParameter(parentCommand.Kind, commandParameter.Kind))
         {
             return [new SimpleError(
                 commandParameter.Span,
