@@ -4,15 +4,23 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:FileManager.UI.Views"
+      xmlns:treeViewProps="clr-namespace:HBLibrary.Wpf.Styles.TreeView;assembly=HBLibrary.Wpf"
+      xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="SettingsPage">
-    
+
+    <Page.DataContext>
+        <viewModels:SettingsPageViewModel/>
+    </Page.DataContext>
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViews.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViewItems.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -22,10 +30,21 @@
             <ColumnDefinition Width="200"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        
-        
-        <TreeView Grid.Column="0">
+
+
+        <TreeView Style="{StaticResource HBDark_TreeView}"
+                  Grid.Column="0"
+                  ItemsSource="{Binding Options}"
+                  treeViewProps:TreeViewAttachedProperties.SelectedItem="{Binding SelectedOption}"
+                  ItemContainerStyle="{StaticResource HBDark_TreeViewItem}">
             
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
         </TreeView>
+
+        <Frame Source="{Binding CurrentPageSource}" Grid.Column="1"/>
     </Grid>
 </Page>

@@ -18,26 +18,26 @@ public class MainWindowViewModel : ViewModelBase {
     public ObservableCollection<NavButton> NavButtons { get; set; }
 
 
-    private NavButton _currentPageSelection;
+    private NavButton currentPageSelection;
     public NavButton CurrentPageSelection {
         get {
-            return _currentPageSelection;
+            return currentPageSelection;
         }
         set {
-            _currentPageSelection = value;
+            currentPageSelection = value;
             NotifyPropertyChanged();
 
-            if (_currentPageSelection != null) {
-                CurrentPageSource = _currentPageSelection.NavLink;
+            if (currentPageSelection != null) {
+                CurrentPageSource = currentPageSelection.NavLink;
             }
         }
     }
 
-    private Uri _currentPageSource;
+    private Uri currentPageSource;
     public Uri CurrentPageSource {
-        get { return _currentPageSource; }
+        get { return currentPageSource; }
         set {
-            _currentPageSource = value;
+            currentPageSource = value;
             NotifyPropertyChanged();
         }
     }
@@ -115,8 +115,8 @@ public class MainWindowViewModel : ViewModelBase {
             }
         ];
 
-        _currentPageSelection = NavButtons[0];
-        _currentPageSource = NavButtons[0].NavLink;
+        currentPageSelection = NavButtons[0];
+        currentPageSource = NavButtons[0].NavLink;
     }
 
 }
