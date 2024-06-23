@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 
 namespace FileManager.UI.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
+    public RelayCommand WindowClosedCommand { get; set; }
     public ObservableCollection<NavButton> NavButtons { get; set; }
 
 
@@ -43,6 +44,9 @@ public class MainWindowViewModel : ViewModelBase {
     }
 
     public MainWindowViewModel() {
+        WindowClosedCommand = new RelayCommand(OnWindowClosed, true);
+
+
         double height = 80;
         double iconHeight = 25.0;
         double iconWidth = 25.0;
@@ -119,4 +123,7 @@ public class MainWindowViewModel : ViewModelBase {
         currentPageSource = NavButtons[0].NavLink;
     }
 
+    private void OnWindowClosed(object obj) {
+        
+    }
 }
