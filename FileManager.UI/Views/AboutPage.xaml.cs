@@ -1,4 +1,5 @@
 ﻿using FileManager.UI.ViewModels;
+using FileManager.UI.ViewModels.SettingsPageViewModels;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Services;
 using System;
@@ -26,6 +27,9 @@ public partial class AboutPage : Page {
         InitializeComponent();
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-        this.DataContext = viewModelCache.GetOrNew<AboutPageViewModel>();
+        AboutPageViewModel viewModel = viewModelCache.GetOrNew<AboutPageViewModel>();
+        viewModelCache.AddOrUpdate(viewModel);
+
+        this.DataContext = viewModel;
     }
 }

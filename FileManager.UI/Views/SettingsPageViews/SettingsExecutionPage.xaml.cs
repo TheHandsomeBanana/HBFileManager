@@ -29,7 +29,10 @@ namespace FileManager.UI.Views.SettingsPageViews
             InitializeComponent();
 
             IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-            this.DataContext = viewModelCache.GetOrNew<SettingsExecutionPageViewModel>();
+            SettingsExecutionPageViewModel viewModel = viewModelCache.GetOrNew<SettingsExecutionPageViewModel>();
+            viewModelCache.AddOrUpdate(viewModel);
+
+            this.DataContext = viewModel;
         }
     }
 }
