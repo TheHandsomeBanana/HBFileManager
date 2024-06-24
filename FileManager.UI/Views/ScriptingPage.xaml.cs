@@ -1,4 +1,7 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels;
+using HBLibrary.Common.DI.Unity;
+using HBLibrary.Wpf.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,17 +15,18 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Unity;
 
-namespace FileManager.UI.Views
-{
+namespace FileManager.UI.Views {
     /// <summary>
     /// Interaction logic for ScriptingPage.xaml
     /// </summary>
-    public partial class ScriptingPage : Page
-    {
-        public ScriptingPage()
-        {
+    public partial class ScriptingPage : Page {
+        public ScriptingPage() {
             InitializeComponent();
+
+            IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
+            this.DataContext = viewModelCache.GetOrNew<ScriptingPageViewModel>();
         }
     }
 }

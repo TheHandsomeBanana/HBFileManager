@@ -22,7 +22,7 @@
         WindowStartupLocation="CenterScreen">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="30" GlassFrameThickness="0" ResizeBorderThickness="5" CornerRadius="5" NonClientFrameEdges="None"/>
+        <WindowChrome CaptionHeight="40" GlassFrameThickness="0" ResizeBorderThickness="5" CornerRadius="6" NonClientFrameEdges="None"/>
     </WindowChrome.WindowChrome>
 
     <Window.DataContext>
@@ -67,7 +67,7 @@
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"></RowDefinition>
+                <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
 
@@ -91,20 +91,17 @@
                             VerticalAlignment="Center">
                 <Button x:Name="MinimizeButton"
                             Style="{StaticResource MinimizeButton}" 
-                            Width="40"
                             WindowChrome.IsHitTestVisibleInChrome="True"
                             ToolTip="Minimize"
                             Command="{x:Static SystemCommands.MinimizeWindowCommand}"/>
                 <Button x:Name="RestoreButton"
                             Style="{StaticResource RestoreButton}" 
-                            Width="40"
                             WindowChrome.IsHitTestVisibleInChrome="True" 
                             ToolTip="Restore"
                             Visibility="Collapsed"
                             Command="{x:Static SystemCommands.RestoreWindowCommand}"/>
                 <Button x:Name="MaximizeButton"
                             Style="{StaticResource MaximizeButton}" 
-                            Width="40"
                             WindowChrome.IsHitTestVisibleInChrome="True" 
                             ToolTip="Maximize"
                             Visibility="Visible"
@@ -112,7 +109,7 @@
                 <Button x:Name="CloseButton"
                             buttonProps:ButtonAttachedProperties.CornerRadius="0 5 0 0"
                             Style="{StaticResource CloseButtonRed}" 
-                            Width="40"
+                            Width="50"
                             WindowChrome.IsHitTestVisibleInChrome="True" 
                             ToolTip="Close"
                             Command="{x:Static SystemCommands.CloseWindowCommand}"/>
@@ -138,7 +135,7 @@
                 </ListBox>
             </Border>
 
-            <Frame Grid.Column="1" Grid.Row="1" 
+            <Frame x:Name="MainFrame" Grid.Column="1" Grid.Row="1" 
                    NavigationUIVisibility="Hidden"
                    Source="{Binding CurrentPageSource}">
 

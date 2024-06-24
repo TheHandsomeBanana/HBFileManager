@@ -21,6 +21,7 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViews.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViewItems.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Frame/Frames.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -34,6 +35,7 @@
 
         <TreeView Style="{StaticResource HBDark_TreeView}"
                   Grid.Column="0"
+                  Padding="0 5"
                   ItemsSource="{Binding Options}"
                   treeViewProps:TreeViewAttachedProperties.SelectedItem="{Binding SelectedOption}"
                   ItemContainerStyle="{StaticResource HBDark_TreeViewItem}">
@@ -45,6 +47,6 @@
             </TreeView.ItemTemplate>
         </TreeView>
 
-        <Frame Source="{Binding CurrentPageSource}" Grid.Column="1"/>
+        <Frame Style="{StaticResource HBDark_Frame}" Margin="10 0 0 0" Source="{Binding CurrentPageSource}" Grid.Column="1"/>
     </Grid>
 </Page>

@@ -1,6 +1,9 @@
-﻿using HBLibrary.Wpf.Commands;
+﻿using FileManager.UI.Models;
+using HBLibrary.Common.DI.Unity;
+using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Extensions;
 using HBLibrary.Wpf.Navigation;
+using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,13 +12,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Markup.Localizer;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Navigation;
+using Unity;
 
 namespace FileManager.UI.ViewModels;
 public class MainWindowViewModel : ViewModelBase {
+    private readonly IViewModelCache viewModelCache;
+    private ViewModelBase CurrentPageViewModel;
+
     public RelayCommand WindowClosedCommand { get; set; }
+
     public ObservableCollection<NavButton> NavButtons { get; set; }
 
 
@@ -40,12 +50,21 @@ public class MainWindowViewModel : ViewModelBase {
         set {
             currentPageSource = value;
             NotifyPropertyChanged();
+
+            if(CurrentPageViewModel != null) {
+                viewModelCache.AddOrUpdate(CurrentPageViewModel);
+            }
+
+            if(value is not null) { 
+                CurrentPageViewModel = GetViewModelForPage(value);
+            }
         }
     }
 
     public MainWindowViewModel() {
-        WindowClosedCommand = new RelayCommand(OnWindowClosed, true);
+        viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
 
+        WindowClosedCommand = new RelayCommand(OnWindowClosed, true);
 
         double height = 80;
         double iconHeight = 25.0;
@@ -105,6 +124,19 @@ public class MainWindowViewModel : ViewModelBase {
                 SelectedBackground = selectedBackground,
                 Background = background,
             },
+            new NavButton {
+                Text = "Application Log",
+                Icon = Geometry.Parse("M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H13C12.59,21.75 12.2,21.44 11.86,21.1C9.22,18.67 9.05,14.56 11.5,11.92C13.69,9.5 17.33,9.13 20,11V8L14,2M13,9V3.5L18.5,9H13M20.31,18.9C21.64,16.79 21,14 18.91,12.68C16.8,11.35 14,12 12.69,14.08C11.35,16.19 12,18.97 14.09,20.3C15.55,21.23 17.41,21.23 18.88,20.32L22,23.39L23.39,22L20.31,18.9M16.5,19A2.5,2.5 0 0,1 14,16.5A2.5,2.5 0 0,1 16.5,14A2.5,2.5 0 0,1 19,16.5A2.5,2.5 0 0,1 16.5,19Z"),
+                IconHeight = iconHeight,
+                IconWidth = iconWidth,
+                IconFill = BrushHelper.GetColorFromHex("#cdd5e0")!,
+                NavLink = new Uri("Views/ApplicationLogPage.xaml", UriKind.Relative),
+                Height = height,
+                Foreground = foreground,
+                HorizontalAlignment = horizontalAlignment,
+                SelectedBackground = selectedBackground,
+                Background = background,
+            },
             new NavButton { Text = "About",
                 Icon = Geometry.Parse("M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"),
                 IconHeight = iconHeight,
@@ -121,9 +153,30 @@ public class MainWindowViewModel : ViewModelBase {
 
         currentPageSelection = NavButtons[0];
         currentPageSource = NavButtons[0].NavLink;
+        CurrentPageViewModel = GetViewModelForPage(currentPageSource);
     }
 
     private void OnWindowClosed(object obj) {
         
+    }
+
+    private ViewModelBase GetViewModelForPage(Uri pageUri) {
+
+        switch (pageUri.ToString()) {
+            case "Views/ExplorerPage.xaml":
+                return viewModelCache.GetOrNew<ExplorerPageViewModel>();
+            case "Views/ScriptingPage.xaml":
+                return viewModelCache.GetOrNew<ScriptingPageViewModel>();
+            case "Views/ExecutionPage.xaml":
+                return viewModelCache.GetOrNew<ExecutionPageViewModel>();
+            case "Views/SettingsPage.xaml":
+                return viewModelCache.GetOrNew<SettingsPageViewModel>();
+            case "Views/ApplicationLogPage.xaml":
+                return viewModelCache.GetOrNew<ApplicationLogPageViewModel>();
+            case "Views/AboutPage.xaml":
+                return viewModelCache.GetOrNew<AboutPageViewModel>();
+        }
+
+        throw new InvalidOperationException("Unknown page uri");
     }
 }

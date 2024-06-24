@@ -17,15 +17,19 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Unity;
 
-namespace FileManager.UI.Views.SettingsPageViews;
-/// <summary>
-/// Interaction logic for SettingsEnvironmentPage.xaml
-/// </summary>
-public partial class SettingsEnvironmentPage : Page {
-    public SettingsEnvironmentPage() {
-        InitializeComponent();
+namespace FileManager.UI.Views.SettingsPageViews
+{
+    /// <summary>
+    /// Interaction logic for SettingsExecutionPage.xaml
+    /// </summary>
+    public partial class SettingsExecutionPage : Page
+    {
+        public SettingsExecutionPage()
+        {
+            InitializeComponent();
 
-        IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-        this.DataContext = viewModelCache.GetOrNew<SettingsEnvironmentPageViewModel>();
+            IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
+            this.DataContext = viewModelCache.GetOrNew<SettingsExecutionPageViewModel>();
+        }
     }
 }

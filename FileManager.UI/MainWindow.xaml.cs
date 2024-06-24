@@ -1,8 +1,11 @@
-﻿using System.Reflection.Metadata;
+﻿using FileManager.UI.ViewModels;
+using HBLibrary.Wpf.Services;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Navigation;
 
 namespace FileManager.UI {
     /// <summary>
