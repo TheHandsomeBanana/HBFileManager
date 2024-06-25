@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.Models.SettingsPageModels {
-    public class SettingsWinRARPageModel {
-        public bool UseWinRAR { get; set; }
-        public string Location { get; set; } = "";
-        public string LicenseKeyLocation { get; set; } = "";
-    }
+namespace FileManager.UI.Models.SettingsPageModels;
+public class SettingsWinRARPageModel {
+    public bool UseWinRAR { get; set; }
+    public string Location { get; set; } = "";
+    public string LicenseKeyLocation { get; set; } = "";
 }

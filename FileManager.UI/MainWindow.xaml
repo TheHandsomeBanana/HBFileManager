@@ -124,18 +124,21 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type nav:NavButton}">
                             <nav:NavButton Icon="{Binding Icon}" 
+                                           IconHeight="25"
+                                           IconWidth="25"
                                            Text="{Binding Text}" 
                                            NavLink="{Binding NavLink}"
                                            Height="80" 
                                            SelectedBackground="{StaticResource HBDark_Border}" 
                                            HorizontalAlignment="Stretch" 
-                                           Foreground="White"/>
+                                           Foreground="White"
+                                           Background="Transparent"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Border>
 
-            <Frame x:Name="MainFrame" Grid.Column="1" Grid.Row="1" 
+            <Frame x:Name="MainWindowFrame" Grid.Column="1" Grid.Row="1" 
                    NavigationUIVisibility="Hidden"
                    Source="{Binding CurrentPageSource}">
 

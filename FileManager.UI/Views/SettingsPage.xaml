@@ -47,6 +47,9 @@
             </TreeView.ItemTemplate>
         </TreeView>
 
-        <Frame Style="{StaticResource HBDark_Frame}" Margin="10 0 0 0" Source="{Binding CurrentPageSource}" Grid.Column="1"/>
+        <Frame x:Name="SettingsPageFrame" 
+               Style="{StaticResource HBDark_Frame}" 
+               Margin="10 0 0 0" 
+               Source="{Binding CurrentPageSource}" Grid.Column="1"/>
     </Grid>
 </Page>

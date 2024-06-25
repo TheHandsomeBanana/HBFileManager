@@ -23,13 +23,16 @@ namespace FileManager.UI.ViewModels.SettingsPageViewModels {
                 return model.UseWinRAR;
             }
             set {
-                model.UseWinRAR = value;
-                NotifyPropertyChanged();
 
                 if(!value) {
                     Location = "";
                     LicenseKeyLocation = "";
+                    ErrorText = "";
+                    ErrorTextVisibility = Visibility.Collapsed;
                 }
+
+                model.UseWinRAR = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -38,6 +41,10 @@ namespace FileManager.UI.ViewModels.SettingsPageViewModels {
             set {
                 model.Location = value;
                 NotifyPropertyChanged();
+
+                if (!UseWinRAR) {
+                    return;
+                }
 
                 if (CheckProvidedLocation(value)) {
                     ValidateWinRARLicense();
@@ -52,9 +59,6 @@ namespace FileManager.UI.ViewModels.SettingsPageViewModels {
         public Visibility ErrorTextVisibility {
             get => errorTextVisibility;
             set {
-                if (!UseWinRAR)
-                    return;
-
                 errorTextVisibility = value;
                 NotifyPropertyChanged();
             }
@@ -73,9 +77,6 @@ namespace FileManager.UI.ViewModels.SettingsPageViewModels {
         public string ErrorText {
             get => errorText;
             set {
-                if (!UseWinRAR)
-                    return;
-
                 errorText = value;
                 NotifyPropertyChanged();
             }

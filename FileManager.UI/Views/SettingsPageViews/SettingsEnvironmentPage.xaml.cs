@@ -27,7 +27,6 @@ public partial class SettingsEnvironmentPage : Page {
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
         SettingsEnvironmentPageViewModel viewModel = viewModelCache.GetOrNew<SettingsEnvironmentPageViewModel>();
-        viewModelCache.AddOrUpdate(viewModel);
 
         this.DataContext = viewModel;
     }

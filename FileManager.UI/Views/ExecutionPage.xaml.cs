@@ -17,22 +17,17 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Unity;
 
-namespace FileManager.UI.Views
-{
-    /// <summary>
-    /// Interaction logic for ExecutionPage.xaml
-    /// </summary>
-    public partial class ExecutionPage : Page
-    {
-        public ExecutionPage()
-        {
-            InitializeComponent();
+namespace FileManager.UI.Views; 
+/// <summary>
+/// Interaction logic for ExecutionPage.xaml
+/// </summary>
+public partial class ExecutionPage : Page {
+    public ExecutionPage() {
+        InitializeComponent();
 
-            IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-            ExecutionPageViewModel viewModel = viewModelCache.GetOrNew<ExecutionPageViewModel>();
-            viewModelCache.AddOrUpdate(viewModel);
+        IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
+        ExecutionPageViewModel viewModel = viewModelCache.GetOrNew<ExecutionPageViewModel>();
 
-            this.DataContext = viewModel;
-        }
+        this.DataContext = viewModel;
     }
 }

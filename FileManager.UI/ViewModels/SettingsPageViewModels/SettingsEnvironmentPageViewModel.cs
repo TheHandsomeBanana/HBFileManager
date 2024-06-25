@@ -7,5 +7,10 @@ using System.Threading.Tasks;
 
 namespace FileManager.UI.ViewModels.SettingsPageViewModels {
     public class SettingsEnvironmentPageViewModel : ViewModelBase {
+        public string TestEnvironmentSetting { get; set; } = "Testvalue";
+
+        public SettingsEnvironmentPageViewModel() {
+
+        }
     }
 }

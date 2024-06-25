@@ -27,7 +27,6 @@ public partial class ExplorerPage : Page {
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
         ExplorerPageViewModel viewModel = viewModelCache.GetOrNew<ExplorerPageViewModel>();
-        viewModelCache.AddOrUpdate(viewModel);
 
         this.DataContext = viewModel;
     }

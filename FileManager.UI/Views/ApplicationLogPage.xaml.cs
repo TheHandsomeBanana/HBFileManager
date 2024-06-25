@@ -17,22 +17,18 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Unity;
 
-namespace FileManager.UI.Views
-{
-    /// <summary>
-    /// Interaction logic for ApplicationLogPage.xaml
-    /// </summary>
-    public partial class ApplicationLogPage : Page
-    {
-        public ApplicationLogPage()
-        {
-            InitializeComponent();
+namespace FileManager.UI.Views;
 
-            IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-            ApplicationLogPageViewModel viewModel = viewModelCache.GetOrNew<ApplicationLogPageViewModel>();
-            viewModelCache.AddOrUpdate(viewModel);
+/// <summary>
+/// Interaction logic for ApplicationLogPage.xaml
+/// </summary>
+public partial class ApplicationLogPage : Page {
+    public ApplicationLogPage() {
+        InitializeComponent();
 
-            this.DataContext = viewModel;
-        }
+        IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
+        ApplicationLogPageViewModel viewModel = viewModelCache.GetOrNew<ApplicationLogPageViewModel>();
+
+        this.DataContext = viewModel;
     }
 }

@@ -27,7 +27,6 @@ namespace FileManager.UI.Views {
 
             IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
             ScriptingPageViewModel viewModel = viewModelCache.GetOrNew<ScriptingPageViewModel>();
-            viewModelCache.AddOrUpdate(viewModel);
 
             this.DataContext = viewModel;
         }

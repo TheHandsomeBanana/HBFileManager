@@ -4,11 +4,31 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:FileManager.UI.Views.SettingsPageViews"
+      xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.SettingsPageViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="SettingsEnvironmentPage">
 
-    <Grid>
-        <Label Content="Test Environment"/>
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <viewModels:SettingsExecutionPageViewModel/>
+    </Page.DataContext>
+
+    <Grid Margin="10">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Test Environment:" Margin="0 0 5 0"/>
+            <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="{Binding TestEnvironmentSetting}"/>
+        </StackPanel>
     </Grid>
 </Page>

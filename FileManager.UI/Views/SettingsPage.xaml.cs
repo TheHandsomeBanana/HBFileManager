@@ -1,6 +1,7 @@
 ﻿using FileManager.UI.ViewModels;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Services;
+using HBLibrary.Wpf.Services.FrameNavigationService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,11 @@ namespace FileManager.UI.Views;
 public partial class SettingsPage : Page {
     public SettingsPage() {
         InitializeComponent();
+        //IFrameNavigationService navigationService = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IFrameNavigationService>();
+        //navigationService.RegisterFrame("SettingsPageFrame", SettingsPageFrame);
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
         SettingsPageViewModel viewModel = viewModelCache.GetOrNew<SettingsPageViewModel>();
-        viewModelCache.AddOrUpdate(viewModel);
 
         this.DataContext = viewModel;
     }

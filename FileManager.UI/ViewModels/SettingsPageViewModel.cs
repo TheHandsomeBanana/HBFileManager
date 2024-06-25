@@ -27,8 +27,6 @@ public class SettingsPageViewModel : ViewModelBase {
         }
     }
 
-   
-
     public ObservableCollection<TreeViewItem> Options { get; set; }
 
     private TreeViewItem selectedOption;

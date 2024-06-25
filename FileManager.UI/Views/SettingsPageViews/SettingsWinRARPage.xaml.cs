@@ -27,7 +27,6 @@ public partial class SettingsWinRARPage : Page {
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
         SettingsWinRARPageViewModel viewModel = viewModelCache.GetOrNew<SettingsWinRARPageViewModel>();
-        viewModelCache.AddOrUpdate(viewModel);
 
 
         this.DataContext = viewModel;

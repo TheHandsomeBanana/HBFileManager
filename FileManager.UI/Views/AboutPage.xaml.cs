@@ -28,7 +28,6 @@ public partial class AboutPage : Page {
 
         IViewModelCache viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
         AboutPageViewModel viewModel = viewModelCache.GetOrNew<AboutPageViewModel>();
-        viewModelCache.AddOrUpdate(viewModel);
 
         this.DataContext = viewModel;
     }
