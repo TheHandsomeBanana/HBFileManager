@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
 
-namespace FileManager.UI.ViewModels.SettingsPageViewModels {
-    public class SettingsWinRARPageViewModel : ViewModelBase {
-        private readonly SettingsWinRARPageModel model;
+namespace FileManager.UI.ViewModels.SettingsViewModels {
+    public class SettingsWinRARViewModel : ViewModelBase {
+        private readonly SettingsWinRARModel model;
 
         public RelayCommand DetectWinRARCommand { get; set; }
         public RelayCommand BrowseLocationCommand { get; set; }
@@ -83,13 +83,13 @@ namespace FileManager.UI.ViewModels.SettingsPageViewModels {
         }
 
 
-        public SettingsWinRARPageViewModel() {
-            model = new SettingsWinRARPageModel();
+        public SettingsWinRARViewModel() {
+            model = new SettingsWinRARModel();
             DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation, true);
             BrowseLocationCommand = new RelayCommand(BrowseLocation, true);
         }
 
-        public SettingsWinRARPageViewModel(SettingsWinRARPageModel model) : this() {
+        public SettingsWinRARViewModel(SettingsWinRARModel model) : this() {
             this.model = model;
         }
 

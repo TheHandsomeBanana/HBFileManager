@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.ViewModels {
-    public class ExplorerPageViewModel : ViewModelBase {
+namespace FileManager.UI.ViewModels
+{
+    public class ScriptingViewModel : ViewModelBase {
     }
 }

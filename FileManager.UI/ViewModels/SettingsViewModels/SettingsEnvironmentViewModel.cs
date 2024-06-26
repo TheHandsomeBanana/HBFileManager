@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.ViewModels.SettingsPageViewModels {
-    public class SettingsEnvironmentPageViewModel : ViewModelBase {
+namespace FileManager.UI.ViewModels.SettingsViewModels {
+    public class SettingsEnvironmentViewModel : ViewModelBase {
         public string TestEnvironmentSetting { get; set; } = "Testvalue";
 
-        public SettingsEnvironmentPageViewModel() {
+        public SettingsEnvironmentViewModel() {
 
         }
     }

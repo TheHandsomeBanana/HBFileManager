@@ -1,7 +1,6 @@
 ﻿using FileManager.UI.ViewModels;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Services;
-using HBLibrary.Wpf.Services.FrameNavigationService;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Windows;

@@ -6,6 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.UI.ViewModels {
-    public class ExecutionPageViewModel : ViewModelBase {
+    public class ApplicationLogViewModel : ViewModelBase {
     }
 }

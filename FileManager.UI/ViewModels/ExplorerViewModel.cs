@@ -6,6 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.UI.ViewModels {
-    public class ApplicationLogPageViewModel : ViewModelBase {
+    public class ExplorerViewModel : ViewModelBase {
     }
 }
