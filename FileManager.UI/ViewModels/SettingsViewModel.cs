@@ -3,6 +3,8 @@ using FileManager.UI.Views.SettingsViews;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
+using HBLibrary.Wpf.Services.NavigationService;
+using HBLibrary.Wpf.Services.NavigationService.Single;
 using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,16 +18,9 @@ using Unity;
 
 namespace FileManager.UI.ViewModels;
 public class SettingsViewModel : ViewModelBase {
-    private readonly IViewModelCache viewModelCache;
-    private ViewModelBase currentViewModel;
-    public ViewModelBase CurrentViewModel {
-        get => currentViewModel;
-        set {
-            currentViewModel = value;
-            NotifyPropertyChanged();
-        }
-    }
-
+    private readonly INavigationService navigationService;
+    private readonly INavigationStore navigationStore;
+    public ViewModelBase CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
     public RelayCommand ChangeViewCommand { get; set; }
 
     public ObservableCollection<TreeViewItem> TreeViewItems { get; set; }
@@ -39,13 +34,20 @@ public class SettingsViewModel : ViewModelBase {
             new TreeViewItem("WinRAR", typeof(SettingsWinRARViewModel)),
         ];
 
-        viewModelCache = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IViewModelCache>();
-        currentViewModel = viewModelCache.GetOrNew<SettingsEnvironmentViewModel>();
+        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+
+        this.navigationStore = container.Resolve<INavigationStore>();
+        this.navigationService = container.Resolve<INavigationService>();
+        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
+    }
+
+    private void SettingsViewModel_CurrentViewModelChanged() {
+        NotifyPropertyChanged(nameof(CurrentViewModel));
     }
 
     private void ChangeView(object obj) {
-        TreeViewItem item = (TreeViewItem)obj;
-        viewModelCache.AddOrUpdate(CurrentViewModel);
-        CurrentViewModel = viewModelCache.GetOrNew(item.ViewModelType);
+        if (obj is TreeViewItem treeViewItem) {
+            navigationService.Navigate(nameof(SettingsViewModel), treeViewItem.ViewModelType);
+        }
     }
 }

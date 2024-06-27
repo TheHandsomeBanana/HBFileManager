@@ -12,15 +12,14 @@ using System.Windows;
 using System.Windows.Navigation;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels {
-    public class SettingsWinRARViewModel : ViewModelBase {
-        private readonly SettingsWinRARModel model;
+    public class SettingsWinRARViewModel : ViewModelBase<SettingsWinRARModel> {
 
         public RelayCommand DetectWinRARCommand { get; set; }
         public RelayCommand BrowseLocationCommand { get; set; }
 
         public bool UseWinRAR {
             get {
-                return model.UseWinRAR;
+                return Model.UseWinRAR;
             }
             set {
 
@@ -31,15 +30,15 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
                     ErrorTextVisibility = Visibility.Collapsed;
                 }
 
-                model.UseWinRAR = value;
+                Model.UseWinRAR = value;
                 NotifyPropertyChanged();
             }
         }
 
         public string Location {
-            get => model.Location;
+            get => Model.Location;
             set {
-                model.Location = value;
+                Model.Location = value;
                 NotifyPropertyChanged();
 
                 if (!UseWinRAR) {
@@ -65,9 +64,9 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         }
 
         public string LicenseKeyLocation {
-            get => model.LicenseKeyLocation;
+            get => Model.LicenseKeyLocation;
             set {
-                model.LicenseKeyLocation = value;
+                Model.LicenseKeyLocation = value;
                 NotifyPropertyChanged();
             }
         }
@@ -84,13 +83,17 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
 
 
         public SettingsWinRARViewModel() {
-            model = new SettingsWinRARModel();
+            Model = new SettingsWinRARModel();
             DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation, true);
             BrowseLocationCommand = new RelayCommand(BrowseLocation, true);
         }
 
         public SettingsWinRARViewModel(SettingsWinRARModel model) : this() {
-            this.model = model;
+            this.Model = model;
+
+            if (UseWinRAR && CheckProvidedLocation(model.Location)) {
+                ValidateWinRARLicense();
+            }
         }
 
         private void DetectWinRARInstallation(object obj) {

@@ -1,6 +1,7 @@
 ﻿using FileManager.UI.ViewModels;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Services;
+using HBLibrary.Wpf.Services.NavigationService;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -17,10 +18,6 @@ namespace FileManager.UI {
         public MainWindow() {
             InitializeComponent();
             StateChanged += MainWindowStateChangeRaised;
-
-            //IFrameNavigationService navigationService = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IFrameNavigationService>();
-            //navigationService.RegisterFrame("MainWindowFrame", MainWindowFrame);
-            //MainWindowFrame.Source = new Uri(App.BaseUri, "FileManager.UI;component/Views/ExplorerPage.xaml");
         }
 
         // Can execute
