@@ -25,22 +25,65 @@ namespace FileManager.UI {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-
+        public static bool StateSaved { get; set; } = false;
         public App() {
             this.Exit += (_, _) => SaveApplicationState();
             AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveApplicationState();
             AppDomain.CurrentDomain.UnhandledException += (_, _) => SaveApplicationState();
-            
+
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
+
             container.RegisterSingleton<INavigationService, NavigationService>();
             container.RegisterSingleton<INavigationStore, NavigationStore>();
+            container.RegisterSingleton<IViewModelStore, ViewModelStore>();
+
             container.RegisterFactory<IJsonFileService>(s => {
                 JsonFileService jsonFileService = new JsonFileService();
                 jsonFileService.UseBase64 = true;
                 return jsonFileService;
             }, new ContainerControlledLifetimeManager());
 
+
+            AddApplicationStorage(container);
+            InitStores(container);
+        }
+
+        private void InitStores(IUnityContainer container) {
+            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+
+            IStorageEntry<SettingsWinRARCoreModel> settingsWinRARCoreModelEntry = applicationStorage.GetStorageEntry<SettingsWinRARCoreModel>(StorageEntryType.Json, false);
+
+            SettingsWinRARCoreModel settingsWinRARCoreModel = settingsWinRARCoreModelEntry.Get() ?? new SettingsWinRARCoreModel();
+            SettingsWinRARModel settingsWinRARModel = AutoMapper.MapUnsafe<SettingsWinRARCoreModel, SettingsWinRARModel>(settingsWinRARCoreModel);
+
+            INavigationStore navigationStore = container.Resolve<INavigationStore>();
+
+            ExplorerViewModel mainViewModelEntryChild = new ExplorerViewModel();
+            SettingsEnvironmentViewModel settingsViewModelEntryChild = new SettingsEnvironmentViewModel();
+
+            navigationStore[nameof(MainViewModel)] = new ActiveViewModel(mainViewModelEntryChild);
+            navigationStore[nameof(SettingsViewModel)] = new ActiveViewModel(settingsViewModelEntryChild);
+
+            IViewModelStore viewModelStore = container.Resolve<IViewModelStore>();
+            viewModelStore.InitViewModelInstances(e =>
+                e.AddViewModel(new ExplorerViewModel())
+                .AddViewModel(new JobsViewModel())
+                .AddViewModel(new ScriptingViewModel())
+                .AddViewModel(new ExecutionViewModel())
+                .AddViewModel(new SettingsViewModel())
+                .AddViewModel(new ApplicationLogViewModel())
+                .AddViewModel(new AboutViewModel())
+                .AddViewModel(new SettingsEnvironmentViewModel())
+                .AddViewModel(new SettingsExecutionViewModel())
+                .AddViewModel(new SettingsWinRARViewModel(settingsWinRARModel))
+                .Build());
+
+            
+        }
+
+
+        private void AddApplicationStorage(IUnityContainer container) {
             string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Storage");
             Directory.CreateDirectory(storagePath);
             ApplicationStorage appStorage = new ApplicationStorage();
@@ -48,49 +91,24 @@ namespace FileManager.UI {
             appStorage.BasePath = storagePath;
 
             container.RegisterInstance<IApplicationStorage>(appStorage);
-
-            InitializeNavigationStore(container);
         }
 
-        
-
-        private void InitializeNavigationStore(IUnityContainer container) {
-            ExplorerViewModel mainViewModelStartControl = new ExplorerViewModel();
-            SettingsEnvironmentViewModel settingsViewModelStartControl = new SettingsEnvironmentViewModel();
-
-            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-            
-            IStorageEntry<SettingsWinRARCoreModel> settingsWinRARCoreModelEntry = applicationStorage.GetStorageEntry<SettingsWinRARCoreModel>(StorageEntryType.Json, false);
-
-            SettingsWinRARCoreModel settingsWinRARCoreModel = settingsWinRARCoreModelEntry.Get() ?? new SettingsWinRARCoreModel();
-            SettingsWinRARModel settingsWinRARModel = AutoMapper.MapUnsafe<SettingsWinRARCoreModel, SettingsWinRARModel>(settingsWinRARCoreModel);
-
-            var navigationStore = container.Resolve<INavigationStore>();
-            navigationStore[nameof(MainViewModel)] = new ActiveViewModel(mainViewModelStartControl);
-            navigationStore[nameof(SettingsViewModel)] = new ActiveViewModel(settingsViewModelStartControl);
-
-            navigationStore.InitViewModelInstances(e =>
-                e.AddViewModel(mainViewModelStartControl)
-                .AddViewModel(new ScriptingViewModel())
-                .AddViewModel(new ExecutionViewModel())
-                .AddViewModel(new SettingsViewModel())
-                .AddViewModel(new ApplicationLogViewModel())
-                .AddViewModel(new AboutViewModel())
-                .AddViewModel(settingsViewModelStartControl)
-                .AddViewModel(new SettingsExecutionViewModel())
-                .AddViewModel(new SettingsWinRARViewModel(settingsWinRARModel))
-                .Build());
-        }
 
         public static void SaveApplicationState() {
+            if (StateSaved) {
+                return;
+            }
+
+            StateSaved = true;
+
             IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
             if (container is null)
                 return;
 
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-            INavigationStore navigationStore = container.Resolve<INavigationStore>();
+            IViewModelStore viewModelStore = container.Resolve<IViewModelStore>();
 
-            SettingsWinRARViewModel settingsWinRARViewModel = navigationStore.GetStoredViewModel<SettingsWinRARViewModel>();
+            SettingsWinRARViewModel settingsWinRARViewModel = viewModelStore.GetStoredViewModel<SettingsWinRARViewModel>();
             SettingsWinRARCoreModel settingsWinRARCoreModel = AutoMapper.MapUnsafe<SettingsWinRARModel, SettingsWinRARCoreModel>(settingsWinRARViewModel.Model);
 
 

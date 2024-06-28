@@ -32,6 +32,7 @@ public class MainViewModel : ViewModelBase {
     public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
     public NavigateCommand<ExplorerViewModel> NavigateToExplorerCommand { get; set; }
+    public NavigateCommand<JobsViewModel> NavigateToJobsCommand { get; set; }
     public NavigateCommand<ScriptingViewModel> NavigateToScriptingCommand { get; set; }
     public NavigateCommand<ExecutionViewModel> NavigateToExecutionCommand { get; set; }
     public NavigateCommand<SettingsViewModel> NavigateToSettingsCommand { get; set; }
@@ -49,6 +50,7 @@ public class MainViewModel : ViewModelBase {
         INavigationService navigationService = container.Resolve<INavigationService>();
 
         NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService);
+        NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService);
         NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService);
         NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService);
         NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService);
