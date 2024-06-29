@@ -45,20 +45,25 @@ public class MainViewModel : ViewModelBase {
 
 
     public MainViewModel() {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-        this.navigationStore = container.Resolve<INavigationStore>();
-        INavigationService navigationService = container.Resolve<INavigationService>();
+        IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
 
-        NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService);
-        NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService);
-        NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService);
-        NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService);
-        NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService);
-        NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService);
-        NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService);
+        if (container is not null) {
+
+            this.navigationStore = container.Resolve<INavigationStore>();
+            INavigationService navigationService = container.Resolve<INavigationService>();
+
+            NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService);
+            NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService);
+            NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService);
+            NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService);
+            NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService);
+            NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService);
+            NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService);
 
 
-        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
+            navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
+        }
+
         WindowClosedCommand = new RelayCommand(OnWindowClosed, true);
     }
 
@@ -66,7 +71,7 @@ public class MainViewModel : ViewModelBase {
         NotifyPropertyChanged(nameof(CurrentViewModel));
     }
 
-    private void OnWindowClosed(object obj) {
+    private void OnWindowClosed(object? obj) {
         App.SaveApplicationState();
     }
 }

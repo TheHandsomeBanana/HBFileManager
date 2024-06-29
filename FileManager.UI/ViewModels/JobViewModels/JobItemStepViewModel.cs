@@ -8,4 +8,6 @@ using System.Threading.Tasks;
 
 namespace FileManager.UI.ViewModels.Jobs;
 public class JobItemStepViewModel : ViewModelBase<JobItemStepModel> {
+    public JobItemStepViewModel(JobItemStepModel model) : base(model) {
+    }
 }

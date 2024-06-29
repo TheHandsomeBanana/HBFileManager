@@ -19,6 +19,7 @@ using HBLibrary.Services.IO.Storage.Entries;
 using HBLibrary.Common;
 using FileManager.UI.Models.SettingsPageModels;
 using HBLibrary.Services.IO.Json;
+using FileManager.UI.Services;
 
 namespace FileManager.UI {
     /// <summary>
@@ -37,6 +38,8 @@ namespace FileManager.UI {
             container.RegisterSingleton<INavigationService, NavigationService>();
             container.RegisterSingleton<INavigationStore, NavigationStore>();
             container.RegisterSingleton<IViewModelStore, ViewModelStore>();
+            container.RegisterSingleton<IJobService, JobService>();
+            container.RegisterType<IDialogService, DialogService>();
 
             container.RegisterFactory<IJsonFileService>(s => {
                 JsonFileService jsonFileService = new JsonFileService();
@@ -84,7 +87,7 @@ namespace FileManager.UI {
 
 
         private void AddApplicationStorage(IUnityContainer container) {
-            string storagePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Storage");
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, "FileManager", "data");
             Directory.CreateDirectory(storagePath);
             ApplicationStorage appStorage = new ApplicationStorage();
             appStorage.JsonFileService = container.Resolve<IJsonFileService>();

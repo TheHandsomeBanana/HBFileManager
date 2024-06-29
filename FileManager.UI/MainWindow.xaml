@@ -168,7 +168,7 @@
                                            Background="Transparent"
                                            SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
-                                           IconFill="#8ae28a"
+                                           IconFill="{StaticResource VSGreen}"
                                            Command="{Binding NavigateToExecutionCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
                     </buttons:ListBoxButton>
@@ -214,7 +214,7 @@
                 </ListBox>
             </Border>
 
-            <ContentControl Content="{Binding CurrentViewModel}" Grid.Column="1" Grid.Row="1">
+            <ContentControl Content="{Binding CurrentViewModel}" Grid.Column="1" Grid.Row="1" Margin="10">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewModels:ExplorerViewModel}">
                         <views:ExplorerView/>

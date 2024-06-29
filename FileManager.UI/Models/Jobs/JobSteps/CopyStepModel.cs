@@ -7,4 +7,5 @@ using System.Threading.Tasks;
 
 namespace FileManager.UI.Models.Jobs.JobSteps;
 public class CopyStepModel : JobItemStepModel {
+    public override StepType StepType => StepType.Copy;
 }

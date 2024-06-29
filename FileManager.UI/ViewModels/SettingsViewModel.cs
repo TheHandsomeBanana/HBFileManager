@@ -34,18 +34,20 @@ public class SettingsViewModel : ViewModelBase {
             new TreeViewItem("WinRAR", typeof(SettingsWinRARViewModel)),
         ];
 
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
 
-        this.navigationStore = container.Resolve<INavigationStore>();
-        this.navigationService = container.Resolve<INavigationService>();
-        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
+        if (container is not null) {
+            this.navigationStore = container.Resolve<INavigationStore>();
+            this.navigationService = container.Resolve<INavigationService>();
+            navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
+        }
     }
 
     private void SettingsViewModel_CurrentViewModelChanged() {
         NotifyPropertyChanged(nameof(CurrentViewModel));
     }
 
-    private void ChangeView(object obj) {
+    private void ChangeView(object? obj) {
         if (obj is TreeViewItem treeViewItem) {
             navigationService.Navigate(nameof(SettingsViewModel), treeViewItem.ViewModelType);
         }

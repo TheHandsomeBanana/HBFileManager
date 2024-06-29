@@ -35,9 +35,9 @@
                  Text="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                  Margin="0 0 5 0">
             </TextBox>
-            <Button Grid.Column="1" Style="{StaticResource HBDark_BrowseButton}"
+            <Button Grid.Column="1" Style="{StaticResource HBDark_VSBrowseButton}"
                 Command="{Binding BrowseLocationCommand}"></Button>
-            <Button Grid.Column="2" Style="{StaticResource HBDark_DefaultButton}" 
+            <Button Grid.Column="2" Style="{StaticResource HBDark_VSButton1}" 
                 Command="{Binding DetectWinRARCommand}"
                 Margin="5 0 0 0"
                 Content="Autodetect"

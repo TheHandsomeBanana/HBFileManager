@@ -4,9 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManager.UI.Views"
+             xmlns:viewModels ="clr-namespace:FileManager.UI.ViewModels"
+             xmlns:jobViewModels="clr-namespace:FileManager.UI.ViewModels.Jobs"
+             xmlns:jobViews="clr-namespace:FileManager.UI.Views.JobViews"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <!--<UserControl.DataContext>
+        <viewModels:JobsViewModel/>
+    </UserControl.DataContext>-->
+    
     <Grid>
-            
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <jobViews:JobListView DataContext="{Binding JobsList}" Grid.Column="0"/>
     </Grid>
 </UserControl>
