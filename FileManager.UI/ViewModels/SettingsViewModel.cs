@@ -1,4 +1,6 @@
-﻿using FileManager.UI.ViewModels.SettingsViewModels;
+﻿using FileManager.UI.Models.SettingsPageModels;
+using FileManager.UI.Services.SettingsService;
+using FileManager.UI.ViewModels.SettingsViewModels;
 using FileManager.UI.Views.SettingsViews;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Commands;
@@ -20,6 +22,7 @@ namespace FileManager.UI.ViewModels;
 public class SettingsViewModel : ViewModelBase {
     private readonly INavigationService navigationService;
     private readonly INavigationStore navigationStore;
+    private readonly ISettingsService settingsService;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
     public RelayCommand ChangeViewCommand { get; set; }
 
@@ -27,20 +30,20 @@ public class SettingsViewModel : ViewModelBase {
 
     public SettingsViewModel() {
         ChangeViewCommand = new RelayCommand(ChangeView, true);
+        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+
+        this.navigationService = container.Resolve<INavigationService>();
+        this.navigationStore = container.Resolve<INavigationStore>();
+        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
+        settingsService = container.Resolve<ISettingsService>();
+
+        SettingsWinRARModel winRARModel = settingsService.GetOrSetNew(() => new SettingsWinRARModel())!;
 
         TreeViewItems = [
-            new TreeViewItem("Environment", typeof(SettingsEnvironmentViewModel)),
-            new TreeViewItem("Execution", typeof(SettingsExecutionViewModel)),
-            new TreeViewItem("WinRAR", typeof(SettingsWinRARViewModel)),
+            new TreeViewItem("Environment", new SettingsEnvironmentViewModel()),
+            new TreeViewItem("Execution", new SettingsExecutionViewModel()),
+            new TreeViewItem("WinRAR", new SettingsWinRARViewModel(winRARModel!)),
         ];
-
-        IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
-
-        if (container is not null) {
-            this.navigationStore = container.Resolve<INavigationStore>();
-            this.navigationService = container.Resolve<INavigationService>();
-            navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
-        }
     }
 
     private void SettingsViewModel_CurrentViewModelChanged() {
@@ -49,7 +52,7 @@ public class SettingsViewModel : ViewModelBase {
 
     private void ChangeView(object? obj) {
         if (obj is TreeViewItem treeViewItem) {
-            navigationService.Navigate(nameof(SettingsViewModel), treeViewItem.ViewModelType);
+            navigationService.Navigate(nameof(SettingsViewModel), treeViewItem.ViewModel);
         }
     }
 }

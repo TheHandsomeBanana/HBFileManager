@@ -1,0 +1,68 @@
+﻿using HBLibrary.Common;
+using HBLibrary.Common.Extensions;
+using HBLibrary.Services.IO;
+using HBLibrary.Services.IO.Json;
+using HBLibrary.Services.IO.Storage;
+using HBLibrary.Services.IO.Storage.Container;
+using HBLibrary.Services.IO.Storage.Entries;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+
+namespace FileManager.UI.Services.SettingsService;
+public class SettingsService : ISettingsService {
+    private readonly IStorageEntryContainer container;
+    public SettingsService(IApplicationStorage applicationStorage) {
+        if(applicationStorage.BasePath is null) {
+            throw new InvalidOperationException($"{nameof(IApplicationStorage)} does not have a {nameof(IApplicationStorage.BasePath)}");
+        }
+
+        this.container = applicationStorage.GetContainer(typeof(SettingsService).GUID);
+    }
+
+
+    public TSetting? GetSetting<TSetting>() where TSetting : class {
+        return GetSetting(typeof(TSetting)) as TSetting;
+    }
+
+    public void SetSetting<TSetting>(TSetting setting) where TSetting : class {
+        SetSetting(typeof(TSetting), setting);
+    }
+
+    public void SaveSettings() {
+        container.Save();
+    }
+
+    public object? GetSetting(Type type) {
+        if (container.TryGet(type.GuidString(), out IStorageEntry? entry)) {
+            return entry!.Get(type);
+        }
+
+        return null;
+    }
+
+    public void SetSetting(Type type, object setting) {
+        container.AddOrUpdate(type.GuidString(), setting, StorageEntryContentType.Json);
+    }
+
+    public TSetting GetOrSetNew<TSetting>(Func<TSetting> createSettingFunc) where TSetting : class {
+        if(container.TryGet(typeof(TSetting).GuidString(), out IStorageEntry? entry)) {
+            TSetting? setting = entry!.Get(typeof(TSetting)) as TSetting;
+
+            if(setting is null) {
+                setting = createSettingFunc();
+                SetSetting(setting);
+            }
+
+            return setting;
+        }
+
+        TSetting newSetting = createSettingFunc();
+        SetSetting(newSetting);
+        return newSetting;
+    }
+}

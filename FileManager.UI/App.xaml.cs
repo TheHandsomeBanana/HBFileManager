@@ -15,11 +15,15 @@ using HBLibrary.Wpf.Services.NavigationService.Single;
 using HBLibrary.Wpf.ViewModels;
 using System.Diagnostics;
 using FileManager.Core.Models;
-using HBLibrary.Services.IO.Storage.Entries;
 using HBLibrary.Common;
 using FileManager.UI.Models.SettingsPageModels;
 using HBLibrary.Services.IO.Json;
 using FileManager.UI.Services;
+using HBLibrary.Services.IO;
+using HBLibrary.Services.IO.Storage.Builder;
+using HBLibrary.Services.IO.Xml;
+using HBLibrary.Common.Extensions;
+using FileManager.UI.Services.SettingsService;
 
 namespace FileManager.UI {
     /// <summary>
@@ -35,65 +39,44 @@ namespace FileManager.UI {
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
 
+            INavigationStore navigationStore = new NavigationStore();
+            navigationStore.AddDefaultViewModel(nameof(MainViewModel), new ExplorerViewModel());
+            navigationStore.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
+            container.RegisterInstance(navigationStore);
+
+
             container.RegisterSingleton<INavigationService, NavigationService>();
-            container.RegisterSingleton<INavigationStore, NavigationStore>();
             container.RegisterSingleton<IViewModelStore, ViewModelStore>();
             container.RegisterSingleton<IJobService, JobService>();
             container.RegisterType<IDialogService, DialogService>();
 
-            container.RegisterFactory<IJsonFileService>(s => {
-                JsonFileService jsonFileService = new JsonFileService();
-                jsonFileService.UseBase64 = true;
-                return jsonFileService;
-            }, new ContainerControlledLifetimeManager());
-
 
             AddApplicationStorage(container);
-            InitStores(container);
+
+            container.RegisterType<ISettingsService, SettingsService>(new ContainerControlledLifetimeManager());
         }
-
-        private void InitStores(IUnityContainer container) {
-            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-
-            IStorageEntry<SettingsWinRARCoreModel> settingsWinRARCoreModelEntry = applicationStorage.GetStorageEntry<SettingsWinRARCoreModel>(StorageEntryType.Json, false);
-
-            SettingsWinRARCoreModel settingsWinRARCoreModel = settingsWinRARCoreModelEntry.Get() ?? new SettingsWinRARCoreModel();
-            SettingsWinRARModel settingsWinRARModel = AutoMapper.MapUnsafe<SettingsWinRARCoreModel, SettingsWinRARModel>(settingsWinRARCoreModel);
-
-            INavigationStore navigationStore = container.Resolve<INavigationStore>();
-
-            ExplorerViewModel mainViewModelEntryChild = new ExplorerViewModel();
-            SettingsEnvironmentViewModel settingsViewModelEntryChild = new SettingsEnvironmentViewModel();
-
-            navigationStore[nameof(MainViewModel)] = new ActiveViewModel(mainViewModelEntryChild);
-            navigationStore[nameof(SettingsViewModel)] = new ActiveViewModel(settingsViewModelEntryChild);
-
-            IViewModelStore viewModelStore = container.Resolve<IViewModelStore>();
-            viewModelStore.InitViewModelInstances(e =>
-                e.AddViewModel(new ExplorerViewModel())
-                .AddViewModel(new JobsViewModel())
-                .AddViewModel(new ScriptingViewModel())
-                .AddViewModel(new ExecutionViewModel())
-                .AddViewModel(new SettingsViewModel())
-                .AddViewModel(new ApplicationLogViewModel())
-                .AddViewModel(new AboutViewModel())
-                .AddViewModel(new SettingsEnvironmentViewModel())
-                .AddViewModel(new SettingsExecutionViewModel())
-                .AddViewModel(new SettingsWinRARViewModel(settingsWinRARModel))
-                .Build());
-
-            
-        }
-
 
         private void AddApplicationStorage(IUnityContainer container) {
             string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, "FileManager", "data");
-            Directory.CreateDirectory(storagePath);
-            ApplicationStorage appStorage = new ApplicationStorage();
-            appStorage.JsonFileService = container.Resolve<IJsonFileService>();
-            appStorage.BasePath = storagePath;
 
-            container.RegisterInstance<IApplicationStorage>(appStorage);
+            IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
+            appStorageBuilder.AddContainer(typeof(SettingsService), builder => {
+                builder.SetContainerPath("settings");
+
+                builder.ConfigureFileServices(fs => {
+                    fs.UseJsonFileService(() => {
+                        JsonFileService jsonFileService = new JsonFileService();
+                        jsonFileService.UseBase64 = true;
+                        return jsonFileService;
+                    })
+                    .UseFileService(() => new FileService())
+                    .UseXmlFileService(() => new XmlFileService());
+                });
+
+                return builder.Build();
+            });
+
+            container.RegisterInstance(appStorageBuilder.Build(), InstanceLifetime.Singleton);
         }
 
 
@@ -109,13 +92,7 @@ namespace FileManager.UI {
                 return;
 
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-            IViewModelStore viewModelStore = container.Resolve<IViewModelStore>();
-
-            SettingsWinRARViewModel settingsWinRARViewModel = viewModelStore.GetStoredViewModel<SettingsWinRARViewModel>();
-            SettingsWinRARCoreModel settingsWinRARCoreModel = AutoMapper.MapUnsafe<SettingsWinRARModel, SettingsWinRARCoreModel>(settingsWinRARViewModel.Model);
-
-
-            applicationStorage.SaveStorageEntry(settingsWinRARCoreModel, StorageEntryType.Json);
+            applicationStorage.SaveAll();
         }
     }
 }

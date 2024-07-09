@@ -13,7 +13,7 @@ public sealed class MoveOperation : IOOperation, IAsyncOperation {
     }
 
     public async Task Run() {
-        if (!Target.HasValue)
+        if (Target is null)
             throw new OperationException("Destination not set.");
 
         //await IOService.Move(Source, Target.Value);

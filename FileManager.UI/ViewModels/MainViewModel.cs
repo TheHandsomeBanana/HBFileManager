@@ -52,13 +52,13 @@ public class MainViewModel : ViewModelBase {
             this.navigationStore = container.Resolve<INavigationStore>();
             INavigationService navigationService = container.Resolve<INavigationService>();
 
-            NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService);
-            NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService);
-            NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService);
-            NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService);
-            NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService);
-            NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService);
-            NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService);
+            NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService, () => new ExplorerViewModel());
+            NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService, () => new JobsViewModel());
+            NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService, () => new ScriptingViewModel());
+            NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService, () => new ExecutionViewModel());
+            NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService, () => new SettingsViewModel());
+            NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService, () => new ApplicationLogViewModel());
+            NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
 
 
             navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;

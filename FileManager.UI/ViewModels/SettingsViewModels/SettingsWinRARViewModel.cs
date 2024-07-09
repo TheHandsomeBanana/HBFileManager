@@ -96,11 +96,11 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
             }
         }
 
-        private void DetectWinRARInstallation(object obj) {
+        private void DetectWinRARInstallation(object? obj) {
             Location = WinRARManager.GetWinRARInstallationPath() ?? "";
         }
 
-        private void BrowseLocation(object obj) {
+        private void BrowseLocation(object? obj) {
             OpenFolderDialog openFolderDialog = new OpenFolderDialog();
             openFolderDialog.Multiselect = false;
             if(openFolderDialog.ShowDialog() ?? false) {

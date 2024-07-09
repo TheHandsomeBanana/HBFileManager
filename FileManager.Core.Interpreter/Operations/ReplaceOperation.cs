@@ -13,7 +13,7 @@ public sealed class ReplaceOperation : IOOperation, IAsyncOperation {
     }
 
     public async Task Run() {
-        if (!Target.HasValue)
+        if (Target is null)
             throw new OperationException("Destination not set.");
 
         //await IOService.Replace(Source, Target.Value);
