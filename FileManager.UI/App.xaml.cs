@@ -14,27 +14,29 @@ using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.Services.NavigationService.Single;
 using HBLibrary.Wpf.ViewModels;
 using System.Diagnostics;
-using FileManager.Core.Models;
 using HBLibrary.Common;
 using FileManager.UI.Models.SettingsPageModels;
 using HBLibrary.Services.IO.Json;
-using FileManager.UI.Services;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.IO.Storage.Builder;
 using HBLibrary.Services.IO.Xml;
 using HBLibrary.Common.Extensions;
 using FileManager.UI.Services.SettingsService;
+using FileManager.UI.Services.JobService;
+using System.Text.Json;
+using HBLibrary.Common.Json;
 
-namespace FileManager.UI {
+namespace FileManager.UI
+{
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
         public static bool StateSaved { get; set; } = false;
         public App() {
-            this.Exit += (_, _) => SaveApplicationState();
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveApplicationState();
-            AppDomain.CurrentDomain.UnhandledException += (_, _) => SaveApplicationState();
+            this.Exit += (_, _) => SaveApplicationStateOnExit();
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveApplicationStateOnExit();
+            AppDomain.CurrentDomain.UnhandledException += (_, _) => SaveApplicationStateOnExit();
 
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
@@ -66,11 +68,34 @@ namespace FileManager.UI {
                 builder.ConfigureFileServices(fs => {
                     fs.UseJsonFileService(() => {
                         JsonFileService jsonFileService = new JsonFileService();
+                        jsonFileService.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = { new TimeOnlyConverter() },
+                            WriteIndented = true
+                        });
+
                         jsonFileService.UseBase64 = true;
                         return jsonFileService;
-                    })
-                    .UseFileService(() => new FileService())
-                    .UseXmlFileService(() => new XmlFileService());
+                    });
+                });
+
+                return builder.Build();
+            });
+
+            appStorageBuilder.AddContainer(typeof(JobService), builder => {
+                builder.SetContainerPath("jobs");
+
+                builder.ConfigureFileServices(fs => {
+                    fs.UseJsonFileService(() => {
+                        JsonFileService jsonFileService = new JsonFileService();
+
+                        jsonFileService.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = { new TimeOnlyConverter() },
+                            WriteIndented = true
+                        });
+
+                        jsonFileService.UseBase64 = true;
+                        return jsonFileService;
+                    });
                 });
 
                 return builder.Build();
@@ -80,13 +105,22 @@ namespace FileManager.UI {
         }
 
 
-        public static void SaveApplicationState() {
+        public static void SaveApplicationStateOnExit() {
             if (StateSaved) {
                 return;
             }
 
             StateSaved = true;
 
+            IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
+            if (container is null)
+                return;
+
+            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+            applicationStorage.SaveAll();
+        }
+
+        public static void SaveApplicationState() {
             IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
             if (container is null)
                 return;

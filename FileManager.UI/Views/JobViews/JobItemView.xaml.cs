@@ -15,10 +15,10 @@ using System.Windows.Shapes;
 
 namespace FileManager.UI.Views.JobViews;
 /// <summary>
-/// Interaction logic for JobListView.xaml
+/// Interaction logic for JobItemView.xaml
 /// </summary>
-public partial class JobListView : UserControl {
-    public JobListView() {
+public partial class JobItemView : UserControl {
+    public JobItemView() {
         InitializeComponent();
     }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace FileManager.Core.Interpreter;
 public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
 {
-    private string content;
+    private string content = "";
     public ImmutableArray<SimpleError> Evaluate(SyntaxTree syntaxTree, string content)
     {
         this.content = content;

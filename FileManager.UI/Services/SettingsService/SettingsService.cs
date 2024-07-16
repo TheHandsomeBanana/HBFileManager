@@ -17,13 +17,8 @@ namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {
     private readonly IStorageEntryContainer container;
     public SettingsService(IApplicationStorage applicationStorage) {
-        if(applicationStorage.BasePath is null) {
-            throw new InvalidOperationException($"{nameof(IApplicationStorage)} does not have a {nameof(IApplicationStorage.BasePath)}");
-        }
-
         this.container = applicationStorage.GetContainer(typeof(SettingsService).GUID);
     }
-
 
     public TSetting? GetSetting<TSetting>() where TSetting : class {
         return GetSetting(typeof(TSetting)) as TSetting;
@@ -31,10 +26,6 @@ public class SettingsService : ISettingsService {
 
     public void SetSetting<TSetting>(TSetting setting) where TSetting : class {
         SetSetting(typeof(TSetting), setting);
-    }
-
-    public void SaveSettings() {
-        container.Save();
     }
 
     public object? GetSetting(Type type) {

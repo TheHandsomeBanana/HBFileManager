@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.Wpf", "..\HBLibra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.Core", "FileManager.Core\FileManager.Core.csproj", "{6E5CE41B-2BDC-40D8-8620-66F45CFBAF19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManager.WorkerService", "FileManager.WorkerService\FileManager.WorkerService.csproj", "{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.WorkerService", "FileManager.WorkerService\FileManager.WorkerService.csproj", "{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

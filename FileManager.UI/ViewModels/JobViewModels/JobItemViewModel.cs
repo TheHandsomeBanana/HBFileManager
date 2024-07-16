@@ -16,7 +16,7 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
             NotifyPropertyChanged();
         }
     }
-    public DateTime? ScheduledAt {
+    public TimeOnly? ScheduledAt {
         get => Model.ScheduledAt;
         set {
             Model.ScheduledAt = value;
@@ -36,6 +36,10 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         get => Model.Scheduled;
         set {
             Model.Scheduled = value;
+            if (!value) {
+                ScheduledAt = null;
+            }
+
             NotifyPropertyChanged();
         }
     }

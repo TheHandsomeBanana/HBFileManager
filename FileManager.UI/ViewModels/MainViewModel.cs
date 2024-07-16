@@ -1,5 +1,4 @@
-﻿using FileManager.Core.Models;
-using FileManager.UI.Models;
+﻿using FileManager.UI.Models;
 using FileManager.UI.Models.SettingsPageModels;
 using FileManager.UI.ViewModels.SettingsViewModels;
 using HBLibrary.Common;
@@ -12,6 +11,7 @@ using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.Services.NavigationService.Single;
 using HBLibrary.Wpf.ViewModels;
+using HBLibrary.Wpf.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,37 +41,41 @@ public class MainViewModel : ViewModelBase {
 
     public string NavigateCommandParameter => nameof(MainViewModel);
 
-    public RelayCommand WindowClosedCommand { get; set; }
-
+    public RelayCommand SaveApplicationStateCommand { get; set; }
 
     public MainViewModel() {
-        IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
-
-        if (container is not null) {
-
-            this.navigationStore = container.Resolve<INavigationStore>();
-            INavigationService navigationService = container.Resolve<INavigationService>();
-
-            NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService, () => new ExplorerViewModel());
-            NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService, () => new JobsViewModel());
-            NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService, () => new ScriptingViewModel());
-            NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService, () => new ExecutionViewModel());
-            NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService, () => new SettingsViewModel());
-            NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService, () => new ApplicationLogViewModel());
-            NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
+        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
 
 
-            navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
-        }
+        this.navigationStore = container.Resolve<INavigationStore>();
+        INavigationService navigationService = container.Resolve<INavigationService>();
 
-        WindowClosedCommand = new RelayCommand(OnWindowClosed, true);
+        NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService, () => new ExplorerViewModel());
+        NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService, () => new JobsViewModel());
+        NavigateToScriptingCommand = new NavigateCommand<ScriptingViewModel>(navigationService, () => new ScriptingViewModel());
+        NavigateToExecutionCommand = new NavigateCommand<ExecutionViewModel>(navigationService, () => new ExecutionViewModel());
+        NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService, () => new SettingsViewModel());
+        NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService, () => new ApplicationLogViewModel());
+        NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
+
+
+        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
+
+        SaveApplicationStateCommand = new RelayCommand(SaveApplicationState, true);
+    }
+
+    private void SaveApplicationState(object? obj) {
+        App.SaveApplicationState();
+        HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
+
+        //MessageBox.Show("Application state saved successfully",
+        //    "Saved",
+        //    MessageBoxButton.OK,
+        //    MessageBoxImage.Information);
+
     }
 
     private void MainWindowViewModel_CurrentViewModelChanged() {
         NotifyPropertyChanged(nameof(CurrentViewModel));
-    }
-
-    private void OnWindowClosed(object? obj) {
-        App.SaveApplicationState();
     }
 }

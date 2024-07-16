@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              MinHeight="100"
              MinWidth="350">
@@ -49,6 +51,10 @@
                             CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
             </TextBox.InputBindings>
 
+            <i:Interaction.Behaviors>
+                <behaviors:TextBoxFocusBehavior/>
+            </i:Interaction.Behaviors>
+            
         </TextBox>
 
         <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right">
