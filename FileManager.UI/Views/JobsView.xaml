@@ -9,6 +9,7 @@
              xmlns:jobViews="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <!--<UserControl.DataContext>
@@ -28,6 +29,8 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:NullToVisibilityConverter x:Key="n2v"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -121,6 +124,8 @@
             </Grid>
         </Border>
 
-        <jobViews:JobItemView DataContext="{Binding SelectedJob}" Grid.Column="1"/>
+        <jobViews:JobItemView DataContext="{Binding SelectedJob}" 
+                              Grid.Column="1"
+                              Visibility="{Binding DataContext.SelectedJob, Converter={StaticResource n2v}, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
     </Grid>
 </UserControl>

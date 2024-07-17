@@ -37,7 +37,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Name" Grid.ColumnSpan="3" Height="16"/>
-        <TextBox Text="{Binding Name}" Style="{StaticResource HBDark_TextBox}" 
+        <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource HBDark_TextBox}" 
                  Grid.ColumnSpan="3" 
                  Grid.Row="1" 
                  VerticalAlignment="Top" 

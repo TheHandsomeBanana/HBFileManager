@@ -9,9 +9,8 @@ using System.Windows;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public class AddJobViewModel : ViewModelBase {
-    public RelayCommand AddJobCommand { get; set; }
-    public RelayCommand CancelCommand { get; set; }
-
+    public RelayCommand<Window> AddJobCommand { get; set; }
+    public RelayCommand<Window> CancelCommand { get; set; }
 
     private string name = "";
     public string Name {
@@ -19,25 +18,31 @@ public class AddJobViewModel : ViewModelBase {
         set {
             name = value;
             NotifyPropertyChanged();
+
+            AddJobCommand.NotifyCanExecuteChanged();
         }
     }
 
     public AddJobViewModel() {
-        AddJobCommand = new RelayCommand(AddAndFinish, true);
-        CancelCommand = new RelayCommand(CancelAndFinish, true);
+        AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name));
+        CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
     }
 
-    private void AddAndFinish(object? obj) {
-        if(obj is Window window) {
-            window.DialogResult = true;
-            window.Close();
+    private void AddAndFinish(Window? obj) {
+        if(obj is null) {
+            return;
         }
+
+        obj.DialogResult = true;
+        obj.Close();
     }
 
-    private void CancelAndFinish(object? obj) {
-        if (obj is Window window) {
-            window.DialogResult = false;
-            window.Close();
+    private void CancelAndFinish(Window? obj) {
+        if (obj is null) {
+            return;
         }
+
+        obj.DialogResult = false;
+        obj.Close();
     }
 }

@@ -67,12 +67,6 @@ public class MainViewModel : ViewModelBase {
     private void SaveApplicationState(object? obj) {
         App.SaveApplicationState();
         HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
-
-        //MessageBox.Show("Application state saved successfully",
-        //    "Saved",
-        //    MessageBoxButton.OK,
-        //    MessageBoxImage.Information);
-
     }
 
     private void MainWindowViewModel_CurrentViewModelChanged() {

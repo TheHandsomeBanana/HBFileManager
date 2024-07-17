@@ -7,6 +7,7 @@ using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
+using HBLibrary.Wpf.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,6 +15,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using Unity;
 
@@ -36,6 +38,7 @@ public class JobsViewModel : ViewModelBase {
             NotifyPropertyChanged();
         }
     }
+
 
     private ICollectionView jobsView;
     public ICollectionView JobsView => jobsView;
@@ -99,7 +102,14 @@ public class JobsViewModel : ViewModelBase {
     }
 
     public void DeleteJob(JobItemViewModel jobItemViewModel) {
-        jobs.Remove(jobItemViewModel);
-        jobService.Delete(jobItemViewModel.Model.Id);
+        MessageBoxResult result = HBDarkMessageBox.Show("Delete job",
+            "Are you sure you want to delete this job?",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (result == MessageBoxResult.Yes) {
+            jobs.Remove(jobItemViewModel);
+            jobService.Delete(jobItemViewModel.Model.Id);
+        }
     }
 }
