@@ -25,6 +25,7 @@ using FileManager.UI.Services.SettingsService;
 using FileManager.UI.Services.JobService;
 using System.Text.Json;
 using HBLibrary.Common.Json;
+using FileManager.UI.Converters;
 
 namespace FileManager.UI
 {
@@ -66,15 +67,12 @@ namespace FileManager.UI
                 builder.SetContainerPath("settings");
 
                 builder.ConfigureFileServices(fs => {
-                    fs.UseJsonFileService(() => {
-                        JsonFileService jsonFileService = new JsonFileService();
-                        jsonFileService.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = { new TimeOnlyConverter() },
+                    fs.UseJsonFileService(jfs => {
+                        jfs.SetGlobalOptions(new JsonSerializerOptions {
                             WriteIndented = true
                         });
 
-                        jsonFileService.UseBase64 = true;
-                        return jsonFileService;
+                        jfs.UseBase64 = true;
                     });
                 });
 
@@ -85,16 +83,16 @@ namespace FileManager.UI
                 builder.SetContainerPath("jobs");
 
                 builder.ConfigureFileServices(fs => {
-                    fs.UseJsonFileService(() => {
-                        JsonFileService jsonFileService = new JsonFileService();
-
-                        jsonFileService.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = { new TimeOnlyConverter() },
+                    fs.UseJsonFileService(jfs => {
+                        jfs.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = { 
+                                new TimeOnlyConverter(),
+                                new JobItemStepConverter()
+                            },
                             WriteIndented = true
                         });
 
-                        jsonFileService.UseBase64 = true;
-                        return jsonFileService;
+                        jfs.UseBase64 = true;
                     });
                 });
 

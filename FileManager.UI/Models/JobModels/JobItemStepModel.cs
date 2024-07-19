@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace FileManager.UI.Models.Job;
 public abstract class JobItemStepModel {
     public abstract StepType StepType { get; }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "";
 }
 
 public enum StepType {

@@ -28,7 +28,6 @@ public class JobsViewModel : ViewModelBase {
     public RelayCommand AddJobCommand { get; set; }
     public RelayCommand<JobItemViewModel> DeleteJobCommand { get; set; }
 
-    public ObservableCollection<JobItemViewModel> Jobs => jobs;
 
     private JobItemViewModel? selectedJob;
     public JobItemViewModel? SelectedJob {
@@ -40,7 +39,7 @@ public class JobsViewModel : ViewModelBase {
     }
 
 
-    private ICollectionView jobsView;
+    private readonly ICollectionView jobsView;
     public ICollectionView JobsView => jobsView;
 
     private string? searchText;
@@ -73,7 +72,7 @@ public class JobsViewModel : ViewModelBase {
 
     private bool FilterJobs(object obj) {
         if (obj is JobItemViewModel job) {
-            return string.IsNullOrEmpty(SearchText) || job.Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0;
+            return string.IsNullOrEmpty(SearchText) || job.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
         }
         return false;
     }

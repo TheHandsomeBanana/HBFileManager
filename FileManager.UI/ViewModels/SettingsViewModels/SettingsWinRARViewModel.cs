@@ -26,8 +26,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
                 if(!value) {
                     Location = "";
                     LicenseKeyLocation = "";
-                    ErrorText = "";
-                    ErrorTextVisibility = Visibility.Collapsed;
+                    LocationErrorText = "";
                 }
 
                 Model.UseWinRAR = value;
@@ -54,15 +53,6 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
             }
         }
 
-        private Visibility errorTextVisibility = Visibility.Collapsed;
-        public Visibility ErrorTextVisibility {
-            get => errorTextVisibility;
-            set {
-                errorTextVisibility = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         public string LicenseKeyLocation {
             get => Model.LicenseKeyLocation;
             set {
@@ -72,14 +62,25 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         }
 
 
-        private string errorText = "";
-        public string ErrorText {
-            get => errorText;
+        private string locationErrorText = "";
+        public string LocationErrorText {
+            get => locationErrorText;
             set {
-                errorText = value;
+                locationErrorText = value;
                 NotifyPropertyChanged();
             }
         }
+
+        private string licenseKeyLocationErrorText = "";
+        public string LicenseKeyLocationErrorText {
+            get => licenseKeyLocationErrorText;
+            set {
+                licenseKeyLocationErrorText = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+
 
 
         public SettingsWinRARViewModel() {
@@ -110,25 +111,21 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
 
         private bool CheckProvidedLocation(string value) {
             if (!WinRARManager.CheckWinRARInstallationForPath(value)) {
-                ErrorText = "WinRAR not found in this directory";
-                ErrorTextVisibility = Visibility.Visible;
+                LocationErrorText = "WinRAR not found in this directory";
                 return false;
             }
 
-            ErrorTextVisibility = Visibility.Collapsed;
-            ErrorText = "";
+            LocationErrorText = "";
             return true;
         }
 
         private void ValidateWinRARLicense() {
             if(WinRARManager.CheckWinRARLicense(out string licenseKey)) {
                 LicenseKeyLocation = licenseKey;
-                ErrorTextVisibility = Visibility.Collapsed;
-                ErrorText = "";
+                LicenseKeyLocationErrorText = "";
             }
             else {
-                ErrorText = "WinRAR license is invalid.";
-                ErrorTextVisibility = Visibility.Visible;
+                LicenseKeyLocationErrorText = "WinRAR license is invalid.";
             }
         }
     }

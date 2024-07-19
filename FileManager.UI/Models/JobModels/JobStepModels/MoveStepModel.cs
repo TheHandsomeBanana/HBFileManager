@@ -6,6 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.UI.Models.JobModels.JobStepModels;
-public class ArchiveStepModel : JobItemStepModel {
-    public override StepType StepType => StepType.Archive;
+public class MoveStepModel : JobItemStepModel {
+    public override StepType StepType => StepType.Move;
 }

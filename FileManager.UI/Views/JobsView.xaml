@@ -66,9 +66,9 @@
                 </buttons:IconButton>
 
                 <TextBox Style="{StaticResource HBDark_VSFilterBox}" 
-                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
-                 Tag="Search Jobs"
-                 Grid.Row="2" >
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                         Tag="Search Jobs"
+                         Grid.Row="2" >
 
                 </TextBox>
 
@@ -83,8 +83,8 @@
 
                                 <menus:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                  Fill="{StaticResource VSRed}"
-                                  Stretch="Uniform"/>
+                                          Fill="{StaticResource VSRed}"
+                                          Stretch="Uniform"/>
                                 </menus:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
@@ -92,8 +92,8 @@
 
                     <ListBox.InputBindings>
                         <KeyBinding Key="Delete" 
-                            Command="{Binding DeleteJobCommand}" 
-                            CommandParameter="{Binding SelectedJob}"/>
+                                    Command="{Binding DeleteJobCommand}" 
+                                    CommandParameter="{Binding SelectedJob}"/>
                     </ListBox.InputBindings>
 
                     <ListBox.ItemTemplate>
@@ -111,8 +111,8 @@
                             <MenuItem Header="Add new job" Command="{Binding AddJobCommand}">
                                 <menus:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                  Fill="{StaticResource VSGreen}"
-                                  Stretch="Uniform"/>
+                                          Fill="{StaticResource VSGreen}"
+                                          Stretch="Uniform"/>
                                 </menus:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>

@@ -5,18 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
+             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
+             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    
+             d:DesignHeight="500" d:DesignWidth="800">
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/TimePicker.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
@@ -24,49 +30,142 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Vertical" Margin="10">
+    <Grid Margin="10 10 10 0">
 
-        <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}" Text="Properties" Margin="0 0 0 10">
-        </TextBlock>
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Name" Margin="0 0 0 3">
-        </TextBlock>
-        <TextBox Style="{StaticResource HBDark_TextBox}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10">
-        </TextBox>
-        <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding OnDemand}" Content="On Demand" Margin="0 0 0 10"></CheckBox>
-        <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding Scheduled}" Content="Scheduled" Margin="0 0 0 10"></CheckBox>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Vertical" Grid.Row="0">
+
+            <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}" Text="Properties" Margin="0 0 0 10">
+            </TextBlock>
+            <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Name" Margin="0 0 0 3">
+            </TextBlock>
+            <TextBox Style="{StaticResource HBDark_TextBox}" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0 0 0 10">
+            </TextBox>
+            <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding OnDemand}" Content="On Demand" Margin="0 0 0 10"></CheckBox>
+            <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding Scheduled}" Content="Scheduled" Margin="0 0 0 10"></CheckBox>
 
 
-        <controls:TimePicker Visibility="{Binding Scheduled, Converter={StaticResource b2v}, FallbackValue=Visible}"
+            <controls:TimePicker Visibility="{Binding Scheduled, Converter={StaticResource b2v}, FallbackValue=Visible}"
                              SelectedTime="{Binding ScheduledAt, Mode=TwoWay}"
                              SeperatorStyle="{StaticResource HBDark_TextBlock}"
                              MinuteStyle="{StaticResource HBDark_ComboBox}"
                              HourStyle="{StaticResource HBDark_ComboBox}"
-                             MinuteItemTemplate="{StaticResource HBDark_ComboBoxItem}"
-                             HourItemTemplate="{StaticResource HBDark_ComboBoxItem}"
                              HorizontalAlignment="Left"
                              Margin="0 0 0 10">
 
-            <controls:TimePicker.Icon>
-                <Path Data="M12 20C16.4 20 20 16.4 20 12S16.4 4 12 4 4 7.6 4 12 7.6 20 12 20M12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M12.5 12.8L7.7 15.6L7 14.2L11 11.9V7H12.5V12.8Z"
+                <controls:TimePicker.Icon>
+                    <Path Data="M12 20C16.4 20 20 16.4 20 12S16.4 4 12 4 4 7.6 4 12 7.6 20 12 20M12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M12.5 12.8L7.7 15.6L7 14.2L11 11.9V7H12.5V12.8Z"
                       Fill="{StaticResource VSAccentViolet}"
                       Stroke="{StaticResource VSViolet}"
                       StrokeThickness="0.5"
                       Stretch="Uniform"></Path>
-            </controls:TimePicker.Icon>
-            
-        </controls:TimePicker>
+                </controls:TimePicker.Icon>
 
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Description" Margin="0 0 0 3">
-        </TextBlock>
+            </controls:TimePicker>
+
+            <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Description" Margin="0 0 0 3">
+            </TextBlock>
+
+            <TextBox Style="{StaticResource HBDark_TextBox}" 
+                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalContentAlignment="Top"
+                     Height="100"
+                     Margin="0 0 0 10">
+            </TextBox>
+        </StackPanel>
+
         
-        <TextBox Style="{StaticResource HBDark_TextBox}" 
-                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                 VerticalContentAlignment="Top"
-                 Margin="0 0 0 10"
-                 Height="100">
-        </TextBox>
 
-        <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}" Text="Steps" Margin="0 0 0 10">
-        </TextBlock>
-    </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource HBDark_ControlBorder}" Grid.Column="0">
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}" Text="Steps" Grid.Row="0">
+                    </TextBlock>
+                    
+                    <buttons:IconButton Grid.Row="1" HorizontalAlignment="Left"
+                                        BorderThickness="1"
+                                        Height="24"
+                                        Width="24"
+                                        IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                        IconFill="{StaticResource VSGreen}"
+                                        Command="{Binding AddStepCommand}">
+
+                    </buttons:IconButton>
+
+                    <TextBox Style="{StaticResource HBDark_VSFilterBox}" 
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                             Tag="Search Job Steps"
+                             Grid.Row="2">
+                    </TextBox>
+
+                    <ListBox Style="{StaticResource HBDark_ListBox}"
+                             ItemsSource="{Binding StepsView}"
+                             SelectedItem="{Binding SelectedStep}"
+                             Grid.Row="3">
+                        <ListBox.Resources>
+                            <ContextMenu x:Key="contextMenu" 
+                                          DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          Style="{StaticResource HBDark_ContextMenu}">
+                                <MenuItem Header="Delete step"
+                                           Command="{Binding DeleteStepCommand}"
+                                           CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                    <menus:MenuItemAttachedProperties.IconPath>
+                                        <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                               Fill="{StaticResource VSRed}"
+                                               Stretch="Uniform"/>
+                                    </menus:MenuItemAttachedProperties.IconPath>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListBox.Resources>
+
+                        <ListBox.InputBindings>
+                            <KeyBinding Key="Delete" 
+                                         Command="{Binding DeleteStepCommand}" 
+                                         CommandParameter="{Binding SelectedStep}"/>
+                        </ListBox.InputBindings>
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource HBDark_ListBoxItem}">
+                                <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ContextMenu>
+                            <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                                <MenuItem Header="Add new step" Command="{Binding AddStepCommand}">
+                                    <menus:MenuItemAttachedProperties.IconPath>
+                                        <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                               Fill="{StaticResource VSGreen}"
+                                               Stretch="Uniform"/>
+                                    </menus:MenuItemAttachedProperties.IconPath>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+
 </UserControl>

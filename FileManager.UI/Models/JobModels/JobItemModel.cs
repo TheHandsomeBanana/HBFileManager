@@ -12,5 +12,5 @@ public class JobItemModel {
     public bool OnDemand { get; set; }
     public bool Scheduled { get; set; }
     public string? Description { get; set; }
-    public List<JobItemStepModel> Steps { get; set; } = [];
+    public Dictionary<Guid, JobItemStepModel> Steps { get; set; } = [];
 }

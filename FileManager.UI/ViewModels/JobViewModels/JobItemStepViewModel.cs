@@ -7,7 +7,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.UI.ViewModels.Jobs;
-public class JobItemStepViewModel : ViewModelBase<JobItemStepModel> {
-    public JobItemStepViewModel(JobItemStepModel model) : base(model) {
+public abstract class JobItemStepViewModel : ViewModelBase<JobItemStepModel> {
+	public string Name {
+		get { return Model.Name; }
+		set { 
+			Model.Name = value;
+			NotifyPropertyChanged();
+		}
+	}
+
+
+	public JobItemStepViewModel(JobItemStepModel model) : base(model) {
     }
 }

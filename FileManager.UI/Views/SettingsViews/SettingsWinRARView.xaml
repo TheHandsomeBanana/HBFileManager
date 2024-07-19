@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.SettingsViewModels"
+             xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -16,6 +17,8 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:StringToVisibilityConverter x:Key="s2v"/>
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -43,13 +46,24 @@
                 Content="Autodetect"
                 Padding="5 0 5 0"></Button>
         </Grid>
-        <TextBlock Style="{StaticResource HBDark_ErrorTextBlock}" Text="{Binding ErrorText}" Visibility="{Binding ErrorTextVisibility, FallbackValue=Collapsed}"></TextBlock>
+
+        <TextBlock Style="{StaticResource HBDark_ErrorTextBlock}" 
+                   Text="{Binding LocationErrorText}" 
+                   Visibility="{Binding LocationErrorText, Converter={StaticResource s2v}}">
+        </TextBlock>
 
         <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="License Key" Margin="0 0 0 3"></TextBlock>
         <TextBox Style="{StaticResource HBDark_TextBox}"
-     Text="{Binding LicenseKeyLocation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-             IsEnabled="False">
+                 Text="{Binding LicenseKeyLocation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="False"
+                 Margin="0 0 0 5">
         </TextBox>
+
+        <TextBlock Style="{StaticResource HBDark_ErrorTextBlock}" 
+                   Text="{Binding LicenseKeyLocationErrorText}" 
+                   Visibility="{Binding LicenseKeyLocationErrorText, Converter={StaticResource s2v}}">
+        </TextBlock>
+
 
     </StackPanel>
 </UserControl>
