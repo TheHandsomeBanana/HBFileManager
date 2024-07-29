@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.Core", "FileMan
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.WorkerService", "FileManager.WorkerService\FileManager.WorkerService.csproj", "{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.Services.Security", "..\HBLibrary\HBLibrary.Services.Security\HBLibrary.Services.Security.csproj", "{61D7D4A9-9855-48BB-A63D-353FD2F08A5D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7900351-5CE6-43DE-A72B-C20CD68C1E7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61D7D4A9-9855-48BB-A63D-353FD2F08A5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61D7D4A9-9855-48BB-A63D-353FD2F08A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61D7D4A9-9855-48BB-A63D-353FD2F08A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61D7D4A9-9855-48BB-A63D-353FD2F08A5D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{5D617DAB-6A49-431B-B17B-EDA3D837B4F3} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
 		{6E5CE41B-2BDC-40D8-8620-66F45CFBAF19} = {1D225878-8FC8-419F-9F2E-C1599089CC69}
 		{F7900351-5CE6-43DE-A72B-C20CD68C1E7A} = {89522F03-38CD-42E6-84A6-87A87F1484CA}
+		{61D7D4A9-9855-48BB-A63D-353FD2F08A5D} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE14C107-2CE1-4AA5-929A-C946862C90F8}

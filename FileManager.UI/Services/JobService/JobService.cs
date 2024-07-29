@@ -3,6 +3,7 @@ using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;
 using HBLibrary.Services.IO.Storage.Entries;
+using HBLibrary.Services.IO.Storage.Settings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
