@@ -15,7 +15,6 @@ using HBLibrary.Wpf.Services.NavigationService.Single;
 using HBLibrary.Wpf.ViewModels;
 using System.Diagnostics;
 using HBLibrary.Common;
-using FileManager.UI.Models.SettingsPageModels;
 using HBLibrary.Services.IO.Json;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.IO.Storage.Builder;

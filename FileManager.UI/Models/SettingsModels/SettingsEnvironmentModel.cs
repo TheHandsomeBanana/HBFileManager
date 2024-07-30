@@ -4,6 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.Models;
-public class JobModel {
+namespace FileManager.UI.Models.SettingsModels;
+public class SettingsEnvironmentModel {
 }

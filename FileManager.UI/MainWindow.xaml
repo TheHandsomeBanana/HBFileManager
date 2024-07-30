@@ -80,12 +80,24 @@
                 <TextBlock Text="HB File Manager"
                            FontFamily="Bahnschrift SemiBold"
                                Margin="10,0,0,0" 
-                               Foreground="White" FontSize="16"/>
+                               Foreground="{StaticResource Foreground}" FontSize="16"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1"
                             HorizontalAlignment="Right" 
                             VerticalAlignment="Center">
+                <buttons:IconButton 
+                    ToolTip="Save application state"
+                    WindowChrome.IsHitTestVisibleInChrome="True"
+                    IconData="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"
+                    IconFill="White"
+                    IconStretch="Fill"
+                    IconHeight="15"
+                    IconWidth="15"
+                    Command="{Binding OpenAccountOverviewCommand}"
+                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+                </buttons:IconButton>
+                
                 <buttons:IconButton 
                     ToolTip="Save application state"
                     WindowChrome.IsHitTestVisibleInChrome="True"
@@ -130,14 +142,15 @@
 
                 <ListBox x:Name="sidebar" Background="Transparent" BorderThickness="0">
                     <buttons:ListBoxButton Text="Explorer"
+                                           BorderThickness="0"
                                            Icon="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z"
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
+                                           IsSelected="True"
                                            IconFill="#f1c23c"
                                            Command="{Binding NavigateToExplorerCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
@@ -147,11 +160,11 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
                                            IconFill="#cdd5e0"
+                                           BorderThickness="0"
                                            Command="{Binding NavigateToJobsCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
                     </buttons:ListBoxButton>
@@ -160,11 +173,11 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
                                            IconFill="#5DADE2"
+                                           BorderThickness="0"
                                            Command="{Binding NavigateToScriptingCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">      
                     </buttons:ListBoxButton>
@@ -173,10 +186,10 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
+                                           BorderThickness="0"
                                            IconFill="{StaticResource VSGreen}"
                                            Command="{Binding NavigateToExecutionCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
@@ -186,11 +199,11 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
                                            IconFill="#cdd5e0"
+                                           BorderThickness="0"
                                            Command="{Binding NavigateToSettingsCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
                     </buttons:ListBoxButton>
@@ -199,11 +212,11 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
                                            IconFill="#cdd5e0"
+                                           BorderThickness="0"
                                            Command="{Binding NavigateToApplicationLogCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
                     </buttons:ListBoxButton>
@@ -212,11 +225,11 @@
                                            IconWidth="25"
                                            IconHeight="25"
                                            Height="80"
-                                           Foreground="White"
+                                           Foreground="{StaticResource Foreground}"
                                            Background="Transparent"
-                                           SelectedBackground="{StaticResource HBDark_Border}"
                                            HorizontalAlignment="Stretch"
                                            IconFill="#1d7ccc"
+                                           BorderThickness="0"
                                            Command="{Binding NavigateToAboutCommand}"
                                            CommandParameter="{Binding NavigateCommandParameter}">
                     </buttons:ListBoxButton>

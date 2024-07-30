@@ -21,9 +21,5 @@ namespace FileManager.UI.Views.SettingsViews;
 public partial class SettingsWinRARView : UserControl {
     public SettingsWinRARView() {
         InitializeComponent();
-
-        this.DataContextChanged += (s, e) => {
-            Debug.WriteLine($"SettingsWinRARView DataContext: {this.DataContext?.GetType().Name}");
-        };
     }
 }

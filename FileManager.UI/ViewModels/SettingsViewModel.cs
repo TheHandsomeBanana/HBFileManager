@@ -1,4 +1,4 @@
-﻿using FileManager.UI.Models.SettingsPageModels;
+﻿using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels.SettingsViewModels;
 using FileManager.UI.Views.SettingsViews;
@@ -20,39 +20,35 @@ using Unity;
 
 namespace FileManager.UI.ViewModels;
 public class SettingsViewModel : ViewModelBase {
-    private readonly INavigationService navigationService;
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
-    public RelayCommand ChangeViewCommand { get; set; }
+    public string NavigateCommandParameter => nameof(SettingsViewModel);
 
-    public ObservableCollection<TreeViewItem> TreeViewItems { get; set; }
+
+    public NavigateCommand<SettingsEnvironmentViewModel> NavigateToEnvironmentCommand { get; set; }
+    public NavigateCommand<SettingsExecutionViewModel> NavigateToExecutionCommand { get; set; }
+    public NavigateCommand<SettingsWinRARViewModel> NavigateToWinRARCommand { get; set; }
 
     public SettingsViewModel() {
-        ChangeViewCommand = new RelayCommand(ChangeView, true);
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        INavigationService navigationService = container.Resolve<INavigationService>();
 
-        this.navigationService = container.Resolve<INavigationService>();
         this.navigationStore = container.Resolve<INavigationStore>();
         navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
         settingsService = container.Resolve<ISettingsService>();
 
-        SettingsWinRARModel winRARModel = settingsService.GetOrSetNew(() => new SettingsWinRARModel())!;
+        SettingsEnvironmentModel environmentModel = settingsService.GetOrSetNew(() => new SettingsEnvironmentModel());
+        SettingsWinRARModel winRARModel = settingsService.GetOrSetNew(() => new SettingsWinRARModel());
 
-        TreeViewItems = [
-            new TreeViewItem("Environment", new SettingsEnvironmentViewModel()),
-            new TreeViewItem("Execution", new SettingsExecutionViewModel()),
-            new TreeViewItem("WinRAR", new SettingsWinRARViewModel(winRARModel!)),
-        ];
+        NavigateToEnvironmentCommand = new NavigateCommand<SettingsEnvironmentViewModel>(navigationService, () => new SettingsEnvironmentViewModel(environmentModel));
+        NavigateToExecutionCommand = new NavigateCommand<SettingsExecutionViewModel>(navigationService, () => new SettingsExecutionViewModel());
+        NavigateToWinRARCommand = new NavigateCommand<SettingsWinRARViewModel>(navigationService, () => new SettingsWinRARViewModel(winRARModel));
+
+        NavigateToEnvironmentCommand.Execute(NavigateCommandParameter);
     }
 
     private void SettingsViewModel_CurrentViewModelChanged() {
         NotifyPropertyChanged(nameof(CurrentViewModel));
-    }
-
-    private void ChangeView(object? obj) {
-        if (obj is TreeViewItem treeViewItem) {
-            navigationService.Navigate(nameof(SettingsViewModel), treeViewItem.ViewModel);
-        }
     }
 }

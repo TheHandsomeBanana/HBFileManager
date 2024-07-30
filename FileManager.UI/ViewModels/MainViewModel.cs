@@ -1,5 +1,6 @@
 ﻿using FileManager.UI.Models;
-using FileManager.UI.Models.SettingsPageModels;
+using FileManager.UI.Models.SettingsModels;
+using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels.SettingsViewModels;
 using HBLibrary.Common;
 using HBLibrary.Common.DI.Unity;
@@ -29,6 +30,7 @@ using Unity;
 namespace FileManager.UI.ViewModels;
 public class MainViewModel : ViewModelBase {
     private readonly INavigationStore navigationStore;
+    private readonly ISettingsService settingsService;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
     public NavigateCommand<ExplorerViewModel> NavigateToExplorerCommand { get; set; }
@@ -42,11 +44,12 @@ public class MainViewModel : ViewModelBase {
     public string NavigateCommandParameter => nameof(MainViewModel);
 
     public RelayCommand SaveApplicationStateCommand { get; set; }
+    public RelayCommand<Window> OpenAccountOverviewCommand { get; set; }
 
     public MainViewModel() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
 
-
+        this.settingsService = container.Resolve<ISettingsService>();
         this.navigationStore = container.Resolve<INavigationStore>();
         INavigationService navigationService = container.Resolve<INavigationService>();
 
@@ -62,6 +65,18 @@ public class MainViewModel : ViewModelBase {
         navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
 
         SaveApplicationStateCommand = new RelayCommand(SaveApplicationState, true);
+        OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview, true);
+
+        NavigateToExplorerCommand.Execute(NavigateCommandParameter);
+    }
+
+    private void OpenAccountOverview(Window obj) {
+        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj);
+        accountWindow.Show();
+    }
+
+    private void LocalLoginCompleted(object? sender, LoginResult e) {
+        
     }
 
     private void SaveApplicationState(object? obj) {

@@ -6,13 +6,10 @@
              xmlns:local="clr-namespace:FileManager.UI.ViewModels"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.SettingsViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.SettingsViews"
-             xmlns:treeViews="clr-namespace:HBLibrary.Wpf.Styles.TreeView;assembly=HBLibrary.Wpf"
+             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.DataContext>
-        <local:SettingsViewModel/>
-    </UserControl.DataContext>
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -21,9 +18,45 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViews.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TreeView/TreeViewItems.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Frame/Frames.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+                <GeometryGroup x:Key="WinRARIcon">
+                    <!-- Background Books -->
+                    <RectangleGeometry Rect="10,10,180,40" />
+                    <RectangleGeometry Rect="10,50,180,40" />
+                    <RectangleGeometry Rect="10,90,180,40" />
+                    <!-- Binding Straps -->
+                    <RectangleGeometry Rect="80,10,40,120" />
+                    <RectangleGeometry Rect="80,30,40,20" />
+                    <RectangleGeometry Rect="80,70,40,20" />
+                    <RectangleGeometry Rect="80,110,40,20" />
+                    <!-- Lock -->
+                    <PathGeometry>
+                        <PathGeometry.Figures>
+                            <PathFigure StartPoint="85,50" IsClosed="True">
+                                <PathFigure.Segments>
+                                    <LineSegment Point="115,50" />
+                                    <ArcSegment Point="115,55" Size="5,5" SweepDirection="Clockwise" />
+                                    <LineSegment Point="85,55" />
+                                    <ArcSegment Point="85,50" Size="5,5" SweepDirection="Counterclockwise" />
+                                </PathFigure.Segments>
+                            </PathFigure>
+                            <PathFigure StartPoint="90,55" IsClosed="True">
+                                <PathFigure.Segments>
+                                    <LineSegment Point="110,55" />
+                                    <LineSegment Point="110,90" />
+                                    <ArcSegment Point="90,90" Size="10,10" SweepDirection="Clockwise" />
+                                    <LineSegment Point="90,55" />
+                                </PathFigure.Segments>
+                            </PathFigure>
+                        </PathGeometry.Figures>
+                    </PathGeometry>
+                </GeometryGroup>
+
         </ResourceDictionary>
+
+        
     </UserControl.Resources>
 
     <Grid>
@@ -32,23 +65,51 @@
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
+        
 
-        <TreeView ItemsSource="{Binding TreeViewItems}"
-              Style="{StaticResource HBDark_TreeView}"
-              Grid.Column="0"
-              Padding="0 5"
-              ItemContainerStyle="{StaticResource HBDark_TreeViewItem}">
 
-            <i:Interaction.Behaviors>
-                <treeViews:TreeViewSelectedItemBehavior Command="{Binding ChangeViewCommand}"/>
-            </i:Interaction.Behaviors>
+        <ListBox Style="{StaticResource HBDark_ListBox}"
+                 BorderThickness="0 0 1 0"
+                 BorderBrush="{StaticResource HBDark_Border}">
+            <buttons:ListBoxButton Style="{StaticResource HBDark_HorizontalListBoxButton}"
+                                     Text="Environment"
+                                   Icon="M6 2C4.89 2 4 2.89 4 4V20A2 2 0 0 0 6 22H12.68A7 7 0 0 1 12 19A7 7 0 0 1 19 12A7 7 0 0 1 20 12.08V8L14 2H6M13 3.5L18.5 9H13V3.5M18 14C17.87 14 17.76 14.09 17.74 14.21L17.55 15.53C17.25 15.66 16.96 15.82 16.7 16L15.46 15.5C15.35 15.5 15.22 15.5 15.15 15.63L14.15 17.36C14.09 17.47 14.11 17.6 14.21 17.68L15.27 18.5C15.25 18.67 15.24 18.83 15.24 19C15.24 19.17 15.25 19.33 15.27 19.5L14.21 20.32C14.12 20.4 14.09 20.53 14.15 20.64L15.15 22.37C15.21 22.5 15.34 22.5 15.46 22.5L16.7 22C16.96 22.18 17.24 22.35 17.55 22.47L17.74 23.79C17.76 23.91 17.86 24 18 24H20C20.11 24 20.22 23.91 20.24 23.79L20.43 22.47C20.73 22.34 21 22.18 21.27 22L22.5 22.5C22.63 22.5 22.76 22.5 22.83 22.37L23.83 20.64C23.89 20.53 23.86 20.4 23.77 20.32L22.7 19.5C22.72 19.33 22.74 19.17 22.74 19C22.74 18.83 22.73 18.67 22.7 18.5L23.76 17.68C23.85 17.6 23.88 17.47 23.82 17.36L22.82 15.63C22.76 15.5 22.63 15.5 22.5 15.5L21.27 16C21 15.82 20.73 15.65 20.42 15.53L20.23 14.21C20.22 14.09 20.11 14 20 14H18M19 17.5C19.83 17.5 20.5 18.17 20.5 19C20.5 19.83 19.83 20.5 19 20.5C18.16 20.5 17.5 19.83 17.5 19C17.5 18.17 18.17 17.5 19 17.5Z"
+                                   IconHeight="16"
+                                   IconWidth="16"
+                                   IsSelected="True"
+                                     Foreground="White"
+                                     Background="Transparent"
+                                     HorizontalAlignment="Stretch"
+                                     Command="{Binding NavigateToEnvironmentCommand}"
+                                     CommandParameter="{Binding NavigateCommandParameter}">
+            </buttons:ListBoxButton>
 
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}" />
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+
+            <buttons:ListBoxButton Style="{StaticResource HBDark_HorizontalListBoxButton}"
+                                    Text="Execution"
+                                   Icon="M8.5,8.64L13.77,12L8.5,15.36V8.64M6.5,5V19L17.5,12"
+                                    IconWidth="16"
+                                    IconHeight="16"
+                                    Foreground="White"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Stretch"
+                                    IconFill="{StaticResource VSGreen}"
+                                    Command="{Binding NavigateToExecutionCommand}"
+                                    CommandParameter="{Binding NavigateCommandParameter}">
+            </buttons:ListBoxButton>
+            <buttons:ListBoxButtonV2 Style="{StaticResource HBDark_ListBoxButtonV2}"
+                                    Text="WinRAR"
+                                     ImageSource="../Resources/Images/WinRARIcon.png"
+                                    ImageWidth="16"
+                                    ImageHeight="16"
+                                    Foreground="White"
+                                    Background="Transparent"
+                                    HorizontalAlignment="Stretch"
+                                    Command="{Binding NavigateToWinRARCommand}"
+                                    CommandParameter="{Binding NavigateCommandParameter}">
+            </buttons:ListBoxButtonV2>
+        </ListBox>
+       
 
         <ContentControl Content="{Binding CurrentViewModel}" 
                         Grid.Column="1"            
