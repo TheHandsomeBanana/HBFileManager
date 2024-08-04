@@ -75,10 +75,6 @@ public class MainViewModel : ViewModelBase {
         accountWindow.Show();
     }
 
-    private void LocalLoginCompleted(object? sender, LoginResult e) {
-        
-    }
-
     private void SaveApplicationState(object? obj) {
         App.SaveApplicationState();
         HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
