@@ -31,6 +31,7 @@ using Microsoft.Extensions.Configuration;
 using System.Configuration;
 using HBLibrary.Common.Authentication.Microsoft;
 using HBLibrary.Wpf.Views;
+using HBLibrary.Wpf.ViewModels.Login;
 
 namespace FileManager.UI {
     /// <summary>
@@ -170,19 +171,57 @@ namespace FileManager.UI {
             IAccountService accountService = container.Resolve<IAccountService>();
             CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
-            AccountInfo? lastAccount = accountService.GetLastAccountAsync(appSettings.ApplicationName).Result;
-            if(lastAccount is not null) {
+            AccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
 
+            if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
+                MSAuthCredentials? credentials = MSAuthCredentials
+                   .CreateFromParameterStorageAsync(appSettings.ApplicationName, lastAccount.Username)
+                   .Result;
 
-                StartupLoginWindow loginWindow = new StartupLoginWindow();
-                StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
-                loginWindow.DataContext = dataContext;
+                // Cached credentials have been found, automatically log in using the cached account identifier
+                // -> Do not trigger login UI
+                if (credentials is not null) {
+                    accountService.LoginAsync(credentials, appSettings.ApplicationName).Wait();
+                    MainWindow mainWindow = new MainWindow {
+                        DataContext = new MainViewModel()
+                    };
+
+                    mainWindow.Show();
+                    return;
+                }
             }
+
+            StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
+            dataContext.LoginCompleted += lr => LoginCompleted(lr, accountService, appSettings);
+
+            if (lastAccount is not null
+                && lastAccount.AccountType == AccountType.Local
+                && dataContext.AppLoginContent is LoginViewModel loginViewModel
+                && loginViewModel.CurrentLoginViewModel is LocalLoginViewModel localLoginViewModel) {
+
+                localLoginViewModel.Username = lastAccount.Username;
+            }
+
+            StartupLoginWindow loginWindow = new StartupLoginWindow();
+            loginWindow.DataContext = dataContext;
+            loginWindow.ShowDialog();
 
             base.OnStartup(e);
         }
 
-        private void LoginCompleted() {
+        private async Task LoginCompleted(LoginResult? arg, IAccountService accountService, CommonAppSettings appSettings) {
+            switch (arg) {
+                case LocalLoginResult localLogin:
+                    await accountService.LoginAsync(new LocalAuthCredentials(localLogin.Username, localLogin.SecurePassword),
+                        appSettings.ApplicationName);
+                    break;
+                case MicrosoftLoginResult microsoftLogin:
+                    // Initial login with cached values was not possible, use interactive login
+                    MSAuthCredentials credentials = MSAuthCredentials.CreateInteractive([MsalScopes.UserRead]);
+                    await accountService.LoginAsync(credentials, appSettings.ApplicationName);
+                    break;
+            }
+
             MainWindow mainWindow = new MainWindow {
                 DataContext = new MainViewModel()
             };
