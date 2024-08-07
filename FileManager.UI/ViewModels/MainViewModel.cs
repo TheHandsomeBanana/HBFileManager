@@ -3,6 +3,8 @@ using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels.SettingsViewModels;
 using HBLibrary.Common;
+using HBLibrary.Common.Account;
+using HBLibrary.Common.Authentication.Microsoft;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Entries;
@@ -31,6 +33,8 @@ namespace FileManager.UI.ViewModels;
 public class MainViewModel : ViewModelBase {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
+    private readonly IAccountService accountService;
+    private readonly CommonAppSettings commonAppSettings;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
     public NavigateCommand<ExplorerViewModel> NavigateToExplorerCommand { get; set; }
@@ -51,6 +55,9 @@ public class MainViewModel : ViewModelBase {
 
         this.settingsService = container.Resolve<ISettingsService>();
         this.navigationStore = container.Resolve<INavigationStore>();
+        this.accountService = container.Resolve<IAccountService>();
+        this.commonAppSettings = container.Resolve<CommonAppSettings>();
+
         INavigationService navigationService = container.Resolve<INavigationService>();
 
         NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService, () => new ExplorerViewModel());
@@ -71,7 +78,7 @@ public class MainViewModel : ViewModelBase {
     }
 
     private void OpenAccountOverview(Window obj) {
-        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj);
+        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, new AccountViewModel(accountService, commonAppSettings));
         accountWindow.Show();
     }
 
