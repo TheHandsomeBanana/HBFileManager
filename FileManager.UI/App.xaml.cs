@@ -192,7 +192,6 @@ namespace FileManager.UI {
             }
 
             StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
-            dataContext.StartupCompleted += StartupCompleted;
 
             if (lastAccount is not null
                 && lastAccount.AccountType == AccountType.Local
@@ -203,17 +202,30 @@ namespace FileManager.UI {
 
             StartupLoginWindow loginWindow = new StartupLoginWindow();
             loginWindow.DataContext = dataContext;
+
+            dataContext.StartupCompleted += success => {
+                if (success) {
+                    MainWindow = new MainWindow {
+                        DataContext = new MainViewModel()
+                    };
+
+                    MainWindow.Closed += (_, _) => {
+                        Shutdown();
+                    };
+
+                    MainWindow.Show();
+                }
+                else {
+                    loginWindow.Close();
+                    Shutdown();
+                }
+            };
+
             loginWindow.ShowDialog();
 
             base.OnStartup(e);
         }
 
-        private void StartupCompleted() {
-            MainWindow mainWindow = new MainWindow {
-                DataContext = new MainViewModel()
-            };
 
-            mainWindow.Show();
-        }
     }
 }
