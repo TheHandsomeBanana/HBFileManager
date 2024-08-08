@@ -34,6 +34,7 @@ using HBLibrary.Wpf.Views;
 using HBLibrary.Wpf.ViewModels.Login;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
+using System.Windows.Interop;
 
 namespace FileManager.UI {
     /// <summary>
@@ -94,6 +95,7 @@ namespace FileManager.UI {
                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
                .WithRedirectUri(azureAdOptions.RedirectUri)
                .WithWindowsEmbeddedBrowserSupport()
+               .WithWindowsDesktopFeatures(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
                .Build();
 
             // Token cache for handling accounts across sessions
@@ -182,86 +184,95 @@ namespace FileManager.UI {
         public void PreventShutdown() {
             CanShutdown = false;
         }
-        
+
         public void AllowShutdown() {
             CanShutdown = true;
         }
         #endregion
 
         protected override async void OnStartup(StartupEventArgs e) {
-            IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-            IAccountService accountService = container.Resolve<IAccountService>();
-            CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
+            try {
+                IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+                IAccountService accountService = container.Resolve<IAccountService>();
+                CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
-            AccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
+                AccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
 
-            if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
-                MSAuthCredentials? credentials = MSAuthCredentials
-                   .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username);
-
-                // Cached credentials have been found, automatically log in using the cached account identifier
-                // -> Do not trigger login UI
-                if (credentials is not null) {
-                    await accountService.LoginAsync(credentials, appSettings.ApplicationName);
-
+                if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                     MainWindow = new MainWindow {
                         DataContext = new MainViewModel()
                     };
 
-                    MainWindow.Closed += (sender, _) => {
-                        if (CanShutdown) {
-                            Shutdown();
-                        }
-                        else {
-                            CanShutdown = true;
-                        }
-                    };
-
                     MainWindow.Show();
-                    return;
+
+                    IntPtr windowHandle = new WindowInteropHelper(MainWindow).Handle;
+
+                    MSAuthCredentials? credentials = MSAuthCredentials
+                       .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username, null, b => {
+                           b.WithParentActivityOrWindow(windowHandle); // Fallback for interactive login
+                       });
+
+                    // Cached credentials have been found, automatically log in using the cached account identifier
+                    // -> Do not trigger login UI
+                    if (credentials is not null) {
+                        await accountService.LoginAsync(credentials, appSettings.ApplicationName);
+
+                        MainWindow.Closed += (sender, _) => {
+                            if (CanShutdown) {
+                                Shutdown();
+                            }
+                            else {
+                                CanShutdown = true;
+                            }
+                        };
+
+                        return;
+                    }
                 }
+
+                StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
+
+                if (lastAccount is not null
+                    && lastAccount.AccountType == AccountType.Local
+                    && dataContext.AppLoginContent is LoginViewModel loginViewModel) {
+
+                    loginViewModel.Username = lastAccount.Username;
+                }
+
+                StartupLoginWindow loginWindow = new StartupLoginWindow();
+                loginWindow.DataContext = dataContext;
+
+                dataContext.StartupCompleted += success => {
+                    if (success) {
+                        MainWindow = new MainWindow {
+                            DataContext = new MainViewModel()
+                        };
+
+                        MainWindow.Closed += (_, _) => {
+                            if (CanShutdown) {
+                                Shutdown();
+                            }
+                            else {
+                                CanShutdown = true;
+                            }
+                        };
+
+                        MainWindow.Show();
+                    }
+                    else {
+                        loginWindow.Close();
+                        Shutdown();
+                    }
+                };
+
+                loginWindow.ShowDialog();
+
+                base.OnStartup(e);
             }
-
-            StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
-
-            if (lastAccount is not null
-                && lastAccount.AccountType == AccountType.Local
-                && dataContext.AppLoginContent is LoginViewModel loginViewModel) {
-
-                loginViewModel.Username = lastAccount.Username;
+            catch {
+                SaveApplicationState();
+                Shutdown();
             }
-
-            StartupLoginWindow loginWindow = new StartupLoginWindow();
-            loginWindow.DataContext = dataContext;
-
-            dataContext.StartupCompleted += success => {
-                if (success) {
-                    MainWindow = new MainWindow {
-                        DataContext = new MainViewModel()
-                    };
-
-                    MainWindow.Closed += (_, _) => {
-                        if (CanShutdown) {
-                            Shutdown();
-                        }
-                        else {
-                            CanShutdown = true;
-                        }
-                    };
-
-                    MainWindow.Show();
-                }
-                else {
-                    loginWindow.Close();
-                    Shutdown();
-                }
-            };
-
-            loginWindow.ShowDialog();
-
-            base.OnStartup(e);
         }
-
-
     }
 }
