@@ -32,6 +32,8 @@ using System.Configuration;
 using HBLibrary.Common.Authentication.Microsoft;
 using HBLibrary.Wpf.Views;
 using HBLibrary.Wpf.ViewModels.Login;
+using Microsoft.Identity.Client;
+using Microsoft.Identity.Client.Desktop;
 
 namespace FileManager.UI {
     /// <summary>
@@ -86,8 +88,19 @@ namespace FileManager.UI {
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
             LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService(commonAppSettings.ApplicationName);
+
+
+            IPublicClientApplication app = PublicClientApplicationBuilder.Create(azureAdOptions.ClientId)
+               .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
+               .WithRedirectUri(azureAdOptions.RedirectUri)
+               .WithWindowsEmbeddedBrowserSupport()
+               .Build();
+
+            // Token cache for handling accounts across sessions
+            MSTokenStorage.Create(commonAppSettings.ApplicationName, app);
+
             PublicMSAuthenticationService publicMSAuthenticationService
-                = new PublicMSAuthenticationService(commonAppSettings.ApplicationName, azureAdOptions.ClientId);
+                = new PublicMSAuthenticationService(app, commonAppSettings);
 
             container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new SingletonLifetimeManager());
             container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new SingletonLifetimeManager());
@@ -164,9 +177,18 @@ namespace FileManager.UI {
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
             applicationStorage.SaveAll();
         }
+
+        public bool CanShutdown { get; private set; } = true;
+        public void PreventShutdown() {
+            CanShutdown = false;
+        }
+        
+        public void AllowShutdown() {
+            CanShutdown = true;
+        }
         #endregion
 
-        protected override void OnStartup(StartupEventArgs e) {
+        protected override async void OnStartup(StartupEventArgs e) {
             IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
             IAccountService accountService = container.Resolve<IAccountService>();
             CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
@@ -175,18 +197,27 @@ namespace FileManager.UI {
 
             if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                 MSAuthCredentials? credentials = MSAuthCredentials
-                   .CreateFromParameterStorageAsync(appSettings.ApplicationName, lastAccount.Username)
-                   .Result;
+                   .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username);
 
                 // Cached credentials have been found, automatically log in using the cached account identifier
                 // -> Do not trigger login UI
                 if (credentials is not null) {
-                    accountService.LoginAsync(credentials, appSettings.ApplicationName).Wait();
-                    MainWindow mainWindow = new MainWindow {
+                    await accountService.LoginAsync(credentials, appSettings.ApplicationName);
+
+                    MainWindow = new MainWindow {
                         DataContext = new MainViewModel()
                     };
 
-                    mainWindow.Show();
+                    MainWindow.Closed += (sender, _) => {
+                        if (CanShutdown) {
+                            Shutdown();
+                        }
+                        else {
+                            CanShutdown = true;
+                        }
+                    };
+
+                    MainWindow.Show();
                     return;
                 }
             }
@@ -210,7 +241,12 @@ namespace FileManager.UI {
                     };
 
                     MainWindow.Closed += (_, _) => {
-                        Shutdown();
+                        if (CanShutdown) {
+                            Shutdown();
+                        }
+                        else {
+                            CanShutdown = true;
+                        }
                     };
 
                     MainWindow.Show();

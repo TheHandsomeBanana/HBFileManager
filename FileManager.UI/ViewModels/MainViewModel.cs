@@ -78,7 +78,32 @@ public class MainViewModel : ViewModelBase {
     }
 
     private void OpenAccountOverview(Window obj) {
-        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, new AccountViewModel(obj, accountService, commonAppSettings));
+        AccountViewModel accountViewModel = new AccountViewModel(obj, accountService, commonAppSettings, success => {
+            if (success) {
+                obj = new MainWindow {
+                    DataContext = new MainViewModel()
+                };
+
+                obj.Closed += (_, _) => {
+                    App currentApp = (App)Application.Current;
+                    if (currentApp.CanShutdown) {
+                        Application.Current.Shutdown();
+                    }
+                    else {
+                        currentApp.AllowShutdown();
+                    }
+                };
+
+                obj.Show();
+            }
+            else {
+                Application.Current.Shutdown();
+            }
+        }, () => { // Prevent shutdown callback
+            (Application.Current as App)?.PreventShutdown();
+        });
+
+        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, accountViewModel);
         accountWindow.Show();
     }
 
