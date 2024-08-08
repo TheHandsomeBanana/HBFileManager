@@ -78,7 +78,7 @@ public class MainViewModel : ViewModelBase {
     }
 
     private void OpenAccountOverview(Window obj) {
-        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, new AccountViewModel(accountService, commonAppSettings));
+        HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, new AccountViewModel(obj, accountService, commonAppSettings));
         accountWindow.Show();
     }
 
