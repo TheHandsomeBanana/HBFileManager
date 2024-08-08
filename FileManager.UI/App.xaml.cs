@@ -78,7 +78,7 @@ namespace FileManager.UI {
             NavigationStore navigationStore = new NavigationStore();
             navigationStore.AddDefaultViewModel(nameof(MainViewModel), new ExplorerViewModel());
             navigationStore.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
-            container.RegisterInstance(navigationStore);
+            container.RegisterInstance<INavigationStore>(navigationStore);
             container.RegisterSingleton<INavigationService, NavigationService>();
         }
         private static void AddAuthentication(IUnityContainer container) {
@@ -192,14 +192,13 @@ namespace FileManager.UI {
             }
 
             StartupLoginViewModel dataContext = new StartupLoginViewModel(accountService, appSettings);
-            dataContext.LoginCompleted += lr => LoginCompleted(lr, accountService, appSettings);
+            dataContext.StartupCompleted += StartupCompleted;
 
             if (lastAccount is not null
                 && lastAccount.AccountType == AccountType.Local
-                && dataContext.AppLoginContent is LoginViewModel loginViewModel
-                && loginViewModel.CurrentLoginViewModel is LocalLoginViewModel localLoginViewModel) {
+                && dataContext.AppLoginContent is LoginViewModel loginViewModel) {
 
-                localLoginViewModel.Username = lastAccount.Username;
+                loginViewModel.Username = lastAccount.Username;
             }
 
             StartupLoginWindow loginWindow = new StartupLoginWindow();
@@ -209,19 +208,7 @@ namespace FileManager.UI {
             base.OnStartup(e);
         }
 
-        private async Task LoginCompleted(LoginResult? arg, IAccountService accountService, CommonAppSettings appSettings) {
-            switch (arg) {
-                case LocalLoginResult localLogin:
-                    await accountService.LoginAsync(new LocalAuthCredentials(localLogin.Username, localLogin.SecurePassword),
-                        appSettings.ApplicationName);
-                    break;
-                case MicrosoftLoginResult microsoftLogin:
-                    // Initial login with cached values was not possible, use interactive login
-                    MSAuthCredentials credentials = MSAuthCredentials.CreateInteractive([MsalScopes.UserRead]);
-                    await accountService.LoginAsync(credentials, appSettings.ApplicationName);
-                    break;
-            }
-
+        private void StartupCompleted() {
             MainWindow mainWindow = new MainWindow {
                 DataContext = new MainViewModel()
             };
