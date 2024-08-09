@@ -95,7 +95,7 @@ namespace FileManager.UI {
                .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
                .WithRedirectUri(azureAdOptions.RedirectUri)
                .WithWindowsEmbeddedBrowserSupport()
-               .WithWindowsDesktopFeatures(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
+               //.WithWindowsDesktopFeatures(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
                .Build();
 
             // Token cache for handling accounts across sessions
@@ -196,26 +196,21 @@ namespace FileManager.UI {
                 IAccountService accountService = container.Resolve<IAccountService>();
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
-                AccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
+                ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
-                    MainWindow = new MainWindow {
-                        DataContext = new MainViewModel()
-                    };
-
-                    MainWindow.Show();
-
-                    IntPtr windowHandle = new WindowInteropHelper(MainWindow).Handle;
-
                     MSAuthCredentials? credentials = MSAuthCredentials
-                       .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username, null, b => {
-                           b.WithParentActivityOrWindow(windowHandle); // Fallback for interactive login
-                       });
+                       .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username);
 
                     // Cached credentials have been found, automatically log in using the cached account identifier
                     // -> Do not trigger login UI
                     if (credentials is not null) {
                         await accountService.LoginAsync(credentials, appSettings.ApplicationName);
+
+                        MainWindow = new MainWindow {
+                            DataContext = new MainViewModel()
+                        };
+
 
                         MainWindow.Closed += (sender, _) => {
                             if (CanShutdown) {
@@ -226,6 +221,7 @@ namespace FileManager.UI {
                             }
                         };
 
+                        MainWindow.Show();
                         return;
                     }
                 }
