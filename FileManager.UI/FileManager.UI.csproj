@@ -13,6 +13,7 @@
   <ItemGroup>
     <None Remove="appsettings.json" />
     <None Remove="Resources\Fonts\Freshman.ttf" />
+    <None Remove="Resources\Images\user-icon.png" />
     <None Remove="Resources\Images\WinRARIcon.png" />
   </ItemGroup>
 
@@ -24,6 +25,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\Icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Images\user-icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Images\WinRARIcon.png">

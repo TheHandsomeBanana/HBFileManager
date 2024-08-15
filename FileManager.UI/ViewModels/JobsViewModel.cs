@@ -1,6 +1,5 @@
 ﻿using FileManager.UI.Models.Job;
 using FileManager.UI.Services.JobService;
-using FileManager.UI.ViewModels.Jobs;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.Views.JobViews;
 using HBLibrary.Common.DI.Unity;

@@ -2,7 +2,6 @@
 using FileManager.UI.Models.JobModels;
 using FileManager.UI.Models.JobModels.JobStepModels;
 using FileManager.UI.Services.JobService;
-using FileManager.UI.ViewModels.Jobs.JobStepViewModels;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views;
@@ -24,7 +23,7 @@ using System.Windows;
 using System.Windows.Data;
 using Unity;
 
-namespace FileManager.UI.ViewModels.Jobs;
+namespace FileManager.UI.ViewModels.JobViewModels;
 public class JobItemViewModel : ViewModelBase<JobItemModel> {
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;

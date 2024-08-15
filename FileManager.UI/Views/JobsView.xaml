@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FileManager.UI.Views"
              xmlns:viewModels ="clr-namespace:FileManager.UI.ViewModels"
-             xmlns:jobViewModels="clr-namespace:FileManager.UI.ViewModels.Jobs"
+             xmlns:jobViewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels"
              xmlns:jobViews="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"

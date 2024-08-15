@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace FileManager.UI.Models.SettingsModels;
 public class SettingsEnvironmentModel {
-    public bool BindJobsToAccount { get; set; }
-    public bool BindSettingsToAccount { get; set; }
+    public JobScope JobScope { get; set; }
+    public SettingsScope SettingsScope { get; set; }
 }

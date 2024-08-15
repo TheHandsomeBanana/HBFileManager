@@ -7,6 +7,8 @@
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels.JobStepViewModels"
+             xmlns:views="clr-namespace:FileManager.UI.Views.JobViews.JobStepViews"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
 
@@ -165,6 +167,18 @@
                     </ListBox>
                 </Grid>
             </Border>
+
+            <ContentControl Grid.Column="1" Content="{Binding SelectedStep}" Margin="10 10 0 0">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewModels:ArchiveStepViewModel}">
+                        <views:ArchiveStepView/>
+                    </DataTemplate>
+                    
+                    <DataTemplate DataType="{x:Type viewModels:CopyStepViewModel}">
+                        <views:CopyStepView/>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </Grid>
     </Grid>
 

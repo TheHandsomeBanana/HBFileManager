@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.ViewModels.Jobs;
+namespace FileManager.UI.ViewModels.JobViewModels;
 public abstract class JobItemStepViewModel : ViewModelBase<JobItemStepModel> {
 	public string Name {
 		get { return Model.Name; }
@@ -16,6 +16,11 @@ public abstract class JobItemStepViewModel : ViewModelBase<JobItemStepModel> {
 		}
 	}
 
+	public StepType StepType {
+		get {
+			return Model.StepType;
+		}
+	}
 
 	public JobItemStepViewModel(JobItemStepModel model) : base(model) {
     }
