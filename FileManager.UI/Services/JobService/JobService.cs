@@ -1,4 +1,4 @@
-﻿using FileManager.UI.Models.Job;
+﻿using FileManager.UI.Models.JobModels;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;

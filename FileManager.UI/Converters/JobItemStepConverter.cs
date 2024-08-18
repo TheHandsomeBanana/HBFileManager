@@ -1,4 +1,4 @@
-﻿using FileManager.UI.Models.Job;
+﻿using FileManager.UI.Models.JobModels;
 using FileManager.UI.Models.JobModels.JobStepModels;
 using System;
 using System.Collections.Generic;

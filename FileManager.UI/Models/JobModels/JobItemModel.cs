@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.Models.Job;
+namespace FileManager.UI.Models.JobModels;
 public class JobItemModel {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";

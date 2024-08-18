@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.UI.Models;
-public enum TargetType {
+public enum FileEntryType {
     File,
     Directory
 }

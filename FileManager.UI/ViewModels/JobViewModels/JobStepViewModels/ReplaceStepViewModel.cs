@@ -1,5 +1,4 @@
-﻿using FileManager.UI.Models.Job;
-using FileManager.UI.Models.JobModels.JobStepModels;
+﻿using FileManager.UI.Models.JobModels.JobStepModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

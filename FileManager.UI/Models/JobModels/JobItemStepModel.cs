@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.UI.Models.Job;
+namespace FileManager.UI.Models.JobModels;
 public abstract class JobItemStepModel {
     public abstract StepType StepType { get; }
     public Guid Id { get; set; }

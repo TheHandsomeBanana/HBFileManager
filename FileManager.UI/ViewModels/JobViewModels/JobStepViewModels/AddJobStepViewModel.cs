@@ -1,4 +1,4 @@
-﻿using FileManager.UI.Models.Job;
+﻿using FileManager.UI.Models.JobModels;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Models;
 using HBLibrary.Wpf.ViewModels;

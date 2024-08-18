@@ -1,5 +1,4 @@
-﻿using FileManager.UI.Models.Job;
-using FileManager.UI.Models.JobModels;
+﻿using FileManager.UI.Models.JobModels;
 using FileManager.UI.Models.JobModels.JobStepModels;
 using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels;
