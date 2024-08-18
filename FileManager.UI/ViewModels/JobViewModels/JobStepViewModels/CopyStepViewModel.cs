@@ -1,6 +1,7 @@
 ﻿using FileManager.UI.Models;
 using FileManager.UI.Models.JobModels.JobStepModels;
 using HBLibrary.Wpf.Commands;
+using HBLibrary.Wpf.Models;
 using HBLibrary.Wpf.ViewModels;
 using Microsoft.Win32;
 using System;
@@ -90,6 +91,22 @@ public class CopyStepViewModel : JobItemStepViewModel {
         }
     }
 
+    public string? TimeDifferenceText {
+        get => TypedModel.TimeDifferenceText;
+        set {
+            TypedModel.TimeDifferenceText = value;
+            NotifyPropertyChanged();
+        }
+    }
+    
+    public TimeUnit? TimeDifferenceUnit {
+        get => TypedModel.TimeDifferenceUnit;
+        set {
+            TypedModel.TimeDifferenceUnit = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public ObservableCollection<FileEntryWrapper> SourceItems { get; set; }
     public ObservableCollection<FileEntryWrapper> DestinationItems { get; set; }
 
@@ -145,6 +162,9 @@ public class CopyStepViewModel : JobItemStepViewModel {
 
         DeleteSourceCommand = new RelayCommand<FileEntryWrapper>(DeleteSource, true);
         DeleteDestinationCommand = new RelayCommand<FileEntryWrapper>(DeleteDestination, true);
+
+        TimeDifference = model.TimeDifference;
+        TimeDifferenceUnit = model.TimeDifferenceUnit;
     }
 
     private void DeleteDestination(FileEntryWrapper obj) {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HBLibrary.Wpf.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,6 +17,8 @@ public class CopyStepModel : JobItemStepModel {
 
     public bool ModifiedOnly { get; set; }
     public TimeSpan? TimeDifference { get; set; }
+    public string? TimeDifferenceText { get; set; }
+    public TimeUnit? TimeDifferenceUnit { get; set; }
 }
 
 public class FileEntryWrapper {

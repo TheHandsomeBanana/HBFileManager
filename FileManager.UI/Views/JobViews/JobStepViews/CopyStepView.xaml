@@ -13,7 +13,7 @@
              xmlns:listViews="clr-namespace:HBLibrary.Wpf.Styles.ListView;assembly=HBLibrary.Wpf"
              xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="400" d:DesignWidth="800">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -44,9 +44,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+    <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                  HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
-                  Padding="0 0 10 10"
+                  Padding="0 0 20 10"
                   scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
 
         <StackPanel>
@@ -76,36 +77,36 @@
                         </Grid.ColumnDefinitions>
 
                         <ComboBox Grid.Column="0"
-                      Style="{StaticResource HBDark_ComboBox}"
-                      Width="Auto"
-                      SelectedItem="{Binding SourceType}"
-                      ItemsSource="{Binding AvailableSourceTypes}">
+                                  Style="{StaticResource HBDark_ComboBox}"
+                                  Width="Auto"
+                                  SelectedItem="{Binding SourceType}"
+                                  ItemsSource="{Binding AvailableSourceTypes}">
                         </ComboBox>
                         <TextBox Style="{StaticResource HBDark_TextBox}" Text="{Binding Source, UpdateSourceTrigger=PropertyChanged}"
-                     ToolTip="{Binding Source, Mode=OneWay}"
-                     Grid.Column="1" 
-                     Margin="5 0 5 0"/>
+                                 ToolTip="{Binding Source, Mode=OneWay}"
+                                 Grid.Column="1" 
+                                 Margin="5 0 5 0"/>
                         <Button Style="{StaticResource HBDark_VSBrowseButton}" Grid.Column="2"
-                    Command="{Binding BrowseSourceCommand}"/>
+                                Command="{Binding BrowseSourceCommand}"/>
 
                         <Button Style="{StaticResource HBDark_VSButton1}" Grid.Column="3" Margin="5 0 0 0"
-                    Content="Add"
-                    Command="{Binding AddSourceCommand}"/>
+                                Content="Add"
+                                Command="{Binding AddSourceCommand}"/>
                     </Grid>
 
                     <ListView Style="{StaticResource HBDark_ListView}"
-                          ItemsSource="{Binding SourceItems}"
-                          SelectedItem="{Binding SelectedSource}"
-                          BorderThickness="1">
+                              ItemsSource="{Binding SourceItems}"
+                              SelectedItem="{Binding SelectedSource}"
+                              BorderThickness="1">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" 
-                            Width="80"
-                            listViews:GridViewColumnAttachedProperties.MinWidth="80">
+                                                Width="80"
+                                                listViews:GridViewColumnAttachedProperties.MinWidth="80">
                                 </GridViewColumn>
 
                                 <GridViewColumn Header="Path" DisplayMemberBinding="{Binding Path}"
-                            listViews:GridViewColumnAttachedProperties.MinWidth="200">
+                                                listViews:GridViewColumnAttachedProperties.MinWidth="200">
                                     <GridViewColumn.Width>
                                         <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}" ConverterParameter="*">
                                             <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}" Path="ActualWidth" />
@@ -117,10 +118,33 @@
                             </GridView>
                         </ListView.View>
 
+                        <ListView.Resources>
+                            <ContextMenu x:Key="contextMenu" 
+                                         DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         Style="{StaticResource HBDark_ContextMenu}">
+                                <MenuItem Header="Delete item"
+                                          Command="{Binding DeleteSourceCommand}"
+                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                    <menus:MenuItemAttachedProperties.IconPath>
+                                        <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                              Fill="{StaticResource VSRed}"
+                                              Stretch="Uniform"/>
+                                    </menus:MenuItemAttachedProperties.IconPath>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListView.Resources>
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource HBDark_ListViewItem}">
+                                <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
                         <ListView.InputBindings>
                             <KeyBinding Key="Delete" 
-                    Command="{Binding DeleteSourceCommand}" 
-                    CommandParameter="{Binding SelectedSource}"/>
+                                        Command="{Binding DeleteSourceCommand}" 
+                                        CommandParameter="{Binding SelectedSource}"/>
                         </ListView.InputBindings>
                     </ListView>
                 </StackPanel>
@@ -132,11 +156,11 @@
 
                 <GroupBox.Header>
                     <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                           Background="{StaticResource HBDark_Background}"
-                           Padding="5 0 5 0"
-                           Text="Destination" 
-                           Grid.Row="0" 
-                           Margin="0 0 0 3"/>
+                               Background="{StaticResource HBDark_Background}"
+                               Padding="5 0 5 0"
+                               Text="Destination" 
+                               Grid.Row="0" 
+                               Margin="0 0 0 3"/>
                 </GroupBox.Header>
 
                 <StackPanel Orientation="Vertical">
@@ -150,29 +174,29 @@
                         </Grid.ColumnDefinitions>
 
                         <ComboBox Grid.Column="0"
-                              Style="{StaticResource HBDark_ComboBox}"
-                              Width="Auto"
-                              SelectedItem="{Binding DestinationType}"
-                              ItemsSource="{Binding AvailableDestinationTypes}">
+                                  Style="{StaticResource HBDark_ComboBox}"
+                                  Width="Auto"
+                                  SelectedItem="{Binding DestinationType}"
+                                  ItemsSource="{Binding AvailableDestinationTypes}">
 
                         </ComboBox>
                         <TextBox Style="{StaticResource HBDark_TextBox}" 
-                             Text="{Binding Destination, UpdateSourceTrigger=PropertyChanged}" 
-                             ToolTip="{Binding Destination, Mode=OneWay}"
-                             Grid.Column="1" 
-                             Margin="5 0 5 0"/>
+                                 Text="{Binding Destination, UpdateSourceTrigger=PropertyChanged}" 
+                                 ToolTip="{Binding Destination, Mode=OneWay}"
+                                 Grid.Column="1" 
+                                 Margin="5 0 5 0"/>
                         <Button Style="{StaticResource HBDark_VSBrowseButton}" Grid.Column="2"
-                            Command="{Binding BrowseDestinationCommand}"/>
+                                Command="{Binding BrowseDestinationCommand}"/>
 
                         <Button Style="{StaticResource HBDark_VSButton1}" Grid.Column="3" Margin="5 0 0 0"
-                            Content="Add"
-                            Command="{Binding AddDestinationCommand}"/>
+                                Content="Add"
+                                Command="{Binding AddDestinationCommand}"/>
                     </Grid>
 
                     <ListView Style="{StaticResource HBDark_ListView}"
-                          ItemsSource="{Binding DestinationItems}"
-                          SelectedItem="{Binding SelectedDestination}"
-                          BorderThickness="0.5">
+                              ItemsSource="{Binding DestinationItems}"
+                              SelectedItem="{Binding SelectedDestination}"
+                              BorderThickness="0.5">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" 
@@ -193,11 +217,35 @@
                             </GridView>
                         </ListView.View>
 
+                        <ListView.Resources>
+                            <ContextMenu x:Key="contextMenu" 
+                                         DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                         Style="{StaticResource HBDark_ContextMenu}">
+                                <MenuItem Header="Delete item"
+                                          Command="{Binding DeleteDestinationCommand}"
+                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                    <menus:MenuItemAttachedProperties.IconPath>
+                                        <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                              Fill="{StaticResource VSRed}"
+                                              Stretch="Uniform"/>
+                                    </menus:MenuItemAttachedProperties.IconPath>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListView.Resources>
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem" BasedOn="{StaticResource HBDark_ListViewItem}">
+                                <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
                         <ListView.InputBindings>
                             <KeyBinding Key="Delete" 
-                    Command="{Binding DeleteDestinationCommand}" 
-                    CommandParameter="{Binding SelectedDestination}"/>
+                                        Command="{Binding DeleteDestinationCommand}" 
+                                        CommandParameter="{Binding SelectedDestination}"/>
                         </ListView.InputBindings>
+
                     </ListView>
                 </StackPanel>
             </GroupBox>
@@ -210,27 +258,29 @@
 
             <StackPanel Orientation="Horizontal" Visibility="{Binding ModifiedOnly, Converter={StaticResource b2v}, FallbackValue=Visible}">
                 <customControls:TimeSpanPicker ParsedText="{Binding TimeDifference, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                           Margin="0 0 5 0">
+                                               Text="{Binding TimeDifferenceText, Mode=TwoWay}"
+                                               TimeUnit="{Binding TimeDifferenceUnit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                               Margin="0 0 5 0">
 
                 </customControls:TimeSpanPicker>
 
                 <buttons:IconButton IconData="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
-                                IconWidth="16"
-                                IconHeight="16"
-                                Width="20"
-                                Height="20"
-                                IconStretch="Uniform"
-                                IconFill="#51b4ff"
-                                Command="{Binding ToggleInfoPopupCommand}">
+                                    IconWidth="16"
+                                    IconHeight="16"
+                                    Width="20"
+                                    Height="20"
+                                    IconStretch="Uniform"
+                                    IconFill="#51b4ff"
+                                    Command="{Binding ToggleInfoPopupCommand}">
                 </buttons:IconButton>
 
                 <Popup IsOpen="{Binding IsInfoPopupOpen}" PlacementTarget="{Binding ElementName=InfoButton}" 
                    StaysOpen="False" Placement="Top">
                     <Border Background="{StaticResource HBDark_TextBox_Background}" BorderBrush="{StaticResource HBDark_TextBox_BorderBrush}" BorderThickness="1" Padding="10">
                         <TextBlock Style="{StaticResource HBDark_TextBlock}" 
-                               Text="Set this value if folders and files should take part in the copying step, when they are older than the provided timespan. Leave this blank to only include size-checking in the modified-only rule." 
-                               TextWrapping="Wrap" 
-                               Width="200"/>
+                                   Text="Set this value if folders and files should take part in the copying step, when they are older than the provided timespan. Leave this blank to only include size-checking in the modified-only rule." 
+                                   TextWrapping="Wrap" 
+                                   Width="200"/>
                     </Border>
                 </Popup>
             </StackPanel>
