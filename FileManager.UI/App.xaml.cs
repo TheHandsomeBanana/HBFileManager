@@ -52,13 +52,11 @@ namespace FileManager.UI {
             AddConfiguration(container);
             AddNavigation(container);
 
-            container.RegisterSingleton<IJobService, JobService>();
+            container.RegisterType<IJobService, JobService>();
             container.RegisterType<IDialogService, DialogService>();
 
             AddAuthentication(container);
-            AddApplicationStorage(container);
-
-            container.RegisterType<ISettingsService, SettingsService>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ISettingsService, SettingsService>();
         }
 
         #region Services
@@ -110,32 +108,32 @@ namespace FileManager.UI {
 
             container.RegisterSingleton<IAccountService, AccountService>();
         }
-        private static void AddApplicationStorage(IUnityContainer container) {
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName, "data");
+        public static void AddApplicationStorageContainers(IApplicationStorage storage, IAccountService accountService) {
+            string accountId = accountService.Account!.AccountId;
 
-            IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
-            appStorageBuilder.AddContainer(typeof(SettingsService), builder => {
-                builder.SetContainerPath("settings");
+            storage.CreateContainer($"{accountId + nameof(SettingsService)}".ToGuid(), b => {
+                b.SetContainerPath($"{Path.Combine(accountId, "settings")}");
 
-                builder.ConfigureFileServices(fs => {
-                    fs.UseJsonFileService(jfs => {
+                b.ConfigureFileServices(c => {
+                    c.UseJsonFileService(jfs => {
+                        jfs.UseBase64 = true;
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = {
+                                new TimeOnlyConverter(),
+                                new JobItemStepConverter()
+                            },
                             WriteIndented = true
                         });
-
-                        jfs.UseBase64 = true;
                     });
                 });
-
-                return builder.Build();
+                return b.Build();
             });
 
-            appStorageBuilder.AddContainer(typeof(JobService), builder => {
-                builder.SetContainerPath("jobs");
+            storage.CreateContainer($"{accountId + nameof(JobService)}".ToGuid(), b => {
+                b.SetContainerPath($"{Path.Combine(accountId, "jobs")}");
 
-                builder.ConfigureFileServices(fs => {
+                b.ConfigureFileServices(fs => {
                     fs.UseJsonFileService(jfs => {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
@@ -149,7 +147,59 @@ namespace FileManager.UI {
                     });
                 });
 
-                return builder.Build();
+                return b.Build();
+            });
+        }
+
+        // This gets called OnStartup after login
+        // -> Requires logged in user id
+        private static void AddApplicationStorage(IUnityContainer container) {
+            Account account = container.Resolve<IAccountService>().Account!;
+
+            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
+
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName, "data");
+
+            IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
+
+            appStorageBuilder.AddContainer($"{account.AccountId + nameof(SettingsService)}".ToGuid(), b => {
+                b.SetContainerPath($"{Path.Combine(account.AccountId, "settings")}");
+                
+                b.ConfigureFileServices(c => {
+                    c.UseJsonFileService(jfs => {
+                        jfs.UseBase64 = true;
+                        jfs.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = {
+                                new TimeOnlyConverter(),
+                                new JobItemStepConverter()
+                            },
+                            WriteIndented = true
+                        });
+                    });
+                });
+
+
+                return b.Build();
+            });
+
+            appStorageBuilder.AddContainer($"{account.AccountId + nameof(JobService)}".ToGuid(), b => {
+                b.SetContainerPath($"{Path.Combine(account.AccountId, "jobs")}");
+
+                b.ConfigureFileServices(fs => {
+                    fs.UseJsonFileService(jfs => {
+                        jfs.SetGlobalOptions(new JsonSerializerOptions {
+                            Converters = {
+                                new TimeOnlyConverter(),
+                                new JobItemStepConverter()
+                            },
+                            WriteIndented = true
+                        });
+
+                        jfs.UseBase64 = true;
+                    });
+                });
+
+                return b.Build();
             });
 
             container.RegisterInstance(appStorageBuilder.Build(), InstanceLifetime.Singleton);
@@ -194,6 +244,7 @@ namespace FileManager.UI {
             try {
                 IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
                 IAccountService accountService = container.Resolve<IAccountService>();
+
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
                 ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
@@ -206,22 +257,7 @@ namespace FileManager.UI {
                     // -> Do not trigger login UI
                     if (credentials is not null) {
                         await accountService.LoginAsync(credentials, appSettings.ApplicationName);
-
-                        MainWindow = new MainWindow {
-                            DataContext = new MainViewModel()
-                        };
-
-
-                        MainWindow.Closed += (sender, _) => {
-                            if (CanShutdown) {
-                                Shutdown();
-                            }
-                            else {
-                                CanShutdown = true;
-                            }
-                        };
-
-                        MainWindow.Show();
+                        MainWindowStartup(container);
                         return;
                     }
                 }
@@ -240,20 +276,7 @@ namespace FileManager.UI {
 
                 dataContext.StartupCompleted += success => {
                     if (success) {
-                        MainWindow = new MainWindow {
-                            DataContext = new MainViewModel()
-                        };
-
-                        MainWindow.Closed += (_, _) => {
-                            if (CanShutdown) {
-                                Shutdown();
-                            }
-                            else {
-                                CanShutdown = true;
-                            }
-                        };
-
-                        MainWindow.Show();
+                        MainWindowStartup(container);
                     }
                     else {
                         loginWindow.Close();
@@ -269,6 +292,25 @@ namespace FileManager.UI {
                 SaveApplicationState();
                 Shutdown();
             }
+        }
+
+        private void MainWindowStartup(IUnityContainer container) {
+            AddApplicationStorage(container);
+
+            MainWindow = new MainWindow {
+                DataContext = new MainViewModel()
+            };
+
+            MainWindow.Closed += (_, _) => {
+                if (CanShutdown) {
+                    Shutdown();
+                }
+                else {
+                    CanShutdown = true;
+                }
+            };
+
+            MainWindow.Show();
         }
     }
 }

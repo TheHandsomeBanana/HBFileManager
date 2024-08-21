@@ -1,4 +1,5 @@
 ﻿using HBLibrary.Common;
+using HBLibrary.Common.Account;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.IO.Json;
@@ -16,8 +17,10 @@ using System.Threading.Tasks;
 namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {
     private readonly IStorageEntryContainer container;
-    public SettingsService(IApplicationStorage applicationStorage) {
-        this.container = applicationStorage.GetContainer(typeof(SettingsService).GUID);
+    public SettingsService(IApplicationStorage applicationStorage, IAccountService accountService) {
+        string containerString = accountService.Account!.AccountId + nameof(JobService);
+
+        this.container = applicationStorage.GetContainer(containerString.ToGuid());
     }
 
     public TSetting? GetSetting<TSetting>() where TSetting : class {

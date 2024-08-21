@@ -1,9 +1,11 @@
 ﻿using FileManager.UI.Models.JobModels;
+using HBLibrary.Common.Account;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;
 using HBLibrary.Services.IO.Storage.Entries;
 using HBLibrary.Services.IO.Storage.Settings;
+using Microsoft.Identity.Client.NativeInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +16,10 @@ using System.Windows.Controls;
 namespace FileManager.UI.Services.JobService;
 public class JobService : IJobService {
     private readonly IStorageEntryContainer container;
-    public JobService(IApplicationStorage applicationStorage) {
-        this.container = applicationStorage.GetContainer(typeof(JobService).GUID);
+    public JobService(IApplicationStorage applicationStorage, IAccountService accountService) {
+        string containerString = accountService.Account!.AccountId + nameof(JobService);
+
+        this.container = applicationStorage.GetContainer(containerString.ToGuid());
     }
 
     public void AddOrUpdate(JobItemModel jobItem) {

@@ -34,6 +34,7 @@ public class MainViewModel : ViewModelBase {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
     private readonly IAccountService accountService;
+    private readonly IApplicationStorage applicationStorage;
     private readonly CommonAppSettings commonAppSettings;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
@@ -53,6 +54,7 @@ public class MainViewModel : ViewModelBase {
     public MainViewModel() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
 
+        this.applicationStorage = container.Resolve<IApplicationStorage>();
         this.settingsService = container.Resolve<ISettingsService>();
         this.navigationStore = container.Resolve<INavigationStore>();
         this.accountService = container.Resolve<IAccountService>();
@@ -80,6 +82,11 @@ public class MainViewModel : ViewModelBase {
     private void OpenAccountOverview(Window obj) {
         AccountViewModel accountViewModel = new AccountViewModel(obj, accountService, commonAppSettings, success => {
             if (success) {
+                // User changed
+                // -> Use new storage containers
+                applicationStorage.RemoveAllContainers();
+                App.AddApplicationStorageContainers(applicationStorage, accountService);
+
                 obj = new MainWindow {
                     DataContext = new MainViewModel()
                 };
