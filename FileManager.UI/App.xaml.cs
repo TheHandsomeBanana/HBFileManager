@@ -109,6 +109,7 @@ namespace FileManager.UI {
             container.RegisterSingleton<IAccountService, AccountService>();
         }
 
+        // This is required for user switching
         public static void AddApplicationStorageContainers(IApplicationStorage storage, IAccountService accountService) {
             string accountId = accountService.Account!.AccountId;
 

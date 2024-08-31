@@ -45,10 +45,12 @@
     </UserControl.Resources>
 
     <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                  scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                  scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                  scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
-                  Padding="0 0 20 10"
-                  scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
+                  Padding="0 0 20 10">
 
         <StackPanel>
             <local:StepView Margin="0 0 0 15"/>
