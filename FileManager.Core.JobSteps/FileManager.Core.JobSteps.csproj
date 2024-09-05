@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Services.IO\HBLibrary.Services.IO.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Services.Logging\HBLibrary.Services.Logging.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Wpf\HBLibrary.Wpf.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\CopyStepView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\StepView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

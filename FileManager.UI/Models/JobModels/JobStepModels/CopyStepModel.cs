@@ -22,6 +22,6 @@ public class CopyStepModel : JobItemStepModel {
 }
 
 public class FileEntryWrapper {
-    public FileEntryType Type { get; set; }
+    public required FileEntryType Type { get; set; }
     public required string Path { get; set; }
 }
