@@ -24,7 +24,7 @@ using FileManager.UI.Services.SettingsService;
 using FileManager.UI.Services.JobService;
 using System.Text.Json;
 using HBLibrary.Common.Json;
-using FileManager.UI.Converters;
+using FileManager.Core.JobSteps.Converters;
 using HBLibrary.Common.Authentication;
 using HBLibrary.Common.Account;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +35,7 @@ using HBLibrary.Wpf.ViewModels.Login;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
 using System.Windows.Interop;
+using FileManager.Core.JobSteps;
 
 namespace FileManager.UI {
     /// <summary>
@@ -52,7 +53,6 @@ namespace FileManager.UI {
             AddConfiguration(container);
             AddNavigation(container);
 
-            container.RegisterType<IJobService, JobService>();
             container.RegisterType<IDialogService, DialogService>();
 
             AddAuthentication(container);
@@ -122,7 +122,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobItemStepConverter()
+                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -139,7 +139,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobItemStepConverter()
+                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -172,7 +172,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobItemStepConverter()
+                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -191,7 +191,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobItemStepConverter()
+                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -204,6 +204,24 @@ namespace FileManager.UI {
             });
 
             container.RegisterInstance(appStorageBuilder.Build(), InstanceLifetime.Singleton);
+        }
+
+        // This gets called OnStartup after login
+        // -> Requires logged in user id
+        private static void AddJobServices(IUnityContainer container) {
+            container.RegisterType<IJobService, JobService>();
+
+            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
+            IAccountService accountService = container.Resolve<IAccountService>();
+
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, 
+                commonAppSettings.ApplicationName, 
+                "data",
+                accountService.Account!.AccountId,
+                "jobstepplugins");
+
+            IPluginJobStepManager jobStepManager = new PluginJobStepManager(storagePath);
+            container.RegisterInstance(jobStepManager, InstanceLifetime.Singleton);
         }
         #endregion
 
@@ -297,6 +315,7 @@ namespace FileManager.UI {
 
         private void MainWindowStartup(IUnityContainer container) {
             AddApplicationStorage(container);
+            AddJobServices(container);
 
             MainWindow = new MainWindow {
                 DataContext = new MainViewModel()

@@ -38,6 +38,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Services.IO\HBLibrary.Services.IO.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Wpf\HBLibrary.Wpf.csproj" />
+    <ProjectReference Include="..\FileManager.Core.JobSteps\FileManager.Core.JobSteps.csproj" />
     <ProjectReference Include="..\FileManager.Core\FileManager.Core.csproj" />
   </ItemGroup>
 
@@ -51,6 +52,7 @@
 
   <ItemGroup>
     <Folder Include="Commands\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
 
 </Project>

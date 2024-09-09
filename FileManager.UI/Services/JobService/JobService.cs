@@ -1,4 +1,5 @@
-﻿using FileManager.UI.Models.JobModels;
+﻿using FileManager.Core.JobSteps;
+using FileManager.UI.Models.JobModels;
 using HBLibrary.Common.Account;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
@@ -52,12 +53,12 @@ public class JobService : IJobService {
         container.Delete(jobId.ToString());
     }
 
-    public void AddOrUpdateStep(Guid jobId, JobItemStepModel step) {
+    public void AddOrUpdateStep(Guid jobId, IJobStep step) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
         job.Steps[step.Id] = step;
     }
 
-    public void DeleteStep(Guid jobId, JobItemStepModel step) {
+    public void DeleteStep(Guid jobId, IJobStep step) {
         DeleteStep(jobId, step.Id);
     }
 
@@ -66,17 +67,17 @@ public class JobService : IJobService {
         job.Steps.Remove(stepId);
     }
 
-    public JobItemStepModel? GetStepById(Guid jobId, Guid stepId) {
+    public IJobStep? GetStepById(Guid jobId, Guid stepId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
         
-        if(job.Steps.TryGetValue(stepId, out JobItemStepModel? step)) {
+        if(job.Steps.TryGetValue(stepId, out IJobStep? step)) {
             return step;
         }
 
         return null;
     }
 
-    public JobItemStepModel[] GetSteps(Guid jobId) {
+    public IJobStep[] GetSteps(Guid jobId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
         return [.. job.Steps.Values];

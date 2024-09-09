@@ -9,6 +9,7 @@
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels.JobStepViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.JobViews.JobStepViews"
+             xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
 
@@ -80,8 +81,6 @@
             </TextBox>
         </StackPanel>
 
-
-
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
@@ -145,7 +144,7 @@
 
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
+                                <TextBlock Text="{Binding StepViewModel.Name}"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                         <ListBox.ItemContainerStyle>
@@ -168,17 +167,18 @@
                 </Grid>
             </Border>
 
-            <ContentControl Grid.Column="1" Margin="10 0 0 0"  Content="{Binding SelectedStep}">
-                <ContentControl.Resources>
-                    <DataTemplate DataType="{x:Type viewModels:ArchiveStepViewModel}">
-                        <views:ArchiveStepView/>
-                    </DataTemplate>
+            <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                          scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                          scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                          scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
+                          HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="0 0 20 10"
+                          Grid.Column="1"
+                          Margin="10 0 0 0">
 
-                    <DataTemplate DataType="{x:Type viewModels:CopyStepViewModel}">
-                        <views:CopyStepView/>
-                    </DataTemplate>
-                </ContentControl.Resources>
-            </ContentControl>
+                <ContentControl Content="{Binding SelectedStep.StepView}"/>
+            </ScrollViewer>
         </Grid>
     </Grid>
 

@@ -1,4 +1,5 @@
-﻿using FileManager.UI.Models.JobModels;
+﻿using FileManager.Core.JobSteps;
+using FileManager.UI.Models.JobModels;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Models;
 using HBLibrary.Wpf.ViewModels;
@@ -27,19 +28,38 @@ public class AddJobStepViewModel : ViewModelBase {
     }
 
 
-    private StepType selectedStepType;
-    public StepType SelectedStepType {
+    private JobStepInfo? selectedStepType;
+    public JobStepInfo? SelectedStepType {
         get { return selectedStepType; }
-        set { 
+        set {
             selectedStepType = value;
+            NotifyPropertyChanged();
+
+            AddJobCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    private JobStepInfo[] availableJobSteps = [];
+    public JobStepInfo[] AvailableStepTypes {
+        get => availableJobSteps;
+        set {
+            availableJobSteps = value;
             NotifyPropertyChanged();
         }
     }
 
-    public AddJobStepViewModel() {
-        AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name));
+    public AddJobStepViewModel(IPluginJobStepManager jobStepManager) {
+        AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name) && selectedStepType is not null);
         CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
 
+        AvailableStepTypes = jobStepManager.GetJobStepTypes().Select(e => {
+            string typeName = PluginJobStepManager.GetJobStepTypeName(e);
+            return new JobStepInfo() {
+                TypeName = typeName,
+                StepType = e
+            };
+
+        }).ToArray();
     }
 
     private void AddAndFinish(Window? obj) {
@@ -59,4 +79,9 @@ public class AddJobStepViewModel : ViewModelBase {
         obj.DialogResult = false;
         obj.Close();
     }
+}
+
+public class JobStepInfo {
+    public required string TypeName { get; set; }
+    public required Type StepType { get; set; }
 }

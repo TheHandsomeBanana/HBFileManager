@@ -13,12 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FileManager.UI.Views.JobViews.JobStepViews;
+namespace FileManager.Core.JobSteps.Views;
 /// <summary>
-/// Interaction logic for StepView.xaml
+/// Interaction logic for ArchiveStepView.xaml
 /// </summary>
-public partial class StepView : UserControl {
-    public StepView() {
+public partial class ArchiveStepView : UserControl {
+    public ArchiveStepView() {
         InitializeComponent();
     }
 }

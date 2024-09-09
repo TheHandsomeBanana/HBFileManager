@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.JobSteps.Attributes;
-[AttributeUsage(AttributeTargets.Class)]
-public class JobStepNameAttribute : Attribute {
+[AttributeUsage(AttributeTargets.Class, Inherited = false)]
+public class JobStepTypeAttribute : Attribute {
     public string Name { get; set; }
 
-    public JobStepNameAttribute(string name) {
+    public JobStepTypeAttribute(string name) {
         Name = name;
     }
 }

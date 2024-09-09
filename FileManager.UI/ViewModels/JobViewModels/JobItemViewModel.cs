@@ -1,5 +1,6 @@
-﻿using FileManager.UI.Models.JobModels;
-using FileManager.UI.Models.JobModels.JobStepModels;
+﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.ViewModels;
+using FileManager.UI.Models.JobModels;
 using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
@@ -26,9 +27,10 @@ namespace FileManager.UI.ViewModels.JobViewModels;
 public class JobItemViewModel : ViewModelBase<JobItemModel> {
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;
+    private readonly IPluginJobStepManager jobStepManager;
 
     public RelayCommand AddStepCommand { get; set; }
-    public RelayCommand<JobItemStepViewModel> DeleteStepCommand { get; set; }
+    public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
 
     public string Name {
         get => Model.Name;
@@ -81,8 +83,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
     }
 
 
-    private JobItemStepViewModel? selectedStep;
-    public JobItemStepViewModel? SelectedStep {
+    private JobStepWrapperViewModel? selectedStep;
+    public JobStepWrapperViewModel? SelectedStep {
         get => selectedStep;
         set {
             selectedStep = value;
@@ -91,19 +93,20 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
     }
 
 
-    private readonly ObservableCollection<JobItemStepViewModel> steps = [];
+    private readonly ObservableCollection<JobStepWrapperViewModel> steps = [];
     private readonly ICollectionView stepsView;
     public ICollectionView StepsView => stepsView;
 
-    
+
 
     public JobItemViewModel(JobItemModel model) : base(model) {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = container.Resolve<IDialogService>();
         this.jobService = container.Resolve<IJobService>();
+        this.jobStepManager = container.Resolve<IPluginJobStepManager>();
 
         AddStepCommand = new RelayCommand(AddStep, true);
-        DeleteStepCommand = new RelayCommand<JobItemStepViewModel>(DeleteStep, true);
+        DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
 
         LoadJobSteps();
 
@@ -119,18 +122,23 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
 
 
     private void AddStep(object? obj) {
-        AddJobStepViewModel addJobViewModel = new AddJobStepViewModel();
+        AddJobStepViewModel addJobViewModel = new AddJobStepViewModel(jobStepManager);
         AddJobStepView addJobView = new AddJobStepView();
 
         bool result = dialogService.ShowCompactDialog(addJobView, addJobViewModel, "Add Step");
         if (result == true) {
-            JobItemStepViewModel stepViewModel = JobSteps.CreateStepVM(addJobViewModel.Name, addJobViewModel.SelectedStepType);
+            IJobStep? jobStep = Activator.CreateInstance(addJobViewModel.SelectedStepType!.StepType!) as IJobStep;
+            jobStep!.Name = addJobViewModel.Name;
+
+            JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(jobStep);
             steps.Add(stepViewModel);
             jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
         }
     }
 
-    public void DeleteStep(JobItemStepViewModel stepViewModel) {
+
+
+    public void DeleteStep(JobStepWrapperViewModel stepViewModel) {
         MessageBoxResult result = HBDarkMessageBox.Show("Delete step",
             "Are you sure you want to delete this step?",
             MessageBoxButton.YesNo,
@@ -144,22 +152,16 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
 
 
     private void LoadJobSteps() {
-        foreach (JobItemStepModel step in Model.Steps.Values) {
-            switch (step.StepType) {
-                case StepType.Archive:
-                    this.steps.Add(new ArchiveStepViewModel((ArchiveStepModel)step));
-                    break;
-                case StepType.Copy:
-                    this.steps.Add(new CopyStepViewModel((CopyStepModel)step));
-                    break;
-            }
+        foreach (IJobStep step in Model.Steps.Values) {
+            JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(step);
+            this.steps.Add(stepViewModel);
         }
     }
 
 
     private bool FilterJobSteps(object obj) {
-        if (obj is JobItemStepViewModel step) {
-            return string.IsNullOrEmpty(SearchText) || step.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+        if (obj is JobStepWrapperViewModel step) {
+            return string.IsNullOrEmpty(SearchText) || step.Model.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
         }
         return false;
     }

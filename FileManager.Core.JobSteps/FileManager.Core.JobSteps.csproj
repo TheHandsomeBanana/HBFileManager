@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ArchiveStepView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\CopyStepView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

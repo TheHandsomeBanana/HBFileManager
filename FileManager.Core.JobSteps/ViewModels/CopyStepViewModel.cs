@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.JobSteps.ViewModels;
-public class CopyStepContext : ViewModelBase<CopyStep> {
+public class CopyStepViewModel : JobStepViewModel<CopyStep> {
 
 
     private bool isInfoPopupOpen;
@@ -72,7 +72,6 @@ public class CopyStepContext : ViewModelBase<CopyStep> {
 
     public EntryType[] AvailableSourceTypes => [EntryType.Directory, EntryType.File];
     public EntryType[] AvailableDestinationTypes => [EntryType.Directory];
-
 
     public bool ModifiedOnly {
         get => Model.ModifiedOnly;
@@ -135,7 +134,7 @@ public class CopyStepContext : ViewModelBase<CopyStep> {
     public RelayCommand AddDestinationCommand { get; set; }
     public RelayCommand<Entry> DeleteSourceCommand { get; set; }
     public RelayCommand<Entry> DeleteDestinationCommand { get; set; }
-    public CopyStepContext(CopyStep model) : base(model) {
+    public CopyStepViewModel(CopyStep model) : base(model) {
         SourceItems = new ObservableCollection<Entry>(Model.SourceItems);
 
         // Refresh Model collection on change
