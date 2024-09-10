@@ -11,7 +11,7 @@ namespace FileManager.Core.JobSteps;
 public interface IJobStep {
     public Guid Id { get; }
     public string Name { get; set; }
-    public bool IsAsync { get; }
+    public bool IsAsync { get; set; }
     public void Execute(IServiceProvider serviceProvider);
     public ValidationResult Validate(IServiceProvider serviceProvider);
 

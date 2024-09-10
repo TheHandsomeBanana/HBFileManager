@@ -1,4 +1,6 @@
 ﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.ViewModels;
+using FileManager.Core.JobSteps.Views;
 using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,15 @@ public class JobStepWrapperViewModel : ViewModelBase<IJobStep> {
     public UserControl? StepView {
         get {
             UserControl? stepView = Model.GetJobStepView();
-            StepViewModel = stepView?.DataContext as ViewModelBase;
+            if (stepView is not null) {
+                StepViewModel = stepView.DataContext as ViewModelBase;
+            }
+            else {
+                stepView = new FallbackStepView();
+                StepViewModel = new FallbackStepViewModel(Model);
+                stepView.DataContext = StepViewModel;
+            }
+
             return stepView;
         }
     }

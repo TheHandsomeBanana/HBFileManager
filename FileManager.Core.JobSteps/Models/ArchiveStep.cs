@@ -22,7 +22,7 @@ public class ArchiveStep : IJobStep {
     }
 
     public System.Windows.Controls.UserControl? GetJobStepView() {
-        throw new NotImplementedException();
+        return null;
     }
 
     public ValidationResult Validate(IServiceProvider serviceProvider) {

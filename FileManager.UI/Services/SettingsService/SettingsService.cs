@@ -18,7 +18,7 @@ namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {
     private readonly IStorageEntryContainer container;
     public SettingsService(IApplicationStorage applicationStorage, IAccountService accountService) {
-        string containerString = accountService.Account!.AccountId + nameof(JobService);
+        string containerString = accountService.Account!.AccountId + nameof(SettingsService);
 
         this.container = applicationStorage.GetContainer(containerString.ToGuid());
     }

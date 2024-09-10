@@ -27,7 +27,7 @@ public class CopyStep : IJobStep {
     public TimeSpan? TimeDifference { get; set; }
     public string? TimeDifferenceText { get; set; }
     public TimeUnit? TimeDifferenceUnit { get; set; }
-    public bool IsAsync { get; }
+    public bool IsAsync { get; set; }
     public int MaxConcurrency { get; set; } = 6;
     public Guid Id { get; set; } = Guid.NewGuid();
     #endregion
