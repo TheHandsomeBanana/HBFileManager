@@ -1,13 +1,18 @@
 ﻿<UserControl x:Class="FileManager.UI.Views.SettingsViews.SettingsPluginsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             xmlns:customControls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
+             xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
+             xmlns:listViews="clr-namespace:HBLibrary.Wpf.Styles.ListView;assembly=HBLibrary.Wpf"
+             xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -16,8 +21,13 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
+            <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -31,7 +41,7 @@
         </Grid.RowDefinitions>
 
         <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
-                   Text="Plugins" />
+                   Text="Assemblies" />
 
 
         <buttons:IconButton Grid.Row="1"
@@ -41,61 +51,121 @@
                             Width="24"
                             IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                             IconFill="{StaticResource VSGreen}"
-                            Command="{Binding AddPluginCommand}">
+                            Command="{Binding AddAssemblyCommand}">
         </buttons:IconButton>
 
         <TextBox Style="{StaticResource HBDark_VSFilterBox}"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                 Tag="Search Plugins"
+                 Tag="Search Assemblies"
                  Grid.Row="2">
 
         </TextBox>
 
-        <ListBox Style="{StaticResource HBDark_ListBox}" 
-                 Grid.Row="3"
-                 ItemsSource="{Binding PluginsView}"
-                 SelectedItem="{Binding SelectedPlugin}">
-            <ListBox.Resources>
-                <ContextMenu x:Key="contextMenu"
-                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                             Style="{StaticResource HBDark_ContextMenu}">
-                    <MenuItem Header="Delete job"
-                              Command="{Binding DeletePluginCommand}"
-                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+        <Grid Grid.Row="3"
+              Margin="0 5 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                        <menus:MenuItemAttachedProperties.IconPath>
-                            <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                  Fill="{StaticResource VSRed}"
-                                  Stretch="Uniform" />
-                        </menus:MenuItemAttachedProperties.IconPath>
-                    </MenuItem>
-                </ContextMenu>
-            </ListBox.Resources>
+            <ListBox Style="{StaticResource HBDark_ListBox}"
+                     ItemsSource="{Binding AssembliesView}"
+                     SelectedItem="{Binding SelectedAssembly}"
+                     Grid.Column="0"
+                     BorderThickness="0 0 1 0"
+                     Margin="0 0 10 0">
+                <ListBox.Resources>
+                    <ContextMenu x:Key="contextMenu"
+                                 DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                 Style="{StaticResource HBDark_ContextMenu}">
+                        <MenuItem Header="Delete job"
+                                  Command="{Binding DeleteAssemblyCommand}"
+                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
-            <ListBox.InputBindings>
-                <KeyBinding Key="Delete"
-                            Command="{Binding DeletePluginCommand}"
-                            CommandParameter="{Binding SelectedPlugin}" />
-            </ListBox.InputBindings>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem"
-                       BasedOn="{StaticResource HBDark_ListBoxItem}">
-                    <Setter Property="ContextMenu"
-                            Value="{StaticResource contextMenu}" />
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ContextMenu>
-                <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
-                    <MenuItem Header="Add new job"
-                              Command="{Binding AddPluginCommand}">
-                        <menus:MenuItemAttachedProperties.IconPath>
-                            <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                  Fill="{StaticResource VSGreen}"
-                                  Stretch="Uniform" />
-                        </menus:MenuItemAttachedProperties.IconPath>
-                    </MenuItem>
-                </ContextMenu>
-            </ListBox.ContextMenu>
-        </ListBox>
+                            <menus:MenuItemAttachedProperties.IconPath>
+                                <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                      Fill="{StaticResource VSRed}"
+                                      Stretch="Uniform" />
+                            </menus:MenuItemAttachedProperties.IconPath>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListBox.Resources>
+
+                <ListBox.InputBindings>
+                    <KeyBinding Key="Delete"
+                                Command="{Binding DeleteAssemblyCommand}"
+                                CommandParameter="{Binding SelectedAssembly}" />
+                </ListBox.InputBindings>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem"
+                           BasedOn="{StaticResource HBDark_ListBoxItem}">
+                        <Setter Property="ContextMenu"
+                                Value="{StaticResource contextMenu}" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ContextMenu>
+                    <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                        <MenuItem Header="Add new job"
+                                  Command="{Binding AddAssemblyCommand}">
+                            <menus:MenuItemAttachedProperties.IconPath>
+                                <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                      Fill="{StaticResource VSGreen}"
+                                      Stretch="Uniform" />
+                            </menus:MenuItemAttachedProperties.IconPath>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Found Plugins"
+                           Style="{StaticResource HBDark_HeaderTextBlock}"
+                           Grid.Row="0" />
+
+                <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                              scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                              scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                              scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="0 0 20 10"
+                              Grid.Column="1"
+                              Grid.Row="1">
+
+                    <ListView Style="{StaticResource HBDark_ListView}"
+                              ItemsSource="{Binding FoundPlugins}"
+                              Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}">
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn Header="Plugin Type"
+                                                DisplayMemberBinding="{Binding PluginType}"
+                                                Width="100"
+                                                listViews:GridViewColumnAttachedProperties.MinWidth="100">
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Concrete Type"
+                                                DisplayMemberBinding="{Binding ConcreteType}"
+                                                listViews:GridViewColumnAttachedProperties.MinWidth="100">
+                                    <GridViewColumn.Width>
+                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
+                                                      ConverterParameter="*">
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
+                                                     Path="ActualWidth" />
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
+                                            <Binding RelativeSource="{RelativeSource Self}" />
+                                        </MultiBinding>
+                                    </GridViewColumn.Width>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

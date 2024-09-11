@@ -17,7 +17,7 @@ public class JobStepManager : IJobStepManager {
         this.pluginManager = pluginManager;    
     }
 
-    public void LoadPluginJobSteps() {
+    public void LoadJobSteps() {
         pluginManager.LoadAssemblies();
         Type[] jobStepType = pluginManager.GetPluginTypes<IJobStep>();
         foreach(Type type in jobStepType) {

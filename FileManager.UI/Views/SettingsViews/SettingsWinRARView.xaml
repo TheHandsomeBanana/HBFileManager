@@ -24,7 +24,7 @@
 
   
 
-    <StackPanel Orientation="Vertical" Margin="10">
+    <StackPanel Orientation="Vertical" Margin="0 10 0 0">
         <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding UseWinRAR}" Content="Enable WinRAR" Margin="0 0 0 5"></CheckBox>
         <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Location" Margin="0 0 0 3"></TextBlock>
         <Grid Margin="0 0 0 5" IsEnabled="{Binding UseWinRAR}">

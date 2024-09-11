@@ -38,31 +38,11 @@
     </UserControl.Resources>
 
 
-    <StackPanel Orientation="Vertical" Margin="10">
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Settings scope" Margin="0 0 0 3"/>
-        <ComboBox Style="{StaticResource HBDark_ComboBox}" 
-                  Width="Auto" 
-                  Margin="0 0 0 5"
-                  ItemsSource="{Binding Source={StaticResource SettingsScopeValues}}"
-                  SelectedItem="{Binding SelectedSettingsScope}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="{Binding Converter={StaticResource e2s}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+    <StackPanel Orientation="Vertical" Margin="0 10 0 0">
+        <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                  Content="Encrypt jobs"
+                  IsChecked="{Binding EncryptJobs}">
 
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Job scope" Margin="0 0 0 3"/>
-        <ComboBox Style="{StaticResource HBDark_ComboBox}" 
-                  Width="Auto" 
-                  Margin="0 0 0 5"
-                  ItemsSource="{Binding Source={StaticResource JobScopeValues}}"
-                  SelectedItem="{Binding SelectedJobScope}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="{Binding Converter={StaticResource e2s}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        </CheckBox>
     </StackPanel>
 </UserControl>

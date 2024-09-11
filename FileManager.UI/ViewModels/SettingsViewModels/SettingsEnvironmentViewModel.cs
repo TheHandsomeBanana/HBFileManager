@@ -4,23 +4,14 @@ using HBLibrary.Wpf.ViewModels;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels {
     public class SettingsEnvironmentViewModel : ViewModelBase<SettingsEnvironmentModel> {
-
-
-        public SettingsScope SelectedSettingsScope {
-            get => Model.SettingsScope;
+        public bool EncryptJobs {
+            get => Model.EncryptJobs;
             set {
-                Model.SettingsScope = value;
+                Model.EncryptJobs = value;
                 NotifyPropertyChanged();
             }
         }
 
-        public JobScope SelectedJobScope {
-            get => Model.JobScope;
-            set {
-                Model.JobScope = value;
-                NotifyPropertyChanged();
-            }
-        }
 
         public SettingsEnvironmentViewModel() {
             Model = new SettingsEnvironmentModel();

@@ -1,5 +1,5 @@
 ﻿namespace FileManager.Core.JobSteps;
 public interface IJobStepManager {
-    public void LoadPluginJobSteps();
+    public void LoadJobSteps();
     public IEnumerable<Type> GetJobStepTypes();
 }

@@ -21,43 +21,42 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
         set {
             searchText = value;
             NotifyPropertyChanged();
-            pluginsView.Refresh();
+            assemblyView.Refresh();
         }
     }
 
-    public RelayCommand AddPluginCommand { get; set; }
-    public RelayCommand<string> DeletePluginCommand { get; set; }
+    public RelayCommand AddAssemblyCommand { get; set; }
+    public RelayCommand<string> DeleteAssemblyCommand { get; set; }
 
-    private string? selectedPlugin;
-    public string? SelectedPlugin {
-        get { return selectedPlugin; }
+    private string? selectedAssembly;
+    public string? SelectedAssembly {
+        get { return selectedAssembly; }
         set {
-            selectedPlugin = value;
+            selectedAssembly = value;
             NotifyPropertyChanged();
         }
     }
 
-    private readonly ICollectionView pluginsView;
-    public ICollectionView PluginsView => pluginsView;
-    public ObservableCollection<string> plugins { get; set; }
+    private readonly ICollectionView assemblyView;
+    public ICollectionView AssembliesView => assemblyView;
+    public ObservableCollection<string> assemblies { get; set; }
 
     public SettingsPluginsViewModel(SettingsPluginsModel model) : base(model) {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         dialogService = container.Resolve<IDialogService>();
 
-        plugins = [.. Model.Plugins];
+        assemblies = [.. Model.Assemblies];
 
-        plugins.CollectionChanged += (_, s) => {
-            Model.Plugins.Clear();
-            Model.Plugins.AddRange(plugins);
+        assemblies.CollectionChanged += (_, s) => {
+            Model.Assemblies.Clear();
+            Model.Assemblies.AddRange(assemblies);
         };
 
-        pluginsView = CollectionViewSource.GetDefaultView(plugins);
-        pluginsView.Filter = FilterPlugins;
+        assemblyView = CollectionViewSource.GetDefaultView(assemblies);
+        assemblyView.Filter = FilterPlugins;
 
-
-        AddPluginCommand = new RelayCommand(AddPlugin, true);
-        DeletePluginCommand = new RelayCommand<string>(DeletePlugin, true);
+        AddAssemblyCommand = new RelayCommand(AddAssembly, true);
+        DeleteAssemblyCommand = new RelayCommand<string>(DeleteAssembly, true);
     }
 
     private bool FilterPlugins(object obj) {
@@ -67,12 +66,12 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
         return false;
     }
 
-    private void DeletePlugin(string obj) {
-        plugins.Remove(obj);
-        SelectedPlugin = plugins.FirstOrDefault();
+    private void DeleteAssembly(string obj) {
+        assemblies.Remove(obj);
+        SelectedAssembly = assemblies.FirstOrDefault();
     }
 
-    private void AddPlugin(object? obj) {
+    private void AddAssembly(object? obj) {
         OpenFileDialog ofd = new OpenFileDialog();
         ofd.Filter = "DLL Files (*.dll)|*.dll";
         ofd.Title = "Select Plugins";
@@ -82,7 +81,7 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
         if (ofd.ShowDialog().GetValueOrDefault()) {
             foreach (string file in ofd.FileNames) {
-                plugins.Add(Path.GetFileName(file));
+                assemblies.Add(Path.GetFileName(file));
             }
         }
     }
