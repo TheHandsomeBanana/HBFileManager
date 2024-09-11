@@ -16,24 +16,20 @@ public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
     private readonly List<SyntaxToken> childTokens = [];
     public IReadOnlyList<SyntaxToken> ChildTokens => childTokens;
 
-    public SyntaxNode(SyntaxNodeKind kind)
-    {
+    public SyntaxNode(SyntaxNodeKind kind) {
         Kind = kind;
     }
 
-    public virtual void AddChildNode(SyntaxNode node)
-    {
+    public virtual void AddChildNode(SyntaxNode node) {
         node.Parent = this;
         childNodes.Add(node);
     }
 
-    public virtual void AddChildToken(SyntaxToken token)
-    {
+    public virtual void AddChildToken(SyntaxToken token) {
         childTokens.Add(token);
     }
 
-    public SyntaxNode GetRoot()
-    {
+    public SyntaxNode GetRoot() {
         SyntaxNode temp = this;
         while (temp.Parent != null)
             temp = temp.Parent;
@@ -43,8 +39,7 @@ public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {
 
     public bool IsKind(SyntaxNodeKind nodeKind) => Kind == nodeKind;
 
-    public override string ToString()
-    {
+    public override string ToString() {
         return $"{Kind} {Span} {LineSpan}";
     }
 

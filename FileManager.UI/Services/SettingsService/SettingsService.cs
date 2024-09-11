@@ -1,18 +1,8 @@
-﻿using HBLibrary.Common;
-using HBLibrary.Common.Account;
+﻿using HBLibrary.Common.Account;
 using HBLibrary.Common.Extensions;
-using HBLibrary.Services.IO;
-using HBLibrary.Services.IO.Json;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;
 using HBLibrary.Services.IO.Storage.Entries;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
 
 namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {
@@ -44,10 +34,10 @@ public class SettingsService : ISettingsService {
     }
 
     public TSetting GetOrSetNew<TSetting>(Func<TSetting> createSettingFunc) where TSetting : class {
-        if(container.TryGet(typeof(TSetting).GuidString(), out IStorageEntry? entry)) {
+        if (container.TryGet(typeof(TSetting).GuidString(), out IStorageEntry? entry)) {
             TSetting? setting = entry!.Get(typeof(TSetting)) as TSetting;
 
-            if(setting is null) {
+            if (setting is null) {
                 setting = createSettingFunc();
                 SetSetting(setting);
             }

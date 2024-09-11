@@ -2,11 +2,6 @@
 using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
 using HBLibrary.Wpf.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;

@@ -1,12 +1,4 @@
-﻿using HBLibrary.Services.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading.Tasks;
-
-namespace FileManager.UI.Services.SettingsService;
+﻿namespace FileManager.UI.Services.SettingsService;
 public interface ISettingsService {
     public TSetting? GetSetting<TSetting>() where TSetting : class;
     public object? GetSetting(Type type);

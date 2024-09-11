@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FileManager.Core.Interpreter.Exceptions;
-using FileManager.Core.Interpreter.Syntax.Arguments;
-using FileManager.Core.Interpreter.Syntax.Expressions;
+﻿using FileManager.Core.Interpreter.Exceptions;
 
 namespace FileManager.Core.Interpreter.Syntax.Commands;
 public class CommandParameterSyntax : SyntaxNode {

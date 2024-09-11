@@ -1,14 +1,12 @@
 using FileManager.Core.Interpreter.Syntax;
-using FileManager.TestBase;
 using HBLibrary.Code.Interpreter;
 using System.Collections.Immutable;
-using Unity;
 
 namespace FileManager.Core.Interpreter.Tests;
 
 [TestClass]
 public class LexerTests : TestBase.TestBase {
-    
+
 
     [TestMethod]
     public void Lex_PositiveTest() {

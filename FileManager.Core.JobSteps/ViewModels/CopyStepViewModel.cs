@@ -1,14 +1,8 @@
 ﻿using FileManager.Core.JobSteps.Models;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Models;
-using HBLibrary.Wpf.ViewModels;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.JobSteps.ViewModels;
 public class CopyStepViewModel : JobStepViewModel<CopyStep> {

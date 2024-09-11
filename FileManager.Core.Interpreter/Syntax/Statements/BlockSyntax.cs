@@ -1,11 +1,4 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
-using FileManager.Core.Interpreter.Syntax.Commands;
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax.Statements;
 public class BlockSyntax : SyntaxNode {

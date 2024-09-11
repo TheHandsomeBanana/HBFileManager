@@ -1,10 +1,5 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
 using FileManager.Core.Interpreter.Syntax.Arguments;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax.Commands;
 public class CommandParameterAssignmentSyntax : SyntaxNode {

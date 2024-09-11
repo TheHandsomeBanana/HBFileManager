@@ -12,7 +12,7 @@ public class SyntaxTree(SyntaxNode root) : ISyntaxTree<SyntaxNode> {
     private static List<SyntaxNode> GetNodesInternal(SyntaxNode current) {
         List<SyntaxNode> temp = [];
 
-        foreach(SyntaxNode child in current.ChildNodes) {
+        foreach (SyntaxNode child in current.ChildNodes) {
             temp.Add(child);
             temp.AddRange(GetNodesInternal(child));
         }

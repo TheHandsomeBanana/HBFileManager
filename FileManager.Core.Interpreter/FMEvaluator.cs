@@ -2,19 +2,12 @@
 using FileManager.Core.Interpreter.Syntax.Commands;
 using HBLibrary.Code.Interpreter;
 using HBLibrary.Code.Interpreter.Evaluator;
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter;
-public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
-{
+public class FMEvaluator : ISemanticEvaluator<SyntaxTree> {
     private string content = "";
-    public ImmutableArray<SimpleError> Evaluate(SyntaxTree syntaxTree, string content)
-    {
+    public ImmutableArray<SimpleError> Evaluate(SyntaxTree syntaxTree, string content) {
         this.content = content;
 
         return syntaxTree.Root
@@ -23,11 +16,9 @@ public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
             .ToImmutableArray();
     }
 
-    private ImmutableArray<SimpleError> CheckNode(SyntaxNode? node)
-    {
+    private ImmutableArray<SimpleError> CheckNode(SyntaxNode? node) {
         ImmutableArray<SimpleError>.Builder errorBuilder = ImmutableArray.CreateBuilder<SimpleError>();
-        switch (node)
-        {
+        switch (node) {
             case CommandStatementSyntax commandStatement:
                 errorBuilder.AddRange(CheckNode(commandStatement.Command));
                 break;
@@ -35,8 +26,7 @@ public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
                 errorBuilder.AddRange(CheckNode(command.ParameterList));
                 break;
             case CommandParameterListSyntax commandParameterList:
-                foreach (CommandParameterSyntax commandParameter in commandParameterList.Parameters)
-                {
+                foreach (CommandParameterSyntax commandParameter in commandParameterList.Parameters) {
                     errorBuilder.AddRange(CheckParameter(commandParameter));
                 }
                 break;
@@ -46,11 +36,9 @@ public class FMEvaluator : ISemanticEvaluator<SyntaxTree>
         return errorBuilder.ToImmutableArray();
     }
 
-    private List<SimpleError> CheckParameter(CommandParameterSyntax commandParameter)
-    {
+    private List<SimpleError> CheckParameter(CommandParameterSyntax commandParameter) {
         CommandSyntax parentCommand = (CommandSyntax)commandParameter.Parent!;
-        if (FMSemanticRuleset.CheckValidCommandParameter(parentCommand.Kind, commandParameter.Kind))
-        {
+        if (FMSemanticRuleset.CheckValidCommandParameter(parentCommand.Kind, commandParameter.Kind)) {
             return [new SimpleError(
                 commandParameter.Span,
                 commandParameter.LineSpan,

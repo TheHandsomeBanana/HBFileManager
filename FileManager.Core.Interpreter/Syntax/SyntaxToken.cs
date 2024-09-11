@@ -29,10 +29,10 @@ public readonly struct SyntaxToken : ISyntaxToken, IEquatable<SyntaxToken> {
             && this.FullSpan == other.FullSpan;
     }
 
-    public override bool Equals([NotNullWhen(true)] object? obj) 
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is SyntaxToken token && Equals(token);
 
-    public override int GetHashCode() =>  HashCode.Combine(Value, Kind, FullSpan);
+    public override int GetHashCode() => HashCode.Combine(Value, Kind, FullSpan);
 
     public bool IsKind(SyntaxTokenKind kind) => Kind == kind;
 

@@ -1,9 +1,4 @@
 ﻿using HBLibrary.Wpf.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.ViewModels;
@@ -21,6 +16,6 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJo
     public string StepType => PluginJobStepManager.GetJobStepTypeName(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {
-        
+
     }
 }

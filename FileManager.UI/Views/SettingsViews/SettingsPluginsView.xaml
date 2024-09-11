@@ -51,7 +51,10 @@
 
         </TextBox>
 
-        <ListBox Style="{StaticResource HBDark_ListBox}" Grid.Row="3">
+        <ListBox Style="{StaticResource HBDark_ListBox}" 
+                 Grid.Row="3"
+                 ItemsSource="{Binding PluginsView}"
+                 SelectedItem="{Binding SelectedPlugin}">
             <ListBox.Resources>
                 <ContextMenu x:Key="contextMenu"
                              DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
@@ -74,12 +77,6 @@
                             Command="{Binding DeletePluginCommand}"
                             CommandParameter="{Binding SelectedPlugin}" />
             </ListBox.InputBindings>
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
             <ListBox.ItemContainerStyle>
                 <Style TargetType="ListBoxItem"
                        BasedOn="{StaticResource HBDark_ListBoxItem}">

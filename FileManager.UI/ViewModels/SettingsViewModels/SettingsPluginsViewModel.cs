@@ -1,61 +1,89 @@
 ﻿using FileManager.UI.Models.SettingsModels;
+using HBLibrary.Common.DI.Unity;
 using HBLibrary.Wpf.Commands;
+using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
-using System;
-using System.Collections.Generic;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Data;
+using Unity;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels;
 
 public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
-    private string newPluginText;
+    private readonly IDialogService dialogService;
 
-    public string NewPluginText {
-        get {
-            return newPluginText;
-        }
+    private string? searchText;
+    public string? SearchText {
+        get => searchText;
         set {
-            newPluginText = value;
+            searchText = value;
             NotifyPropertyChanged();
-            AddPluginCommand.NotifyCanExecuteChanged();
+            pluginsView.Refresh();
         }
     }
 
-
-    public RelayCommand BrowseCommand { get; set; }
     public RelayCommand AddPluginCommand { get; set; }
     public RelayCommand<string> DeletePluginCommand { get; set; }
 
-    public ObservableCollection<string> Plugins { get; set; }
-    public SettingsPluginsViewModel(SettingsPluginsModel model) : base(model) {
-        Plugins = new ObservableCollection<string>(Model.Plugins);
-        Plugins.CollectionChanged += (_, s) => {
-            Model.Plugins.Clear();
-            Model.Plugins.AddRange(Plugins);
-        };
-
-        AddPluginCommand = new RelayCommand(AddPlugin, o => IsPotentialNewPlugin(NewPluginText));
-        DeletePluginCommand = new RelayCommand<string>(DeletePlugin, true);
-        BrowseCommand = new RelayCommand(Browse, true);
+    private string? selectedPlugin;
+    public string? SelectedPlugin {
+        get { return selectedPlugin; }
+        set {
+            selectedPlugin = value;
+            NotifyPropertyChanged();
+        }
     }
 
-    private void Browse(object? obj) {
+    private readonly ICollectionView pluginsView;
+    public ICollectionView PluginsView => pluginsView;
+    public ObservableCollection<string> plugins { get; set; }
+
+    public SettingsPluginsViewModel(SettingsPluginsModel model) : base(model) {
+        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        dialogService = container.Resolve<IDialogService>();
+
+        plugins = [.. Model.Plugins];
+
+        plugins.CollectionChanged += (_, s) => {
+            Model.Plugins.Clear();
+            Model.Plugins.AddRange(plugins);
+        };
+
+        pluginsView = CollectionViewSource.GetDefaultView(plugins);
+        pluginsView.Filter = FilterPlugins;
+
+
+        AddPluginCommand = new RelayCommand(AddPlugin, true);
+        DeletePluginCommand = new RelayCommand<string>(DeletePlugin, true);
+    }
+
+    private bool FilterPlugins(object obj) {
+        if (obj is string name) {
+            return string.IsNullOrEmpty(SearchText) || name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+        }
+        return false;
     }
 
     private void DeletePlugin(string obj) {
-        Plugins.Remove(obj);
+        plugins.Remove(obj);
+        SelectedPlugin = plugins.FirstOrDefault();
     }
 
     private void AddPlugin(object? obj) {
-        Plugins.Add(NewPluginText);
-        NewPluginText = "";
-    }
+        OpenFileDialog ofd = new OpenFileDialog();
+        ofd.Filter = "DLL Files (*.dll)|*.dll";
+        ofd.Title = "Select Plugins";
+        ofd.CheckFileExists = true;
+        ofd.DefaultExt = ".dll";
+        ofd.Multiselect = true;
 
-    private bool IsPotentialNewPlugin(string text) {
-        return text.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
-            && !Plugins.Contains(text);
+        if (ofd.ShowDialog().GetValueOrDefault()) {
+            foreach (string file in ofd.FileNames) {
+                plugins.Add(Path.GetFileName(file));
+            }
+        }
     }
 }

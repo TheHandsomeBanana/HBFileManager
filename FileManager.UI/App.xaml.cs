@@ -1,41 +1,31 @@
-﻿using HBLibrary.Common.DI.Unity;
-using HBLibrary.Services.IO.Storage;
-using HBLibrary.Wpf.Extensions;
-using HBLibrary.Wpf.Services;
-using System.IO;
-using System.Windows;
-using System.Windows.Media.Media3D;
-using System.Windows.Media;
-using Unity;
-using Unity.Lifetime;
+﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.Converters;
+using FileManager.UI.Services.JobService;
+using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels;
 using FileManager.UI.ViewModels.SettingsViewModels;
-using HBLibrary.Wpf.Services.NavigationService;
-using HBLibrary.Wpf.Services.NavigationService.Single;
-using HBLibrary.Wpf.ViewModels;
-using System.Diagnostics;
 using HBLibrary.Common;
-using HBLibrary.Services.IO.Json;
-using HBLibrary.Services.IO;
-using HBLibrary.Services.IO.Storage.Builder;
-using HBLibrary.Services.IO.Xml;
-using HBLibrary.Common.Extensions;
-using FileManager.UI.Services.SettingsService;
-using FileManager.UI.Services.JobService;
-using System.Text.Json;
-using HBLibrary.Common.Json;
-using FileManager.Core.JobSteps.Converters;
-using HBLibrary.Common.Authentication;
 using HBLibrary.Common.Account;
-using Microsoft.Extensions.Configuration;
-using System.Configuration;
+using HBLibrary.Common.Authentication;
 using HBLibrary.Common.Authentication.Microsoft;
-using HBLibrary.Wpf.Views;
+using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Extensions;
+using HBLibrary.Common.Json;
+using HBLibrary.Services.IO.Storage;
+using HBLibrary.Services.IO.Storage.Builder;
+using HBLibrary.Wpf.Services;
+using HBLibrary.Wpf.Services.NavigationService;
+using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.ViewModels.Login;
+using HBLibrary.Wpf.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
-using System.Windows.Interop;
-using FileManager.Core.JobSteps;
+using System.IO;
+using System.Text.Json;
+using System.Windows;
+using Unity;
+using Unity.Lifetime;
 
 namespace FileManager.UI {
     /// <summary>
@@ -165,7 +155,7 @@ namespace FileManager.UI {
 
             appStorageBuilder.AddContainer($"{account.AccountId + nameof(SettingsService)}".ToGuid(), b => {
                 b.SetContainerPath($"{Path.Combine(account.AccountId, "settings")}");
-                
+
                 b.ConfigureFileServices(c => {
                     c.UseJsonFileService(jfs => {
                         jfs.UseBase64 = true;
@@ -214,8 +204,8 @@ namespace FileManager.UI {
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
             IAccountService accountService = container.Resolve<IAccountService>();
 
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, 
-                commonAppSettings.ApplicationName, 
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
+                commonAppSettings.ApplicationName,
                 "data",
                 accountService.Account!.AccountId,
                 "jobstepplugins");

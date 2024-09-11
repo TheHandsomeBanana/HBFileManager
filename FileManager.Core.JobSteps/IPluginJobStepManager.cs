@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FileManager.Core.JobSteps;
+﻿namespace FileManager.Core.JobSteps;
 public interface IPluginJobStepManager {
     public event Action? PluginJobStepsLoaded;
     public event Action? PluginJobStepLoading;

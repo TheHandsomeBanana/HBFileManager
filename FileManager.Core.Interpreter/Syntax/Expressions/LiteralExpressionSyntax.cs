@@ -1,9 +1,4 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax.Expressions;
 public class LiteralExpressionSyntax : ExpressionSyntax {

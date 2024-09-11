@@ -1,7 +1,6 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
 using FileManager.Core.Interpreter.Syntax.Commands;
 using HBLibrary.Code.Interpreter;
-using HBLibrary.Code.Interpreter.Evaluator;
 using System.Collections.Immutable;
 
 namespace FileManager.Core.Interpreter;
@@ -46,7 +45,7 @@ public class FMInterpreter : IInterpreter {
     }
 
     private void RunByNode(SyntaxNode node) {
-        
+
     }
 
     private void RunCommand(CommandStatementSyntax commandExpression) {

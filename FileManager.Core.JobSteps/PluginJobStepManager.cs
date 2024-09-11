@@ -1,17 +1,7 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using FileManager.Core.JobSteps.Models;
-using HBLibrary.Common;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.Extensions;
-using HBLibrary.Services.IO.Storage;
-using HBLibrary.Services.IO.Storage.Container;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.JobSteps;
 public class PluginJobStepManager : IPluginJobStepManager {
@@ -37,7 +27,7 @@ public class PluginJobStepManager : IPluginJobStepManager {
         PluginJobStepLoading?.Invoke();
 
         IEnumerable<Assembly> assemblies = LoadPluginAssemblies();
-        foreach(Assembly assembly in assemblies) {
+        foreach (Assembly assembly in assemblies) {
             RegisterJobStepTypesFromAssembly(assembly);
         }
 
@@ -48,7 +38,7 @@ public class PluginJobStepManager : IPluginJobStepManager {
     private IEnumerable<Assembly> LoadPluginAssemblies() {
         string[] plugins = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
 
-        foreach(string plugin in plugins) {
+        foreach (string plugin in plugins) {
             yield return Assembly.LoadFrom(plugin);
         }
     }

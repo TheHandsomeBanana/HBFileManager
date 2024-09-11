@@ -5,14 +5,6 @@ using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;
 using HBLibrary.Services.IO.Storage.Entries;
-using HBLibrary.Services.IO.Storage.Settings;
-using Microsoft.Identity.Client.NativeInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 
 namespace FileManager.UI.Services.JobService;
 public class JobService : IJobService {
@@ -38,7 +30,7 @@ public class JobService : IJobService {
     }
 
     public JobItemModel? GetById(Guid jobId) {
-        if(container.TryGet(jobId.ToString(), out IStorageEntry? entry)) {
+        if (container.TryGet(jobId.ToString(), out IStorageEntry? entry)) {
             return entry!.Get(typeof(JobItemModel)) as JobItemModel;
         }
 
@@ -69,8 +61,8 @@ public class JobService : IJobService {
 
     public IJobStep? GetStepById(Guid jobId, Guid stepId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
-        
-        if(job.Steps.TryGetValue(stepId, out IJobStep? step)) {
+
+        if (job.Steps.TryGetValue(stepId, out IJobStep? step)) {
             return step;
         }
 

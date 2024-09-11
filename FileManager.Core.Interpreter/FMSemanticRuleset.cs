@@ -1,10 +1,5 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
 using HBLibrary.Services.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter;
 public static class FMSemanticRuleset {
@@ -21,7 +16,7 @@ public static class FMSemanticRuleset {
             SyntaxTokenKind.TypeParameter,
             SyntaxTokenKind.ModifiedOnlyParameter],
 
-        [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral, 
+        [SyntaxTokenKind.Comma] = [SyntaxTokenKind.StringLiteral,
             SyntaxTokenKind.NumericLiteral],
 
         [SyntaxTokenKind.Semicolon] = [SyntaxTokenKind.ArchiveKeyword,

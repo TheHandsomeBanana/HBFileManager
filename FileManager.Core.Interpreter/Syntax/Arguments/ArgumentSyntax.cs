@@ -1,11 +1,5 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
-using FileManager.Core.Interpreter.Syntax.Commands;
 using FileManager.Core.Interpreter.Syntax.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.Core.Interpreter.Syntax.Arguments;
 public class ArgumentSyntax : SyntaxNode {

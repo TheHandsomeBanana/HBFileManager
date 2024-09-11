@@ -2,7 +2,6 @@
 using HBLibrary.Code.Interpreter;
 using HBLibrary.Code.Interpreter.Lexer;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace FileManager.Core.Interpreter;
 public class FMLexer : ILexer<SyntaxToken> {

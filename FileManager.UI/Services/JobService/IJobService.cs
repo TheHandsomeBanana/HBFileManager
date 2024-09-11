@@ -1,11 +1,5 @@
 ﻿using FileManager.Core.JobSteps;
 using FileManager.UI.Models.JobModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileManager.UI.Services.JobService;
 public interface IJobService {

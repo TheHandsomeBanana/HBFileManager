@@ -3,13 +3,6 @@ using HBLibrary.Services.IO.Archiving.WinRAR;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Navigation;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels {
     public class SettingsWinRARViewModel : ViewModelBase<SettingsWinRARModel> {
@@ -23,7 +16,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
             }
             set {
 
-                if(!value) {
+                if (!value) {
                     Location = "";
                     LicenseKeyLocation = "";
                     LocationErrorText = "";
@@ -104,7 +97,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         private void BrowseLocation(object? obj) {
             OpenFolderDialog openFolderDialog = new OpenFolderDialog();
             openFolderDialog.Multiselect = false;
-            if(openFolderDialog.ShowDialog() ?? false) {
+            if (openFolderDialog.ShowDialog() ?? false) {
                 Location = openFolderDialog.FolderName;
             }
         }
@@ -120,7 +113,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         }
 
         private void ValidateWinRARLicense() {
-            if(WinRARManager.CheckWinRARLicense(out string licenseKey)) {
+            if (WinRARManager.CheckWinRARLicense(out string licenseKey)) {
                 LicenseKeyLocation = licenseKey;
                 LicenseKeyLocationErrorText = "";
             }

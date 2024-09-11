@@ -1,10 +1,5 @@
 ﻿using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
@@ -29,7 +24,7 @@ public class AddJobViewModel : ViewModelBase {
     }
 
     private void AddAndFinish(Window? obj) {
-        if(obj is null) {
+        if (obj is null) {
             return;
         }
 

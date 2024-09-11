@@ -1,20 +1,11 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
-using HBLibrary.Common.Extensions;
-using HBLibrary.Common.Limiter;
 using HBLibrary.Common.Results;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Models;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FileManager.Core.JobSteps.Models;
 [JobStepType("Copy")]
