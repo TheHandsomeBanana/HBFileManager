@@ -33,6 +33,7 @@ public class PluginJobStepManager : IPluginJobStepManager {
 
         JobStepsLoading = false;
         JobStepsLoaded = true;
+        PluginJobStepsLoaded?.Invoke();
     }
 
     private IEnumerable<Assembly> LoadPluginAssemblies() {

@@ -7,10 +7,10 @@ public sealed class CopyOperation : IOOperation, IAsyncOperation {
     public CopyOperation(ValidPath source) : base(source) {
     }
 
-    public async Task Run() {
+    public Task Run() {
         if (Target is null)
             throw new OperationException("Destination not set.");
 
-        //await File.Copy(Source, Target.Value);
+        throw new NotImplementedException();
     }
 }

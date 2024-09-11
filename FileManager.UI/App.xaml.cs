@@ -76,7 +76,7 @@ namespace FileManager.UI {
             AzureAdOptions azureAdOptions = container.Resolve<AzureAdOptions>();
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService(commonAppSettings.ApplicationName);
+            LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService(commonAppSettings.ApplicationName!);
 
 
             IPublicClientApplication app = PublicClientApplicationBuilder.Create(azureAdOptions.ClientId)
@@ -87,7 +87,7 @@ namespace FileManager.UI {
                .Build();
 
             // Token cache for handling accounts across sessions
-            MSTokenStorage.Create(commonAppSettings.ApplicationName, app);
+            MSTokenStorage.Create(commonAppSettings.ApplicationName!, app);
 
             PublicMSAuthenticationService publicMSAuthenticationService
                 = new PublicMSAuthenticationService(app, commonAppSettings);
@@ -149,7 +149,7 @@ namespace FileManager.UI {
 
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName, "data");
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName!, "data");
 
             IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
 
@@ -205,7 +205,7 @@ namespace FileManager.UI {
             IAccountService accountService = container.Resolve<IAccountService>();
 
             string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
-                commonAppSettings.ApplicationName,
+                commonAppSettings.ApplicationName!,
                 "data",
                 accountService.Account!.AccountId,
                 "jobstepplugins");
@@ -256,16 +256,16 @@ namespace FileManager.UI {
 
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
-                ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName);
+                ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName!);
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                     MSAuthCredentials? credentials = MSAuthCredentials
-                       .CreateFromParameterStorage(appSettings.ApplicationName, lastAccount.Username);
+                       .CreateFromParameterStorage(appSettings.ApplicationName!, lastAccount.Username);
 
                     // Cached credentials have been found, automatically log in using the cached account identifier
                     // -> Do not trigger login UI
                     if (credentials is not null) {
-                        await accountService.LoginAsync(credentials, appSettings.ApplicationName);
+                        await accountService.LoginAsync(credentials, appSettings.ApplicationName!);
                         MainWindowStartup(container);
                         return;
                     }

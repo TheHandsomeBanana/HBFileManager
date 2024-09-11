@@ -7,10 +7,10 @@ public sealed class MoveOperation : IOOperation, IAsyncOperation {
     public MoveOperation(ValidPath source) : base(source) {
     }
 
-    public async Task Run() {
+    public Task Run() {
         if (Target is null)
             throw new OperationException("Destination not set.");
 
-        //await IOService.Move(Source, Target.Value);
+        throw new NotImplementedException();
     }
 }

@@ -7,10 +7,10 @@ public sealed class ReplaceOperation : IOOperation, IAsyncOperation {
     public ReplaceOperation(ValidPath source) : base(source) {
     }
 
-    public async Task Run() {
+    public Task Run() {
         if (Target is null)
             throw new OperationException("Destination not set.");
 
-        //await IOService.Replace(Source, Target.Value);
+        throw new NotImplementedException();
     }
 }
