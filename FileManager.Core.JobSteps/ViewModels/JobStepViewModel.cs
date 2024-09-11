@@ -12,8 +12,16 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJo
         }
     }
 
+    public bool IsAsync {
+        get => Model.IsAsync;
+        set {
+            Model.IsAsync = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public UserControl? StepView => Model.GetJobStepView();
-    public string StepType => PluginJobStepManager.GetJobStepTypeName(Model.GetType());
+    public string StepType => JobStepManager.GetJobStepTypeName(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {
 

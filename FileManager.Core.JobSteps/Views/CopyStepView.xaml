@@ -264,7 +264,6 @@
                   Content="Run asynchronously"
                   Margin="0 0 0 10"
                   IsChecked="{Binding IsAsync}">
-                  
         </CheckBox>
 
         <CheckBox Style="{StaticResource HBDark_CheckBox}"

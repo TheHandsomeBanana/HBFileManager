@@ -18,7 +18,7 @@ namespace FileManager.UI.ViewModels.JobViewModels;
 public class JobItemViewModel : ViewModelBase<JobItemModel> {
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;
-    private readonly IPluginJobStepManager jobStepManager;
+    private readonly IJobStepManager jobStepManager;
 
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
@@ -94,7 +94,7 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = container.Resolve<IDialogService>();
         this.jobService = container.Resolve<IJobService>();
-        this.jobStepManager = container.Resolve<IPluginJobStepManager>();
+        this.jobStepManager = container.Resolve<IJobStepManager>();
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);

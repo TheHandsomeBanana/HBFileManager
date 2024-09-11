@@ -11,6 +11,7 @@ using HBLibrary.Common.Authentication.Microsoft;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Json;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Builder;
 using HBLibrary.Wpf.Services;
@@ -149,7 +150,7 @@ namespace FileManager.UI {
 
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName!, "data");
+            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName!);
 
             IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
 
@@ -201,17 +202,23 @@ namespace FileManager.UI {
         private static void AddJobServices(IUnityContainer container) {
             container.RegisterType<IJobService, JobService>();
 
+            IPluginManager pluginManager = container.Resolve<IPluginManager>();
+
+            IJobStepManager jobStepManager = new JobStepManager(pluginManager);
+            container.RegisterInstance(jobStepManager, InstanceLifetime.Singleton);
+        }
+
+        private static void AddPluginManager(IUnityContainer container) {
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
             IAccountService accountService = container.Resolve<IAccountService>();
 
             string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
                 commonAppSettings.ApplicationName!,
-                "data",
                 accountService.Account!.AccountId,
-                "jobstepplugins");
+                "plugins");
 
-            IPluginJobStepManager jobStepManager = new PluginJobStepManager(storagePath);
-            container.RegisterInstance(jobStepManager, InstanceLifetime.Singleton);
+            IPluginManager pluginManager = new PluginManager(storagePath);
+            container.RegisterInstance(pluginManager, InstanceLifetime.Singleton);
         }
         #endregion
 
@@ -305,6 +312,7 @@ namespace FileManager.UI {
 
         private void MainWindowStartup(IUnityContainer container) {
             AddApplicationStorage(container);
+            AddPluginManager(container);
             AddJobServices(container);
 
             MainWindow = new MainWindow {

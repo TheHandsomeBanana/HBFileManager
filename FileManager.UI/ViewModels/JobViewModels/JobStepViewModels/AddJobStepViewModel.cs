@@ -40,12 +40,12 @@ public class AddJobStepViewModel : ViewModelBase {
         }
     }
 
-    public AddJobStepViewModel(IPluginJobStepManager jobStepManager) {
+    public AddJobStepViewModel(IJobStepManager jobStepManager) {
         AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name) && selectedStepType is not null);
         CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
 
         AvailableStepTypes = jobStepManager.GetJobStepTypes().Select(e => {
-            string typeName = PluginJobStepManager.GetJobStepTypeName(e);
+            string typeName = JobStepManager.GetJobStepTypeName(e);
             return new JobStepInfo() {
                 TypeName = typeName,
                 StepType = e
