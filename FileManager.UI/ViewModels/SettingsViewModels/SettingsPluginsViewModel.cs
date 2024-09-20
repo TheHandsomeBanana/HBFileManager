@@ -1,12 +1,16 @@
-﻿using FileManager.UI.Models.SettingsModels;
+﻿using FileManager.Core.JobSteps;
+using FileManager.UI.Models.SettingsModels;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
 using Microsoft.Win32;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Windows.Data;
 using Unity;
 
@@ -14,6 +18,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels;
 
 public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
     private readonly IDialogService dialogService;
+    private readonly IPluginManager pluginManager;
 
     private string? searchText;
     public string? SearchText {
@@ -34,16 +39,36 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
         set {
             selectedAssembly = value;
             NotifyPropertyChanged();
+
+            if (!string.IsNullOrEmpty(value)) {
+                if (!pluginManager.IsAssemblyLoaded(value)) {
+                    pluginManager.LoadAssembly(value);
+                }
+
+                FindPlugins(value);
+            }
+
         }
     }
 
     private readonly ICollectionView assemblyView;
     public ICollectionView AssembliesView => assemblyView;
-    public ObservableCollection<string> assemblies { get; set; }
+    public readonly ObservableCollection<string> assemblies;
+
+
+    private PluginInfo[] foundPlugins = [];
+    public PluginInfo[] FoundPlugins {
+        get => foundPlugins;
+        set {
+            foundPlugins = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     public SettingsPluginsViewModel(SettingsPluginsModel model) : base(model) {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         dialogService = container.Resolve<IDialogService>();
+        pluginManager = container.Resolve<IPluginManager>();
 
         assemblies = [.. Model.Assemblies];
 
@@ -68,6 +93,7 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
     private void DeleteAssembly(string obj) {
         assemblies.Remove(obj);
+        pluginManager.RemoveAssembly(obj);
         SelectedAssembly = assemblies.FirstOrDefault();
     }
 
@@ -81,8 +107,26 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
         if (ofd.ShowDialog().GetValueOrDefault()) {
             foreach (string file in ofd.FileNames) {
-                assemblies.Add(Path.GetFileName(file));
+                string fileName = Path.GetFileName(file);
+                assemblies.Add(fileName);
+                pluginManager.AddOrUpdateAssembly(file);
             }
         }
+    }
+
+    private void FindPlugins(string assemblyFileName) {
+        ImmutableArray<Type> pluginTypes = pluginManager.GetPluginTypes<IJobStep>(assemblyFileName);
+
+        FoundPlugins = pluginTypes.Select(t => new PluginInfo {
+            PluginType = nameof(IJobStep),
+            ConcretePluginType = t.FullName!,
+            Metadata = JobStepManager.GetJobStepMetadata(t)
+        }).ToArray();
+    }
+
+    public class PluginInfo {
+        public required string PluginType { get; set; }
+        public required string ConcretePluginType { get; set; }
+        public required JobStepMetadata Metadata { get; set; }
     }
 }

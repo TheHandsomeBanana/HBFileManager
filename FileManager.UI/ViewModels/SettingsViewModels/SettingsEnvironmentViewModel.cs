@@ -11,6 +11,14 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
                 NotifyPropertyChanged();
             }
         }
+        
+        public bool PreloadPluginAssemblies {
+            get => Model.PreloadPluginAssemblies;
+            set {
+                Model.PreloadPluginAssemblies = value;
+                NotifyPropertyChanged();
+            }
+        }
 
 
         public SettingsEnvironmentViewModel() {

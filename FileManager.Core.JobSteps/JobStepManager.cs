@@ -1,6 +1,7 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using FileManager.Core.JobSteps.Models;
 using HBLibrary.Common.Plugins;
+using System.Collections.Immutable;
 using System.IO;
 using System.Reflection;
 
@@ -9,8 +10,8 @@ public class JobStepManager : IJobStepManager {
     private readonly IPluginManager pluginManager;
 
     private readonly Dictionary<string, Type> jobStepTypes = new() {
-        [GetJobStepTypeName(typeof(CopyStep))] = typeof(CopyStep),
-        [GetJobStepTypeName(typeof(ArchiveStep))] = typeof(ArchiveStep),
+        [GetJobStepMetadata(typeof(CopyStep)).TypeName] = typeof(CopyStep),
+        [GetJobStepMetadata(typeof(ArchiveStep)).TypeName] = typeof(ArchiveStep),
     };
 
     public JobStepManager(IPluginManager pluginManager) {
@@ -19,9 +20,9 @@ public class JobStepManager : IJobStepManager {
 
     public void LoadJobSteps() {
         pluginManager.LoadAssemblies();
-        Type[] jobStepType = pluginManager.GetPluginTypes<IJobStep>();
+        ImmutableArray<Type> jobStepType = pluginManager.GetPluginTypes<IJobStep>();
         foreach(Type type in jobStepType) {
-            string typeName = GetJobStepTypeName(type);
+            string typeName = GetJobStepMetadata(type).TypeName;
             jobStepTypes[typeName] = type;
         }
     }
@@ -30,16 +31,21 @@ public class JobStepManager : IJobStepManager {
         return jobStepTypes.Values;
     }
 
-    private static readonly Dictionary<Type, string> knownDisplayNames = [];
-    public static string GetJobStepTypeName(Type stepType) {
-        if (knownDisplayNames.TryGetValue(stepType, out string? displayName)) {
-            return displayName;
+    private static readonly Dictionary<Type, JobStepMetadata> knownJobStepMetadata = [];
+    public static JobStepMetadata GetJobStepMetadata(Type stepType) {
+        if (knownJobStepMetadata.TryGetValue(stepType, out JobStepMetadata? jobStepMetadata)) {
+            return jobStepMetadata;
         }
 
-        JobStepTypeAttribute? nameAttribute = stepType.GetCustomAttribute<JobStepTypeAttribute>(false);
+        JobStepTypeAttribute? stepTypeAttribute = stepType.GetCustomAttribute<JobStepTypeAttribute>(false);
+        JobStepDescriptionAttribute? stepDescriptionAttribute = stepType.GetCustomAttribute<JobStepDescriptionAttribute>(false);
 
-        displayName = nameAttribute is not null ? nameAttribute.Name : stepType.FullName!;
-        knownDisplayNames[stepType] = displayName;
-        return displayName;
+        jobStepMetadata = new JobStepMetadata {
+            TypeName = stepTypeAttribute is not null ? stepTypeAttribute.Name : stepType.FullName!,
+            Description = stepDescriptionAttribute?.Description
+        };
+
+        knownJobStepMetadata[stepType] = jobStepMetadata;
+        return jobStepMetadata;
     }
 }

@@ -21,7 +21,7 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJo
     }
 
     public UserControl? StepView => Model.GetJobStepView();
-    public string StepType => JobStepManager.GetJobStepTypeName(Model.GetType());
+    public JobStepMetadata Metadata => JobStepManager.GetJobStepMetadata(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {
 

@@ -9,6 +9,7 @@ using System.IO;
 
 namespace FileManager.Core.JobSteps.Models;
 [JobStepType("Copy")]
+[JobStepDescription("Copy files and directories from the source definition to destination definition.")]
 public class CopyStep : IJobStep {
     #region Model
     public string Name { get; set; } = "";
@@ -70,7 +71,7 @@ public class CopyStep : IJobStep {
         await Task.WhenAll(copyTasks);
     }
 
-    public ValidationResult Validate(IServiceProvider serviceProvider) {
+    public CollectionResult Validate(IServiceProvider serviceProvider) {
         ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
         List<string> errors = [];
 
@@ -104,13 +105,13 @@ public class CopyStep : IJobStep {
         }
 
         if (errors.Count == 0) {
-            return ValidationResult.Success;
+            return CollectionResult.Ok();
         }
 
-        return ValidationResult.Failure(errors);
+        return CollectionResult.Fail(errors);
     }
 
-    public Task<ValidationResult> ValidateAsync(IServiceProvider serviceProvider) {
+    public Task<CollectionResult> ValidateAsync(IServiceProvider serviceProvider) {
         IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
         List<string> errors = [];
 
@@ -146,10 +147,10 @@ public class CopyStep : IJobStep {
         }
 
         if (errors.Count == 0) {
-            return Task.FromResult(ValidationResult.Success);
+            return Task.FromResult(CollectionResult.Ok());
         }
 
-        return Task.FromResult(ValidationResult.Failure(errors));
+        return Task.FromResult(CollectionResult.Fail(errors));
     }
 
 

@@ -45,9 +45,9 @@ public class AddJobStepViewModel : ViewModelBase {
         CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
 
         AvailableStepTypes = jobStepManager.GetJobStepTypes().Select(e => {
-            string typeName = JobStepManager.GetJobStepTypeName(e);
+            JobStepMetadata stepMetadata = JobStepManager.GetJobStepMetadata(e);
             return new JobStepInfo() {
-                TypeName = typeName,
+                Metadata = stepMetadata,
                 StepType = e
             };
 
@@ -74,6 +74,6 @@ public class AddJobStepViewModel : ViewModelBase {
 }
 
 public class JobStepInfo {
-    public required string TypeName { get; set; }
+    public required JobStepMetadata Metadata { get; set; }  
     public required Type StepType { get; set; }
 }

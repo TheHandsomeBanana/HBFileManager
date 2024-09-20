@@ -1,10 +1,13 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
-using HBLibrary.Common.Results;
+using System.Windows.Controls;
 
-namespace FileManager.Core.JobSteps.Models;
-[JobStepType("Archive")]
-public class ArchiveStep : IJobStep {
+namespace FileManager.Core.JobSteps.PluginTest;
+
+[JobStepType("ComputeFiles")]
+[JobStepDescription("Used to compute numerous files.")]
+public class ComputeFilesJobStep : IJobStep {
     public Guid Id { get; set; } = Guid.NewGuid();
+
     public string Name { get; set; } = "";
     public bool IsAsync { get; set; }
 
@@ -16,15 +19,15 @@ public class ArchiveStep : IJobStep {
         throw new NotImplementedException();
     }
 
-    public System.Windows.Controls.UserControl? GetJobStepView() {
+    public UserControl? GetJobStepView() {
         return null;
     }
 
-    public CollectionResult Validate(IServiceProvider serviceProvider) {
+    public HBLibrary.Common.Results.Result Validate(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 
-    public Task<CollectionResult> ValidateAsync(IServiceProvider serviceProvider) {
+    public Task<HBLibrary.Common.Results.Result> ValidateAsync(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 }

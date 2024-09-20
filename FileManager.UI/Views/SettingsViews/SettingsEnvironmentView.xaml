@@ -21,24 +21,18 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <converters:EnumToStringConverter x:Key="e2s"/>
-
-            <ObjectDataProvider x:Key="SettingsScopeValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}" >
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="baseModels:SettingsScope" />
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
-
-            <ObjectDataProvider x:Key="JobScopeValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}" >
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="baseModels:JobScope" />
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
+            <converters:EnumToStringConverter x:Key="e2s" />
         </ResourceDictionary>
     </UserControl.Resources>
 
 
     <StackPanel Orientation="Vertical" Margin="0 10 0 0">
+        <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                  Content="Preload plugin assemblies"
+                  IsChecked="{Binding PreloadPluginAssemblies}"
+                  Margin="0 0 0 10">
+        </CheckBox>
+        
         <CheckBox Style="{StaticResource HBDark_CheckBox}"
                   Content="Encrypt jobs"
                   IsChecked="{Binding EncryptJobs}">

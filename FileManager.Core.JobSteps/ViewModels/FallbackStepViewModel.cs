@@ -4,6 +4,8 @@ public class FallbackStepViewModel : JobStepViewModel<IJobStep> {
 
 
     public FallbackStepViewModel(IJobStep jobStep) : base(jobStep) {
-        FallbackText = $"No UI available for the step type '{StepType}'";
+        JobStepMetadata metadata = Metadata;
+
+        FallbackText = $"No UI available for the step type '{metadata.TypeName}'";
     }
 }

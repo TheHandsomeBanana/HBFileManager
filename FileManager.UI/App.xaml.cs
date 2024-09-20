@@ -201,24 +201,24 @@ namespace FileManager.UI {
         // -> Requires logged in user id
         private static void AddJobServices(IUnityContainer container) {
             container.RegisterType<IJobService, JobService>();
-
-            IPluginManager pluginManager = container.Resolve<IPluginManager>();
-
-            IJobStepManager jobStepManager = new JobStepManager(pluginManager);
-            container.RegisterInstance(jobStepManager, InstanceLifetime.Singleton);
+            container.RegisterType<IJobStepManager, JobStepManager>();
         }
 
         private static void AddPluginManager(IUnityContainer container) {
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-            IAccountService accountService = container.Resolve<IAccountService>();
-
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
-                commonAppSettings.ApplicationName!,
-                accountService.Account!.AccountId,
-                "plugins");
+            string storagePath = GetPluginStoragePath(container);
 
             IPluginManager pluginManager = new PluginManager(storagePath);
             container.RegisterInstance(pluginManager, InstanceLifetime.Singleton);
+        }
+
+        public static string GetPluginStoragePath(IUnityContainer container) {
+            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
+            IAccountService accountService = container.Resolve<IAccountService>();
+
+            return Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
+                commonAppSettings.ApplicationName!,
+                accountService.Account!.AccountId,
+                "plugins");
         }
         #endregion
 
@@ -330,5 +330,6 @@ namespace FileManager.UI {
 
             MainWindow.Show();
         }
+
     }
 }

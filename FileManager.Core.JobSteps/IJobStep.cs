@@ -12,10 +12,10 @@ public interface IJobStep {
     public string Name { get; set; }
     public bool IsAsync { get; set; }
     public void Execute(IServiceProvider serviceProvider);
-    public ValidationResult Validate(IServiceProvider serviceProvider);
+    public CollectionResult Validate(IServiceProvider serviceProvider);
 
     public Task ExecuteAsync(IServiceProvider serviceProvider);
-    public Task<ValidationResult> ValidateAsync(IServiceProvider serviceProvider);
+    public Task<CollectionResult> ValidateAsync(IServiceProvider serviceProvider);
 
     public System.Windows.Controls.UserControl? GetJobStepView();
 }

@@ -68,7 +68,7 @@
             <ComboBox Style="{StaticResource HBDark_ComboBox}"
                       ItemsSource="{Binding AvailableStepTypes}"
                       SelectedItem="{Binding SelectedStepType}"
-                      DisplayMemberPath="TypeName"
+                      DisplayMemberPath="Metadata.TypeName"
                       SelectedValuePath="StepType"
                       Grid.Row="2"
                       Grid.ColumnSpan="3"

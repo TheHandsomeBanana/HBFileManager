@@ -148,9 +148,20 @@
                                                 listViews:GridViewColumnAttachedProperties.MinWidth="100">
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Concrete Type"
-                                                DisplayMemberBinding="{Binding ConcreteType}"
+                                <GridViewColumn Header="Typename"
+                                                DisplayMemberBinding="{Binding Metadata.TypeName}"
+                                                Width="100"
                                                 listViews:GridViewColumnAttachedProperties.MinWidth="100">
+                                </GridViewColumn>
+                                
+                                <GridViewColumn Header="Concrete Type"
+                                                DisplayMemberBinding="{Binding ConcretePluginType}"
+                                                Width="200"
+                                                listViews:GridViewColumnAttachedProperties.MinWidth="200">
+                                </GridViewColumn>
+                                
+                                <GridViewColumn Header="Description"
+                                                DisplayMemberBinding="{Binding Metadata.Description}">
                                     <GridViewColumn.Width>
                                         <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
                                                       ConverterParameter="*">

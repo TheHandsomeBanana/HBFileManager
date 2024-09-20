@@ -1,7 +1,9 @@
-﻿using FileManager.UI.Services.SettingsService;
+﻿using FileManager.UI.Models.SettingsModels;
+using FileManager.UI.Services.SettingsService;
 using HBLibrary.Common;
 using HBLibrary.Common.Account;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services.NavigationService;
@@ -58,38 +60,25 @@ public class MainViewModel : ViewModelBase {
         OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview, true);
 
         NavigateToExplorerCommand.Execute(NavigateCommandParameter);
+
+        SettingsEnvironmentModel? environmentSettings = settingsService.GetSetting<SettingsEnvironmentModel>();
+        if(environmentSettings is not null && environmentSettings!.PreloadPluginAssemblies) {
+
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+                IPluginManager pluginManager = container.Resolve<IPluginManager>();
+                pluginManager.LoadAssemblies();
+            });
+
+        }
     }
 
     private void OpenAccountOverview(Window obj) {
-        AccountViewModel accountViewModel = new AccountViewModel(obj, accountService, commonAppSettings, success => {
-            if (success) {
-                // User changed
-                // -> Use new storage containers
-                applicationStorage.RemoveAllContainers();
-                App.AddApplicationStorageContainers(applicationStorage, accountService);
-
-                obj = new MainWindow {
-                    DataContext = new MainViewModel()
-                };
-
-                obj.Closed += (_, _) => {
-                    App currentApp = (App)Application.Current;
-                    if (currentApp.CanShutdown) {
-                        Application.Current.Shutdown();
-                    }
-                    else {
-                        currentApp.AllowShutdown();
-                    }
-                };
-
-                obj.Show();
-            }
-            else {
-                Application.Current.Shutdown();
-            }
-        }, () => { // Prevent shutdown callback
-            (Application.Current as App)?.PreventShutdown();
-        });
+        AccountViewModel accountViewModel = new AccountViewModel(obj, 
+            accountService, 
+            commonAppSettings, s => UserSwitchCallback(obj, s), 
+            ((App)Application.Current).PreventShutdown
+        );
 
         HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, accountViewModel);
         accountWindow.Show();
@@ -102,5 +91,38 @@ public class MainViewModel : ViewModelBase {
 
     private void MainWindowViewModel_CurrentViewModelChanged() {
         NotifyPropertyChanged(nameof(CurrentViewModel));
+    }
+
+    private void UserSwitchCallback(Window obj, bool success) {
+        if (success) {
+            // User changed
+            // -> Use new storage containers
+            applicationStorage.RemoveAllContainers();
+            App.AddApplicationStorageContainers(applicationStorage, accountService);
+
+            obj = new MainWindow {
+                DataContext = new MainViewModel()
+            };
+
+            obj.Closed += (_, _) => {
+                App currentApp = (App)Application.Current;
+                if (currentApp.CanShutdown) {
+                    Application.Current.Shutdown();
+                }
+                else {
+                    currentApp.AllowShutdown();
+                }
+            };
+
+            // Change PluginManager folder based on logged in user
+            IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+            IPluginManager pluginManager = container.Resolve<IPluginManager>();
+            pluginManager.SwitchContext(App.GetPluginStoragePath(container), true, false);
+
+            obj.Show();
+        }
+        else {
+            Application.Current.Shutdown();
+        }
     }
 }
