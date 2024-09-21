@@ -115,6 +115,6 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
     private void FindPlugins(string assemblyFileName) {
         FoundPlugins = pluginManager.TypeProvider
-            .GetByAttribute<IJobStep>(pluginManager.GetLoadedAssemblies());
+            .GetCachedByAttribute<IJobStep>(pluginManager.GetLoadedAssemblies());
     }
 }
