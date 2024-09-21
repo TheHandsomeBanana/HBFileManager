@@ -1,15 +1,19 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
-using HBLibrary.Common.Results;
+using HBLibrary.Common;
+using HBLibrary.Common.Plugins.Attributes;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Models;
 using System.IO;
 
 namespace FileManager.Core.JobSteps.Models;
-[JobStepType("Copy")]
-[JobStepDescription("Copy files and directories from the source definition to destination definition.")]
+
+[Plugin(typeof(IJobStep))]
+[Plugin<IJobStep>]
+[PluginTypeName("Copy")]
+[PluginDescription("Copy files and directories from the source definition to destination definition.")]
 public class CopyStep : IJobStep {
     #region Model
     public string Name { get; set; } = "";
@@ -71,9 +75,9 @@ public class CopyStep : IJobStep {
         await Task.WhenAll(copyTasks);
     }
 
-    public CollectionResult Validate(IServiceProvider serviceProvider) {
+    public ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
         ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
-        List<string> errors = [];
+        ResultCollection results = [];
 
         foreach (Entry source in SourceItems) {
             logger.Info($"Validating source item '{source.Path}'");
@@ -83,14 +87,14 @@ public class CopyStep : IJobStep {
                     if (!File.Exists(source.Path)) {
                         string error = $"Source file '{source.Path}' does not exist.";
                         logger.Error(error);
-                        errors.Add(error);
+                        results.Add(Result.Fail(error));
                     }
                     break;
                 case EntryType.Directory:
                     if (!Directory.Exists(source.Path)) {
                         string error = $"Source directory '{source.Path}' does not exist.";
                         logger.Error(error);
-                        errors.Add(error);
+                        results.Add(Result.Fail(error));
                     }
                     break;
             }
@@ -100,20 +104,16 @@ public class CopyStep : IJobStep {
             if (!Directory.Exists(destination.Path)) {
                 string error = $"Destination directory '{destination.Path}' does not exist.";
                 logger.Error(error);
-                errors.Add(error);
+                results.Add(Result.Fail(error));
             }
         }
 
-        if (errors.Count == 0) {
-            return CollectionResult.Ok();
-        }
-
-        return CollectionResult.Fail(errors);
+        return results;
     }
 
-    public Task<CollectionResult> ValidateAsync(IServiceProvider serviceProvider) {
+    public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
         IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
-        List<string> errors = [];
+        ResultCollection results = [];
 
         foreach (Entry source in SourceItems) {
             logger.Info($"Validating source item '{source.Path}'");
@@ -123,14 +123,14 @@ public class CopyStep : IJobStep {
                     if (!File.Exists(source.Path)) {
                         string error = $"Source file '{source.Path}' does not exist.";
                         logger.Error(error);
-                        errors.Add(error);
+                        results.Add(Result.Fail(error));
                     }
                     break;
                 case EntryType.Directory:
                     if (!Directory.Exists(source.Path)) {
                         string error = $"Source directory '{source.Path}' does not exist.";
                         logger.Error(error);
-                        errors.Add(error);
+                        results.Add(Result.Fail(error));
                     }
                     break;
             }
@@ -142,15 +142,12 @@ public class CopyStep : IJobStep {
             if (!Directory.Exists(destination.Path)) {
                 string error = $"Destination directory '{destination.Path}' does not exist.";
                 logger.Error(error);
-                errors.Add(error);
+                results.Add(Result.Fail(error));
             }
         }
 
-        if (errors.Count == 0) {
-            return Task.FromResult(CollectionResult.Ok());
-        }
-
-        return Task.FromResult(CollectionResult.Fail(errors));
+        
+        return Task.FromResult(results.ToImmutableResultCollection());
     }
 
 

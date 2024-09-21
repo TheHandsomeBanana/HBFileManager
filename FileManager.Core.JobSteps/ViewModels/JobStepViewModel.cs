@@ -1,4 +1,5 @@
-﻿using HBLibrary.Wpf.ViewModels;
+﻿using HBLibrary.Common.Plugins;
+using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.ViewModels;
@@ -21,7 +22,7 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJo
     }
 
     public UserControl? StepView => Model.GetJobStepView();
-    public JobStepMetadata Metadata => JobStepManager.GetJobStepMetadata(Model.GetType());
+    public PluginMetadata Metadata => PluginManager.GetPluginMetadata(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {
 

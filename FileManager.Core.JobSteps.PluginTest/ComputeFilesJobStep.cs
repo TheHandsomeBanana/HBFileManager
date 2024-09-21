@@ -1,10 +1,14 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
+using HBLibrary.Common;
+using HBLibrary.Common.Plugins.Attributes;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.PluginTest;
 
-[JobStepType("ComputeFiles")]
-[JobStepDescription("Used to compute numerous files.")]
+[Plugin(typeof(IJobStep))]
+[Plugin<IJobStep>]
+[PluginTypeName("ComputeFiles")]
+[PluginDescription("Used to compute numerous files.")]
 public class ComputeFilesJobStep : IJobStep {
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -23,11 +27,11 @@ public class ComputeFilesJobStep : IJobStep {
         return null;
     }
 
-    public HBLibrary.Common.Results.Result Validate(IServiceProvider serviceProvider) {
+    public ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 
-    public Task<HBLibrary.Common.Results.Result> ValidateAsync(IServiceProvider serviceProvider) {
+    public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 }

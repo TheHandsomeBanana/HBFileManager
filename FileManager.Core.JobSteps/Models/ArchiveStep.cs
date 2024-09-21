@@ -1,8 +1,12 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
-using HBLibrary.Common.Results;
+using HBLibrary.Common;
+using HBLibrary.Common.Plugins.Attributes;
 
 namespace FileManager.Core.JobSteps.Models;
-[JobStepType("Archive")]
+
+[Plugin(typeof(IJobStep))]
+[Plugin<IJobStep>]
+[PluginTypeName("Archive")]
 public class ArchiveStep : IJobStep {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "";
@@ -20,11 +24,11 @@ public class ArchiveStep : IJobStep {
         return null;
     }
 
-    public CollectionResult Validate(IServiceProvider serviceProvider) {
+    public ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 
-    public Task<CollectionResult> ValidateAsync(IServiceProvider serviceProvider) {
+    public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
         throw new NotImplementedException();
     }
 }

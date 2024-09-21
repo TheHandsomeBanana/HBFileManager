@@ -117,7 +117,7 @@ public class MainViewModel : ViewModelBase {
             // Change PluginManager folder based on logged in user
             IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
             IPluginManager pluginManager = container.Resolve<IPluginManager>();
-            pluginManager.SwitchContext(App.GetPluginStoragePath(container), true, false);
+            pluginManager.SwitchContext(e => e.SetPluginsLocation(App.GetPluginStoragePath(container)));
 
             obj.Show();
         }

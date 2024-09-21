@@ -12,6 +12,7 @@ using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Json;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Common.Plugins.Builder;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Builder;
 using HBLibrary.Wpf.Services;
@@ -207,8 +208,12 @@ namespace FileManager.UI {
         private static void AddPluginManager(IUnityContainer container) {
             string storagePath = GetPluginStoragePath(container);
 
-            IPluginManager pluginManager = new PluginManager(storagePath);
-            container.RegisterInstance(pluginManager, InstanceLifetime.Singleton);
+            IPluginManagerBuilder builder = PluginManager.CreateBuilder()
+                .Configure(e => e.SetPluginsLocation(storagePath))
+                .SetDefaultTypeProvider()
+                .SetDefaultAssemblyLoader();
+
+            container.RegisterInstance(builder.Build(), InstanceLifetime.Singleton);
         }
 
         public static string GetPluginStoragePath(IUnityContainer container) {

@@ -41,13 +41,12 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
             NotifyPropertyChanged();
 
             if (!string.IsNullOrEmpty(value)) {
-                if (!pluginManager.IsAssemblyLoaded(value)) {
+                if (!pluginManager.IsPluginAssemblyLoaded(value)) {
                     pluginManager.LoadAssembly(value);
                 }
 
                 FindPlugins(value);
             }
-
         }
     }
 
@@ -56,8 +55,8 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
     public readonly ObservableCollection<string> assemblies;
 
 
-    private PluginInfo[] foundPlugins = [];
-    public PluginInfo[] FoundPlugins {
+    private PluginType[] foundPlugins = [];
+    public PluginType[] FoundPlugins {
         get => foundPlugins;
         set {
             foundPlugins = value;
@@ -93,7 +92,7 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
     private void DeleteAssembly(string obj) {
         assemblies.Remove(obj);
-        pluginManager.RemoveAssembly(obj);
+        pluginManager.RemovePluginAssembly(obj);
         SelectedAssembly = assemblies.FirstOrDefault();
     }
 
@@ -109,24 +108,13 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
             foreach (string file in ofd.FileNames) {
                 string fileName = Path.GetFileName(file);
                 assemblies.Add(fileName);
-                pluginManager.AddOrUpdateAssembly(file);
+                pluginManager.AddPluginAssembly(file);
             }
         }
     }
 
     private void FindPlugins(string assemblyFileName) {
-        ImmutableArray<Type> pluginTypes = pluginManager.GetPluginTypes<IJobStep>(assemblyFileName);
-
-        FoundPlugins = pluginTypes.Select(t => new PluginInfo {
-            PluginType = nameof(IJobStep),
-            ConcretePluginType = t.FullName!,
-            Metadata = JobStepManager.GetJobStepMetadata(t)
-        }).ToArray();
-    }
-
-    public class PluginInfo {
-        public required string PluginType { get; set; }
-        public required string ConcretePluginType { get; set; }
-        public required JobStepMetadata Metadata { get; set; }
+        FoundPlugins = pluginManager.TypeProvider
+            .GetByAttribute<IJobStep>(pluginManager.GetLoadedAssemblies());
     }
 }

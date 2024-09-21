@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.JobSteps;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows;
@@ -45,9 +46,9 @@ public class AddJobStepViewModel : ViewModelBase {
         CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
 
         AvailableStepTypes = jobStepManager.GetJobStepTypes().Select(e => {
-            JobStepMetadata stepMetadata = JobStepManager.GetJobStepMetadata(e);
+            PluginMetadata metadata = PluginManager.GetPluginMetadata(e);
             return new JobStepInfo() {
-                Metadata = stepMetadata,
+                Metadata = metadata,
                 StepType = e
             };
 
@@ -74,6 +75,6 @@ public class AddJobStepViewModel : ViewModelBase {
 }
 
 public class JobStepInfo {
-    public required JobStepMetadata Metadata { get; set; }  
+    public required PluginMetadata Metadata { get; set; }  
     public required Type StepType { get; set; }
 }
