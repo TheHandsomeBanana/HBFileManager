@@ -1,4 +1,5 @@
-﻿using FileManager.UI.Models.SettingsModels;
+﻿using FileManager.Core.JobSteps;
+using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using HBLibrary.Common;
 using HBLibrary.Common.Account;
@@ -18,6 +19,7 @@ public class MainViewModel : ViewModelBase {
     private readonly ISettingsService settingsService;
     private readonly IAccountService accountService;
     private readonly IApplicationStorage applicationStorage;
+    private readonly IPluginManager pluginManager;
     private readonly CommonAppSettings commonAppSettings;
     public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
@@ -42,6 +44,7 @@ public class MainViewModel : ViewModelBase {
         this.navigationStore = container.Resolve<INavigationStore>();
         this.accountService = container.Resolve<IAccountService>();
         this.commonAppSettings = container.Resolve<CommonAppSettings>();
+        this.pluginManager = container.Resolve<IPluginManager>();
 
         INavigationService navigationService = container.Resolve<INavigationService>();
 
@@ -61,22 +64,15 @@ public class MainViewModel : ViewModelBase {
 
         NavigateToExplorerCommand.Execute(NavigateCommandParameter);
 
-        SettingsEnvironmentModel? environmentSettings = settingsService.GetSetting<SettingsEnvironmentModel>();
-        if(environmentSettings is not null && environmentSettings!.PreloadPluginAssemblies) {
-
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-                IPluginManager pluginManager = container.Resolve<IPluginManager>();
-                pluginManager.LoadAssemblies();
-            });
-
-        }
+        Application.Current.Dispatcher.InvokeAsync(() => {
+            pluginManager.LoadAssemblies();
+        });
     }
 
     private void OpenAccountOverview(Window obj) {
-        AccountViewModel accountViewModel = new AccountViewModel(obj, 
-            accountService, 
-            commonAppSettings, s => UserSwitchCallback(obj, s), 
+        AccountViewModel accountViewModel = new AccountViewModel(obj,
+            accountService,
+            commonAppSettings, s => UserSwitchCallback(obj, s),
             ((App)Application.Current).PreventShutdown
         );
 
@@ -95,10 +91,12 @@ public class MainViewModel : ViewModelBase {
 
     private void UserSwitchCallback(Window obj, bool success) {
         if (success) {
+            IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+
             // User changed
             // -> Use new storage containers
             applicationStorage.RemoveAllContainers();
-            App.AddApplicationStorageContainers(applicationStorage, accountService);
+            App.AddApplicationStorageContainers(container);
 
             obj = new MainWindow {
                 DataContext = new MainViewModel()
@@ -115,10 +113,7 @@ public class MainViewModel : ViewModelBase {
             };
 
             // Change PluginManager folder based on logged in user
-            IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-            IPluginManager pluginManager = container.Resolve<IPluginManager>();
             pluginManager.SwitchContext(e => e.SetPluginsLocation(App.GetPluginStoragePath(container)));
-
             obj.Show();
         }
         else {

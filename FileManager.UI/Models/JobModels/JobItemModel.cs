@@ -8,5 +8,5 @@ public class JobItemModel {
     public bool OnDemand { get; set; }
     public bool Scheduled { get; set; }
     public string? Description { get; set; }
-    public Dictionary<Guid, IJobStep> Steps { get; set; } = [];
+    public Dictionary<Guid, JobStep> Steps { get; set; } = [];
 }

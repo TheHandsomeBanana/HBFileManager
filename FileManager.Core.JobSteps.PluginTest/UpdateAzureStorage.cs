@@ -1,20 +1,24 @@
-﻿using FileManager.Core.JobSteps.Attributes;
-using HBLibrary.Common;
+﻿using HBLibrary.Common;
 using HBLibrary.Common.Plugins.Attributes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.PluginTest;
 
 [Plugin<JobStep>]
-[PluginTypeName("ComputeFiles")]
-[PluginDescription("Used to compute numerous files.")]
-public class ComputeFilesJobStep : JobStep {
+[PluginTypeName("Update Azure Storage")]
+[PluginDescription("Used to update a specified Azure storage with many adaptions and whatever lorem ipsum")]
+public class UpdateAzureStorage : JobStep {
     public override void Execute(IServiceProvider serviceProvider) {
-        
+        throw new NotImplementedException();
     }
 
     public override Task ExecuteAsync(IServiceProvider serviceProvider) {
-        return Task.CompletedTask;
+        throw new NotImplementedException();
     }
 
     public override UserControl? GetJobStepView() {
@@ -22,10 +26,10 @@ public class ComputeFilesJobStep : JobStep {
     }
 
     public override ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
-        return ImmutableResultCollection.Ok();
+        throw new NotImplementedException();
     }
 
     public override Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
-        return Task.FromResult(ImmutableResultCollection.Ok());
+        throw new NotImplementedException();
     }
 }

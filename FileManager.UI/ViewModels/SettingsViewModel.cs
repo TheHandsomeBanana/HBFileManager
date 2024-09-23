@@ -29,12 +29,11 @@ public class SettingsViewModel : ViewModelBase {
 
         SettingsEnvironmentModel environmentModel = settingsService.GetOrSetNew(() => new SettingsEnvironmentModel());
         SettingsWinRARModel winRARModel = settingsService.GetOrSetNew(() => new SettingsWinRARModel());
-        SettingsPluginsModel pluginsModel = settingsService.GetOrSetNew(() => new SettingsPluginsModel());
 
         NavigateToEnvironmentCommand = new NavigateCommand<SettingsEnvironmentViewModel>(navigationService, () => new SettingsEnvironmentViewModel(environmentModel));
         NavigateToExecutionCommand = new NavigateCommand<SettingsExecutionViewModel>(navigationService, () => new SettingsExecutionViewModel());
         NavigateToWinRARCommand = new NavigateCommand<SettingsWinRARViewModel>(navigationService, () => new SettingsWinRARViewModel(winRARModel));
-        NavigateToPluginsCommand = new NavigateCommand<SettingsPluginsViewModel>(navigationService, () => new SettingsPluginsViewModel(pluginsModel));
+        NavigateToPluginsCommand = new NavigateCommand<SettingsPluginsViewModel>(navigationService, () => new SettingsPluginsViewModel());
 
         NavigateToEnvironmentCommand.Execute(NavigateCommandParameter);
     }

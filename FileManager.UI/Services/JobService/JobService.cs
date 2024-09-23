@@ -45,12 +45,12 @@ public class JobService : IJobService {
         container.Delete(jobId.ToString());
     }
 
-    public void AddOrUpdateStep(Guid jobId, IJobStep step) {
+    public void AddOrUpdateStep(Guid jobId, JobStep step) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
         job.Steps[step.Id] = step;
     }
 
-    public void DeleteStep(Guid jobId, IJobStep step) {
+    public void DeleteStep(Guid jobId, JobStep step) {
         DeleteStep(jobId, step.Id);
     }
 
@@ -58,18 +58,23 @@ public class JobService : IJobService {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
         job.Steps.Remove(stepId);
     }
+    
+    public void DeleteStep(Guid stepId) {
+        JobItemModel? job = GetAll().Where(e => e.Steps.Any(e => e.Key == stepId)).FirstOrDefault();
+        job?.Steps.Remove(stepId);
+    }
 
-    public IJobStep? GetStepById(Guid jobId, Guid stepId) {
+    public JobStep? GetStepById(Guid jobId, Guid stepId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
-        if (job.Steps.TryGetValue(stepId, out IJobStep? step)) {
+        if (job.Steps.TryGetValue(stepId, out JobStep? step)) {
             return step;
         }
 
         return null;
     }
 
-    public IJobStep[] GetSteps(Guid jobId) {
+    public JobStep[] GetSteps(Guid jobId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
         return [.. job.Steps.Values];

@@ -6,7 +6,7 @@ using System.Windows.Controls;
 
 namespace FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 
-public class JobStepWrapperViewModel : ViewModelBase<IJobStep> {
+public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
     public UserControl? StepView {
         get {
             UserControl? stepView = Model.GetJobStepView();
@@ -36,6 +36,6 @@ public class JobStepWrapperViewModel : ViewModelBase<IJobStep> {
         }
     }
 
-    public JobStepWrapperViewModel(IJobStep model) : base(model) {
+    public JobStepWrapperViewModel(JobStep model) : base(model) {
     }
 }

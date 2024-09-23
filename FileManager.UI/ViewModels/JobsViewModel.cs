@@ -59,9 +59,7 @@ public class JobsViewModel : ViewModelBase {
         jobsView = CollectionViewSource.GetDefaultView(jobs);
         jobsView.Filter = FilterJobs;
 
-        if (jobs.Any()) {
-            SelectedJob = jobs[0];
-        }
+        SelectedJob = jobs.FirstOrDefault();
     }
 
     private bool FilterJobs(object obj) {
@@ -91,6 +89,7 @@ public class JobsViewModel : ViewModelBase {
             SelectedJob = jobItemViewModel;
 
             jobService.AddOrUpdate(newJob);
+            SelectedJob = jobs.LastOrDefault();
         }
     }
 
@@ -103,6 +102,7 @@ public class JobsViewModel : ViewModelBase {
         if (result == MessageBoxResult.Yes) {
             jobs.Remove(jobItemViewModel);
             jobService.Delete(jobItemViewModel.Model.Id);
+            SelectedJob = jobs.FirstOrDefault();
         }
     }
 }

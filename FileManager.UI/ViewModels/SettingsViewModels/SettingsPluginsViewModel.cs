@@ -1,24 +1,29 @@
 ﻿using FileManager.Core.JobSteps;
 using FileManager.UI.Models.SettingsModels;
+using FileManager.UI.Services.JobService;
+using HBLibrary.Common;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Common.Plugins.Loader;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
+using HBLibrary.Wpf.Views;
 using Microsoft.Win32;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
+using System.Windows;
 using System.Windows.Data;
 using Unity;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels;
 
-public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
-    private readonly IDialogService dialogService;
+public class SettingsPluginsViewModel : ViewModelBase {
     private readonly IPluginManager pluginManager;
+    private readonly IJobService jobService;
 
     private string? searchText;
     public string? SearchText {
@@ -31,28 +36,28 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
     }
 
     public RelayCommand AddAssemblyCommand { get; set; }
-    public RelayCommand<string> DeleteAssemblyCommand { get; set; }
+    public RelayCommand<AssemblyName> DeleteAssemblyCommand { get; set; }
 
-    private string? selectedAssembly;
-    public string? SelectedAssembly {
+    private AssemblyName? selectedAssembly;
+    public AssemblyName? SelectedAssembly {
         get { return selectedAssembly; }
         set {
             selectedAssembly = value;
             NotifyPropertyChanged();
 
-            if (!string.IsNullOrEmpty(value)) {
+            if (value is not null) {
                 if (!pluginManager.IsPluginAssemblyLoaded(value)) {
-                    pluginManager.LoadAssembly(value);
+                    Result res = pluginManager.LoadAssembly(value);
                 }
 
-                FindPlugins(value);
+                FindPlugins(value.Name!);
             }
         }
     }
 
     private readonly ICollectionView assemblyView;
     public ICollectionView AssembliesView => assemblyView;
-    public readonly ObservableCollection<string> assemblies;
+    public readonly ObservableCollection<AssemblyName> assemblies;
 
 
     private PluginType[] foundPlugins = [];
@@ -64,36 +69,65 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
         }
     }
 
-    public SettingsPluginsViewModel(SettingsPluginsModel model) : base(model) {
+    public SettingsPluginsViewModel() : base() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-        dialogService = container.Resolve<IDialogService>();
         pluginManager = container.Resolve<IPluginManager>();
+        jobService = container.Resolve<IJobService>();
 
-        assemblies = [.. Model.Assemblies];
-
-        assemblies.CollectionChanged += (_, s) => {
-            Model.Assemblies.Clear();
-            Model.Assemblies.AddRange(assemblies);
-        };
+        assemblies = [.. pluginManager.GetLoadedAssemblies().Select(e => e.GetFirst().GetName())];
 
         assemblyView = CollectionViewSource.GetDefaultView(assemblies);
         assemblyView.Filter = FilterPlugins;
 
         AddAssemblyCommand = new RelayCommand(AddAssembly, true);
-        DeleteAssemblyCommand = new RelayCommand<string>(DeleteAssembly, true);
+        DeleteAssemblyCommand = new RelayCommand<AssemblyName>(DeleteAssembly, true);
+
+        SelectedAssembly = assemblies.FirstOrDefault();
     }
 
     private bool FilterPlugins(object obj) {
-        if (obj is string name) {
-            return string.IsNullOrEmpty(SearchText) || name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
+        if (obj is AssemblyName name) {
+            return string.IsNullOrEmpty(SearchText) || name.FullName.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
         }
         return false;
     }
 
-    private void DeleteAssembly(string obj) {
-        assemblies.Remove(obj);
-        pluginManager.RemovePluginAssembly(obj);
-        SelectedAssembly = assemblies.FirstOrDefault();
+    private void DeleteAssembly(AssemblyName obj) {
+        PluginType[] types = pluginManager.TypeProvider.GetByAttribute<JobStep>([pluginManager.GetLoadedAssembly(obj.Name!)!]);
+
+        List<Tuple<JobStep, PluginType>> foundSteps = [];
+        foreach (JobStep jobStep in jobService.GetAll().SelectMany(e => e.Steps.Values)) {
+            foreach (PluginType type in types) {
+                if (jobStep.GetType() == type.ConcreteType) {
+                    foundSteps.Add(new(jobStep, type));
+                }
+            }
+        }
+
+        string message;
+        if (foundSteps.Any()) {
+            message = $"If you delete this plugin, the following Job-Steps will be deleted as well:\n- " +
+            $"{string.Join("\n- ", foundSteps.Select(e => $"[Name: {e.Item1.Name} | Type: {e.Item2.ConcreteType}]"))}";
+        }
+        else {
+            message = "No Job-Step is using this plugin, you can remove it safely.";
+        }
+
+
+
+        MessageBoxResult result = HBDarkMessageBox.Show("Remove plugin", message, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+        if (result == MessageBoxResult.Yes) {
+            foreach (Guid jobStepId in foundSteps.Select(e => e.Item1.Id)) {
+                jobService.DeleteStep(jobStepId);
+            }
+
+            assemblies.Remove(obj);
+
+            // TODO: handle result
+            Result res = pluginManager.RemovePluginAssembly(obj);
+            SelectedAssembly = assemblies.FirstOrDefault();
+        }
     }
 
     private void AddAssembly(object? obj) {
@@ -106,15 +140,23 @@ public class SettingsPluginsViewModel : ViewModelBase<SettingsPluginsModel> {
 
         if (ofd.ShowDialog().GetValueOrDefault()) {
             foreach (string file in ofd.FileNames) {
-                string fileName = Path.GetFileName(file);
-                assemblies.Add(fileName);
-                pluginManager.AddPluginAssembly(file);
+                AssemblyName assemblyName = AssemblyName.GetAssemblyName(file);
+                if (assemblies.All(e => e.FullName != assemblyName.FullName)) {
+                    assemblies.Add(assemblyName);
+                }
+
+                // TODO: handle result
+                Result res = pluginManager.AddOrUpdatePluginAssembly(file);
+
+                SelectedAssembly = assemblies.LastOrDefault();
             }
         }
     }
 
     private void FindPlugins(string assemblyFileName) {
-        FoundPlugins = pluginManager.TypeProvider
-            .GetCachedByAttribute<IJobStep>(pluginManager.GetLoadedAssemblies());
+        AssemblyContext? loadedContext = pluginManager.GetLoadedAssembly(assemblyFileName);
+        if (loadedContext is not null) {
+            FoundPlugins = pluginManager.TypeProvider.GetCachedByAttribute<JobStep>([loadedContext]);
+        }
     }
 }

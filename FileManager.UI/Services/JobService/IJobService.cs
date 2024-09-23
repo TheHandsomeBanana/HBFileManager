@@ -9,9 +9,10 @@ public interface IJobService {
     public JobItemModel[] GetAll();
     public JobItemModel? GetById(Guid jobId);
 
-    public void AddOrUpdateStep(Guid jobId, IJobStep step);
-    public void DeleteStep(Guid jobId, IJobStep step);
+    public void AddOrUpdateStep(Guid jobId, JobStep step);
+    public void DeleteStep(Guid jobId, JobStep step);
     public void DeleteStep(Guid jobId, Guid stepId);
-    public IJobStep? GetStepById(Guid jobId, Guid stepId);
-    public IJobStep[] GetSteps(Guid jobId);
+    public void DeleteStep(Guid stepId);
+    public JobStep? GetStepById(Guid jobId, Guid stepId);
+    public JobStep[] GetSteps(Guid jobId);
 }

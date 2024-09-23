@@ -12,7 +12,7 @@
              xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
-             d:DesignWidth="800">
+             d:DesignWidth="1000">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -43,16 +43,31 @@
         <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
                    Text="Assemblies" />
 
+        <StackPanel Grid.Row="1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal">
 
-        <buttons:IconButton Grid.Row="1"
-                            HorizontalAlignment="Left"
-                            BorderThickness="1"
-                            Height="24"
-                            Width="24"
-                            IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                            IconFill="{StaticResource VSGreen}"
-                            Command="{Binding AddAssemblyCommand}">
-        </buttons:IconButton>
+            <buttons:IconButton BorderThickness="1"
+                                ToolTip="Add new assembly"
+                                Height="24"
+                                Width="24"
+                                IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                IconFill="{StaticResource VSGreen}"
+                                Command="{Binding AddAssemblyCommand}">
+            </buttons:IconButton>
+            
+            <buttons:IconButton BorderThickness="1"
+                                Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}"
+                                ToolTip="Remove assembly"
+                                Height="24"
+                                Width="24"
+                                IconData="M20 14H4V10H20V14Z"
+                                IconFill="{StaticResource VSRed}"
+                                Command="{Binding DeleteAssemblyCommand}"
+                                CommandParameter="{Binding SelectedAssembly}">
+            </buttons:IconButton>
+        </StackPanel>
 
         <TextBox Style="{StaticResource HBDark_VSFilterBox}"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
@@ -65,20 +80,21 @@
               Margin="0 5 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
 
             <ListBox Style="{StaticResource HBDark_ListBox}"
                      ItemsSource="{Binding AssembliesView}"
                      SelectedItem="{Binding SelectedAssembly}"
-                     Grid.Column="0"
-                     BorderThickness="0 0 1 0"
-                     Margin="0 0 10 0">
+                     DisplayMemberPath="FullName"
+                     Margin="0 0 5 0"
+                     Grid.Column="0">
                 <ListBox.Resources>
                     <ContextMenu x:Key="contextMenu"
                                  DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                  Style="{StaticResource HBDark_ContextMenu}">
-                        <MenuItem Header="Delete job"
+                        <MenuItem Header="Remove Assembly"
                                   Command="{Binding DeleteAssemblyCommand}"
                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
@@ -105,7 +121,7 @@
                 </ListBox.ItemContainerStyle>
                 <ListBox.ContextMenu>
                     <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
-                        <MenuItem Header="Add new job"
+                        <MenuItem Header="Add new Assembly"
                                   Command="{Binding AddAssemblyCommand}">
                             <menus:MenuItemAttachedProperties.IconPath>
                                 <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
@@ -117,7 +133,12 @@
                 </ListBox.ContextMenu>
             </ListBox>
 
-            <Grid Grid.Column="1">
+            <Rectangle Grid.Column="1"
+                       Width="1"
+                       Fill="{StaticResource ControlBorder}" />
+
+            <Grid Grid.Column="2"
+                  Margin="5 0 0 0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
@@ -143,34 +164,23 @@
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Header="Plugin Type"
-                                                DisplayMemberBinding="{Binding PluginType}"
-                                                Width="100"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="100">
+                                                DisplayMemberBinding="{Binding BaseType}"
+                                                Width="Auto">
+                                </GridViewColumn>
+
+                                <GridViewColumn Header="Concrete Type"
+                                                DisplayMemberBinding="{Binding ConcreteType}"
+                                                Width="Auto">
                                 </GridViewColumn>
 
                                 <GridViewColumn Header="Typename"
                                                 DisplayMemberBinding="{Binding Metadata.TypeName}"
-                                                Width="100"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="100">
+                                                Width="Auto">
                                 </GridViewColumn>
-                                
-                                <GridViewColumn Header="Concrete Type"
-                                                DisplayMemberBinding="{Binding ConcretePluginType}"
-                                                Width="200"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="200">
-                                </GridViewColumn>
-                                
+
                                 <GridViewColumn Header="Description"
-                                                DisplayMemberBinding="{Binding Metadata.Description}">
-                                    <GridViewColumn.Width>
-                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                      ConverterParameter="*">
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                     Path="ActualWidth" />
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                            <Binding RelativeSource="{RelativeSource Self}" />
-                                        </MultiBinding>
-                                    </GridViewColumn.Width>
+                                                DisplayMemberBinding="{Binding Metadata.Description}"
+                                                Width="Auto">
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>

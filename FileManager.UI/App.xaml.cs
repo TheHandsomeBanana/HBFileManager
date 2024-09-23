@@ -23,7 +23,9 @@ using HBLibrary.Wpf.Views;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
+using Microsoft.IdentityModel.Abstractions;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
 using Unity;
@@ -102,7 +104,11 @@ namespace FileManager.UI {
         }
 
         // This is required for user switching
-        public static void AddApplicationStorageContainers(IApplicationStorage storage, IAccountService accountService) {
+        public static void AddApplicationStorageContainers(IUnityContainer container) {
+            IApplicationStorage storage = container.Resolve<IApplicationStorage>();
+            IAccountService accountService = container.Resolve<IAccountService>();
+            IPluginManager pluginManager = container.Resolve<IPluginManager>();
+
             string accountId = accountService.Account!.AccountId;
 
             storage.CreateContainer($"{accountId + nameof(SettingsService)}".ToGuid(), b => {
@@ -114,7 +120,6 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -131,7 +136,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobStepConverter()
+                                new JobStepConverter(pluginManager)
                             },
                             WriteIndented = true
                         });
@@ -164,7 +169,6 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobStepConverter()
                             },
                             WriteIndented = true
                         });
@@ -183,7 +187,7 @@ namespace FileManager.UI {
                         jfs.SetGlobalOptions(new JsonSerializerOptions {
                             Converters = {
                                 new TimeOnlyConverter(),
-                                new JobStepConverter()
+                                new JobStepConverter(container.Resolve<IPluginManager>())
                             },
                             WriteIndented = true
                         });
@@ -202,7 +206,6 @@ namespace FileManager.UI {
         // -> Requires logged in user id
         private static void AddJobServices(IUnityContainer container) {
             container.RegisterType<IJobService, JobService>();
-            container.RegisterType<IJobStepManager, JobStepManager>();
         }
 
         private static void AddPluginManager(IUnityContainer container) {
@@ -210,8 +213,10 @@ namespace FileManager.UI {
 
             IPluginManagerBuilder builder = PluginManager.CreateBuilder()
                 .Configure(e => e.SetPluginsLocation(storagePath))
+                .SetDefaultAssemblyLoader()
                 .SetDefaultTypeProvider()
-                .SetDefaultAssemblyLoader();
+                .SetDefaultTypeResolver()
+                .SetDefaultTypeRegistry();
 
             container.RegisterInstance(builder.Build(), InstanceLifetime.Singleton);
         }
@@ -261,12 +266,24 @@ namespace FileManager.UI {
         }
         #endregion
 
+        private static Mutex? mutex = null;
         protected override async void OnStartup(StartupEventArgs e) {
             try {
                 IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+                CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
+
+                // Mutex to dissallow multiple window instances
+                mutex = new Mutex(true, appSettings.ApplicationName, out bool createdNew);
+                if (!createdNew) {
+                    Focus();
+                    Application.Current.Shutdown();
+                    return;
+                }
+
+
+
                 IAccountService accountService = container.Resolve<IAccountService>();
 
-                CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
                 ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName!);
 
@@ -316,8 +333,8 @@ namespace FileManager.UI {
         }
 
         private void MainWindowStartup(IUnityContainer container) {
-            AddApplicationStorage(container);
             AddPluginManager(container);
+            AddApplicationStorage(container);
             AddJobServices(container);
 
             MainWindow = new MainWindow {
@@ -334,6 +351,44 @@ namespace FileManager.UI {
             };
 
             MainWindow.Show();
+        }
+
+
+        protected override void OnExit(ExitEventArgs e) {
+            mutex?.Dispose();
+            mutex = null;
+
+            base.OnExit(e);
+        }
+
+
+        // Logic to bring existing window to front
+        // Windows API for sending messages
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_RESTORE = 9;
+        private void Focus() {
+            IntPtr hWnd = FindWindow(null, "HB File Manager"); 
+
+            if (hWnd != IntPtr.Zero) {
+                // If the window is minimized, restore it
+                if (IsIconic(hWnd)) {
+                    ShowWindow(hWnd, SW_RESTORE);
+                }
+
+                // Bring the window to the foreground
+                SetForegroundWindow(hWnd);
+            }
         }
 
     }

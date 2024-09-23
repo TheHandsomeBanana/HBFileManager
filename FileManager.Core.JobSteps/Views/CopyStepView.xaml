@@ -148,22 +148,12 @@
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Header="Type"
                                                 DisplayMemberBinding="{Binding Type}"
-                                                Width="80"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="80">
+                                                Width="Auto">
                                 </GridViewColumn>
 
                                 <GridViewColumn Header="Path"
                                                 DisplayMemberBinding="{Binding Path}"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="200">
-                                    <GridViewColumn.Width>
-                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                      ConverterParameter="*">
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                     Path="ActualWidth" />
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                            <Binding RelativeSource="{RelativeSource Self}" />
-                                        </MultiBinding>
-                                    </GridViewColumn.Width>
+                                                Width="Auto">
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>
@@ -218,7 +208,7 @@
 
                 <StackPanel Orientation="Vertical">
 
-                    <Grid Margin="0 0 0 10">
+                    <Grid Margin="0 0 0 5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="80" />
                             <ColumnDefinition Width="*" />
@@ -257,22 +247,11 @@
                             <GridView>
                                 <GridViewColumn Header="Type"
                                                 DisplayMemberBinding="{Binding Type}"
-                                                Width="80"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="80" />
+                                                Width="Auto"/>
 
                                 <GridViewColumn Header="Path"
                                                 DisplayMemberBinding="{Binding Path}"
-                                                listViews:GridViewColumnAttachedProperties.MinWidth="200">
-
-                                    <GridViewColumn.Width>
-                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                      ConverterParameter="*">
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                     Path="ActualWidth" />
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                            <Binding RelativeSource="{RelativeSource Self}" />
-                                        </MultiBinding>
-                                    </GridViewColumn.Width>
+                                                Width="Auto">
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>

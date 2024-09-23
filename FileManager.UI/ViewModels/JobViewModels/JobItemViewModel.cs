@@ -4,6 +4,7 @@ using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -18,7 +19,7 @@ namespace FileManager.UI.ViewModels.JobViewModels;
 public class JobItemViewModel : ViewModelBase<JobItemModel> {
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;
-    private readonly IJobStepManager jobStepManager;
+    private readonly IPluginManager pluginManager;
 
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
@@ -94,7 +95,7 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = container.Resolve<IDialogService>();
         this.jobService = container.Resolve<IJobService>();
-        this.jobStepManager = container.Resolve<IJobStepManager>();
+        this.pluginManager = container.Resolve<IPluginManager>();
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
@@ -104,26 +105,25 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         stepsView = CollectionViewSource.GetDefaultView(steps);
         stepsView.Filter = FilterJobSteps;
 
-        if (steps.Any()) {
-            SelectedStep = steps[0];
-        }
+        SelectedStep = steps.FirstOrDefault();
     }
 
     public JobItemViewModel() : this(new JobItemModel()) { }
 
 
     private void AddStep(object? obj) {
-        AddJobStepViewModel addJobViewModel = new AddJobStepViewModel(jobStepManager);
+        AddJobStepViewModel addJobViewModel = new AddJobStepViewModel(pluginManager);
         AddJobStepView addJobView = new AddJobStepView();
 
         bool result = dialogService.ShowCompactDialog(addJobView, addJobViewModel, "Add Step");
         if (result == true) {
-            IJobStep? jobStep = Activator.CreateInstance(addJobViewModel.SelectedStepType!.StepType!) as IJobStep;
+            JobStep? jobStep = Activator.CreateInstance(addJobViewModel.SelectedStepType!.StepType!) as JobStep;
             jobStep!.Name = addJobViewModel.Name;
 
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(jobStep);
             steps.Add(stepViewModel);
             jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
+            SelectedStep = steps[steps.IndexOf(stepViewModel)];
         }
     }
 
@@ -138,12 +138,13 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         if (result == MessageBoxResult.Yes) {
             steps.Remove(stepViewModel);
             jobService.DeleteStep(Model.Id, stepViewModel.Model.Id);
+            SelectedStep = steps.FirstOrDefault();
         }
     }
 
 
     private void LoadJobSteps() {
-        foreach (IJobStep step in Model.Steps.Values) {
+        foreach (JobStep step in Model.Steps.Values) {
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(step);
             this.steps.Add(stepViewModel);
         }

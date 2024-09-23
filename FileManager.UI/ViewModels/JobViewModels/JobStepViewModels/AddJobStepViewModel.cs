@@ -1,11 +1,24 @@
 ﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.Models;
 using HBLibrary.Common.Plugins;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 public class AddJobStepViewModel : ViewModelBase {
+    private readonly static JobStepInfo[] fixedTypes = [
+       new JobStepInfo {
+            StepType = typeof(CopyStep),
+            Metadata = PluginManager.GetPluginMetadata(typeof(CopyStep))
+        },
+        new JobStepInfo {
+            StepType = typeof(ArchiveStep),
+            Metadata = PluginManager.GetPluginMetadata(typeof(ArchiveStep))
+        }
+    ];
+
     public RelayCommand<Window> AddJobCommand { get; set; }
     public RelayCommand<Window> CancelCommand { get; set; }
 
@@ -41,18 +54,23 @@ public class AddJobStepViewModel : ViewModelBase {
         }
     }
 
-    public AddJobStepViewModel(IJobStepManager jobStepManager) {
+    public AddJobStepViewModel(IPluginManager pluginManager) {
         AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name) && selectedStepType is not null);
         CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
 
-        AvailableStepTypes = jobStepManager.GetJobStepTypes().Select(e => {
-            PluginMetadata metadata = PluginManager.GetPluginMetadata(e);
-            return new JobStepInfo() {
-                Metadata = metadata,
-                StepType = e
-            };
 
-        }).ToArray();
+        AvailableStepTypes =
+        [
+            .. fixedTypes,
+            .. pluginManager.TypeProvider
+                .QueryByAttribute<JobStep>(pluginManager.GetLoadedAssemblies())
+                .Select(e => {
+                    return new JobStepInfo {
+                        StepType = e.ConcreteType,
+                        Metadata = e.Metadata,
+                    };
+                }),
+        ];
     }
 
     private void AddAndFinish(Window? obj) {
@@ -75,6 +93,6 @@ public class AddJobStepViewModel : ViewModelBase {
 }
 
 public class JobStepInfo {
-    public required PluginMetadata Metadata { get; set; }  
+    public required PluginMetadata Metadata { get; set; }
     public required Type StepType { get; set; }
 }

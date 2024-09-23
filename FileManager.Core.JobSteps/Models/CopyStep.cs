@@ -10,26 +10,22 @@ using System.IO;
 
 namespace FileManager.Core.JobSteps.Models;
 
-[Plugin(typeof(IJobStep))]
-[Plugin<IJobStep>]
+[Plugin<JobStep>]
 [PluginTypeName("Copy")]
 [PluginDescription("Copy files and directories from the source definition to destination definition.")]
-public class CopyStep : IJobStep {
+public class CopyStep : JobStep {
     #region Model
-    public string Name { get; set; } = "";
     public List<Entry> SourceItems { get; set; } = [];
     public List<Entry> DestinationItems { get; set; } = [];
     public bool ModifiedOnly { get; set; }
     public TimeSpan? TimeDifference { get; set; }
     public string? TimeDifferenceText { get; set; }
     public TimeUnit? TimeDifferenceUnit { get; set; }
-    public bool IsAsync { get; set; }
     public int MaxConcurrency { get; set; } = 6;
-    public Guid Id { get; set; } = Guid.NewGuid();
     #endregion
 
     #region Logic
-    public void Execute(IServiceProvider serviceProvider) {
+    public override void Execute(IServiceProvider serviceProvider) {
         ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
         IFileEntryService fileEntryService = (IFileEntryService)serviceProvider.GetService(typeof(IFileEntryService))!;
 
@@ -44,7 +40,7 @@ public class CopyStep : IJobStep {
         }
     }
 
-    public async Task ExecuteAsync(IServiceProvider serviceProvider) {
+    public override async Task ExecuteAsync(IServiceProvider serviceProvider) {
         IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
         IFileEntryService fileEntryService = (IFileEntryService)serviceProvider.GetService(typeof(IFileEntryService))!;
 
@@ -75,7 +71,7 @@ public class CopyStep : IJobStep {
         await Task.WhenAll(copyTasks);
     }
 
-    public ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
+    public override ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
         ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
         ResultCollection results = [];
 
@@ -111,7 +107,7 @@ public class CopyStep : IJobStep {
         return results;
     }
 
-    public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
+    public override Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
         IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
         ResultCollection results = [];
 
@@ -197,7 +193,7 @@ public class CopyStep : IJobStep {
     }
     #endregion
 
-    public System.Windows.Controls.UserControl? GetJobStepView() {
+    public override System.Windows.Controls.UserControl? GetJobStepView() {
         CopyStepView copyStepView = new CopyStepView();
         copyStepView.DataContext = new CopyStepViewModel(this);
         return copyStepView;
