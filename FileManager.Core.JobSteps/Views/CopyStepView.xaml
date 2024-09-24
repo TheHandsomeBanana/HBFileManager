@@ -145,14 +145,22 @@
                               SelectedItem="{Binding SelectedSource}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
-                                <GridViewColumn Header="Type"
-                                                DisplayMemberBinding="{Binding Type}"
+                                <GridViewColumn DisplayMemberBinding="{Binding Type}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Type" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Path"
-                                                DisplayMemberBinding="{Binding Path}"
+                                <GridViewColumn DisplayMemberBinding="{Binding Path}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Path" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>
@@ -243,13 +251,22 @@
                               SelectedItem="{Binding SelectedDestination}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Type"
-                                                DisplayMemberBinding="{Binding Type}"
-                                                Width="Auto"/>
-
-                                <GridViewColumn Header="Path"
-                                                DisplayMemberBinding="{Binding Path}"
+                                <GridViewColumn DisplayMemberBinding="{Binding Type}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Type" />
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+
+                                <GridViewColumn DisplayMemberBinding="{Binding Path}"
+                                                Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Path" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>

@@ -27,12 +27,15 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/TimePicker.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
+            <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -101,7 +104,7 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
@@ -146,15 +149,60 @@
 
                     <TextBox Style="{StaticResource HBDark_VSFilterBox}"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalAlignment="Top"
                              Tag="Search Job Steps"
                              Grid.Row="2">
                     </TextBox>
 
-                    <ListBox Style="{StaticResource HBDark_ListBox}"
-                             ItemsSource="{Binding StepsView}"
-                             SelectedItem="{Binding SelectedStep}"
-                             Grid.Row="3">
-                        <ListBox.Resources>
+                    <ListView Style="{StaticResource HBDark_ListView}"
+                              ItemsSource="{Binding StepsView}"
+                              SelectedItem="{Binding SelectedStep}"
+                              Grid.Row="3">
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn Width="60">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Enabled" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:SlideToggleButton IsChecked="{Binding StepViewModel.IsEnabled}"
+                                                                        CornerRadius="6"
+                                                                        SliderCornerRadius="6"
+                                                                        HorizontalAlignment="Left">
+
+                                            </controls:SlideToggleButton>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+
+                                <GridViewColumn DisplayMemberBinding="{Binding StepViewModel.Name}">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   FontWeight="Bold"
+                                                   Text="Name" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.Width>
+                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
+                                                      ConverterParameter="*">
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
+                                                     Path="ActualWidth" />
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
+                                            <Binding RelativeSource="{RelativeSource Self}" />
+                                        </MultiBinding>
+                                    </GridViewColumn.Width>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+
+                        <ListView.Resources>
+                            <Style TargetType="GridViewHeaderRowPresenter">
+                                <Setter Property="Visibility"
+                                        Value="Collapsed" />
+                            </Style>
+
                             <ContextMenu x:Key="contextMenu"
                                          DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                          Style="{StaticResource HBDark_ContextMenu}">
@@ -169,27 +217,23 @@
                                     </menus:MenuItemAttachedProperties.IconPath>
                                 </MenuItem>
                             </ContextMenu>
-                        </ListBox.Resources>
+                        </ListView.Resources>
 
-                        <ListBox.InputBindings>
+                        <ListView.InputBindings>
                             <KeyBinding Key="Delete"
                                         Command="{Binding DeleteStepCommand}"
                                         CommandParameter="{Binding SelectedStep}" />
-                        </ListBox.InputBindings>
+                        </ListView.InputBindings>
 
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding StepViewModel.Name}" />
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem"
-                                   BasedOn="{StaticResource HBDark_ListBoxItem}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem"
+                                   BasedOn="{StaticResource HBDark_ListViewItem}">
                                 <Setter Property="ContextMenu"
                                         Value="{StaticResource contextMenu}" />
                             </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ContextMenu>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.ContextMenu>
                             <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
                                 <MenuItem Header="Add new step"
                                           Command="{Binding AddStepCommand}">
@@ -200,8 +244,8 @@
                                     </menus:MenuItemAttachedProperties.IconPath>
                                 </MenuItem>
                             </ContextMenu>
-                        </ListBox.ContextMenu>
-                    </ListBox>
+                        </ListView.ContextMenu>
+                    </ListView>
                 </Grid>
             </Border>
 

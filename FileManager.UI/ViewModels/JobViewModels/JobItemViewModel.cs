@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.Views;
 using FileManager.UI.Models.JobModels;
 using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
@@ -104,6 +105,7 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
 
         stepsView = CollectionViewSource.GetDefaultView(steps);
         stepsView.Filter = FilterJobSteps;
+        stepsView.CollectionChanged += StepsView_CollectionChanged;
 
         SelectedStep = steps.FirstOrDefault();
     }
@@ -156,5 +158,9 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
             return string.IsNullOrEmpty(SearchText) || step.Model.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase);
         }
         return false;
+    }
+
+    private void StepsView_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        SelectedStep = stepsView.Cast<JobStepWrapperViewModel>().FirstOrDefault();
     }
 }

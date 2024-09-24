@@ -81,7 +81,7 @@ public class MainViewModel : ViewModelBase {
     }
 
     private void SaveApplicationState(object? obj) {
-        AppStateHandler.SaveApplicationState();
+        AppStateHandler.SaveAppState();
         HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
     }
 
@@ -98,8 +98,20 @@ public class MainViewModel : ViewModelBase {
             applicationStorage.RemoveAllContainers();
             App.AddApplicationStorageContainers(container);
 
-            obj = new MainWindow {
-                DataContext = new MainViewModel()
+            ApplicationState appState = new ApplicationState {
+                WindowState = obj.WindowState,
+                Left = obj.Left,
+                Top = obj.Top,
+            };
+
+            obj = new MainWindow(appState) {
+                DataContext = new MainViewModel(),
+            };
+
+            obj.Closing += (_, _) => {
+                if (AppStateHandler.CanShutdown) {
+                    AppStateHandler.SaveAppStateBeforeExit();
+                }
             };
 
             obj.Closed += (_, _) => {

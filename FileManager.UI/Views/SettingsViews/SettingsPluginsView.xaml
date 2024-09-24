@@ -164,24 +164,40 @@
                               ItemContainerStyle="{StaticResource HBDark_ListViewItem}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
-                                <GridViewColumn Header="Plugin Type"
-                                                DisplayMemberBinding="{Binding BaseType}"
+                                <GridViewColumn DisplayMemberBinding="{Binding BaseType}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   Text="Plugin Type"
+                                                   FontWeight="Bold" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Concrete Type"
-                                                DisplayMemberBinding="{Binding ConcreteType}"
+                                <GridViewColumn DisplayMemberBinding="{Binding ConcreteType}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   Text="Concrete Type"
+                                                   FontWeight="Bold" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Typename"
-                                                DisplayMemberBinding="{Binding Metadata.TypeName}"
+                                <GridViewColumn DisplayMemberBinding="{Binding Metadata.TypeName}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   Text="Typename"
+                                                   FontWeight="Bold" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
 
-                                <GridViewColumn Header="Description"
-                                                DisplayMemberBinding="{Binding Metadata.Description}"
+                                <GridViewColumn DisplayMemberBinding="{Binding Metadata.Description}"
                                                 Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   Text="Description"
+                                                   FontWeight="Bold" />
+                                    </GridViewColumn.Header>
                                 </GridViewColumn>
                             </GridView>
                         </ListView.View>

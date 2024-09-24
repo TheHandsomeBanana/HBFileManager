@@ -3,7 +3,7 @@ using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.ViewModels;
-public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJobStep {
+public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : JobStep {
 
     public string Name {
         get => Model.Name;
@@ -17,6 +17,14 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : IJo
         get => Model.IsAsync;
         set {
             Model.IsAsync = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public bool IsEnabled {
+        get => Model.IsEnabled;
+        set {
+            Model.IsEnabled = value;
             NotifyPropertyChanged();
         }
     }

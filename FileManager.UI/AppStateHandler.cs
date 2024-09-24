@@ -1,5 +1,6 @@
 ﻿using HBLibrary.Common.DI.Unity;
 using HBLibrary.Services.IO.Storage;
+using HBLibrary.Services.IO.Storage.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ public static class AppStateHandler
 {
     #region State Saving
     public static bool StateSaved { get; set; } = false;
-    public static void SaveApplicationStateOnExit() {
+    public static void SaveAppStateOnExit() {
         if (StateSaved) {
             return;
         }
@@ -29,7 +30,7 @@ public static class AppStateHandler
         IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
         applicationStorage.SaveAll();
     }
-    public static void SaveApplicationState() {
+    public static void SaveAppState() {
         IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
         if (container is null)
             return;
@@ -47,6 +48,21 @@ public static class AppStateHandler
     }
     public static void AllowShutdown() {
         CanShutdown = true;
+    }
+
+    public static void SaveAppStateBeforeExit() {
+        Window mainWindow = Application.Current.MainWindow;
+        
+        WindowState windowState = mainWindow.WindowState == WindowState.Minimized
+                ? WindowState.Normal
+                : mainWindow.WindowState;
+
+        IApplicationStorage applicationStorage = UnityBase.GetChildContainer(nameof(FileManager)).Resolve<IApplicationStorage>();
+        applicationStorage.DefaultContainer.AddOrUpdate("appstate", new ApplicationState() {
+            WindowState = windowState,
+            Top = mainWindow.Top,
+            Left = mainWindow.Left
+        }, StorageEntryContentType.Json);
     }
     #endregion
 

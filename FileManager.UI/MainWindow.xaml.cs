@@ -11,6 +11,26 @@ namespace FileManager.UI {
             StateChanged += MainWindowStateChangeRaised;
         }
 
+        public MainWindow(ApplicationState appState) : this() {
+            WindowState = appState.WindowState;
+            
+            if(appState.Left is not null) {
+                Left = appState.Left.Value;
+            }
+            
+            if(appState.Top is not null) {
+                Top = appState.Top!.Value;
+            }
+
+
+            if (WindowState == WindowState.Maximized) {
+                MainBorder.Margin = new Thickness(8);
+                MainBorder.BorderThickness = new Thickness(0);
+                RestoreButton.Visibility = Visibility.Visible;
+                MaximizeButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
         // Can execute
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e) {
             e.CanExecute = true;

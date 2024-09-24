@@ -15,6 +15,8 @@ using HBLibrary.Common.Plugins;
 using HBLibrary.Common.Plugins.Builder;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Builder;
+using HBLibrary.Services.IO.Storage.Entries;
+using HBLibrary.Services.IO.Storage.Settings;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
@@ -37,9 +39,7 @@ namespace FileManager.UI {
     /// </summary>
     public partial class App : Application {
         public App() {
-            this.Exit += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
-            AppDomain.CurrentDomain.UnhandledException += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
+            AppDomain.CurrentDomain.UnhandledException += (_, _) => AppStateHandler.SaveAppStateOnExit();
 
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
@@ -287,7 +287,7 @@ namespace FileManager.UI {
                 base.OnStartup(e);
             }
             catch {
-                AppStateHandler.SaveApplicationStateOnExit();
+                AppStateHandler.SaveAppStateOnExit();
                 Shutdown();
             }
         }
@@ -297,8 +297,30 @@ namespace FileManager.UI {
             AddApplicationStorage(container);
             AddJobServices(container);
 
-            MainWindow = new MainWindow {
-                DataContext = new MainViewModel()
+
+            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+
+
+            ApplicationState appState = new ApplicationState {
+                WindowState = WindowState.Normal
+            };
+
+            if (applicationStorage.DefaultContainer.TryGet("appstate", out IStorageEntry? entry)) {
+                ApplicationState? appStateEntry = entry.Get<ApplicationState>();
+                if (appStateEntry != null) {
+                    appState = appStateEntry;
+                }
+            }
+
+            MainWindow = new MainWindow(appState) {
+                DataContext = new MainViewModel(),
+            };
+
+
+            MainWindow.Closing += (_, _) => {
+                if(AppStateHandler.CanShutdown) {
+                    AppStateHandler.SaveAppStateBeforeExit();
+                }
             };
 
             MainWindow.Closed += (_, _) => {
@@ -315,9 +337,11 @@ namespace FileManager.UI {
         }
 
 
+
         protected override void OnExit(ExitEventArgs e) {
             AppStateHandler.ExitInstance();
 
+            AppStateHandler.SaveAppStateOnExit();
             base.OnExit(e);
         }
     }
