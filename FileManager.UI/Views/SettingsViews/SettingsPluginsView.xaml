@@ -62,7 +62,7 @@
                                 ToolTip="Remove assembly"
                                 Height="24"
                                 Width="24"
-                                IconData="M20 14H4V10H20V14Z"
+                                IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                                 IconFill="{StaticResource VSRed}"
                                 Command="{Binding DeleteAssemblyCommand}"
                                 CommandParameter="{Binding SelectedAssembly}">
@@ -81,7 +81,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="1" />
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1.5*" />
             </Grid.ColumnDefinitions>
 
             <ListBox Style="{StaticResource HBDark_ListBox}"
@@ -160,7 +160,8 @@
 
                     <ListView Style="{StaticResource HBDark_ListView}"
                               ItemsSource="{Binding FoundPlugins}"
-                              Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}">
+                              Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}"
+                              ItemContainerStyle="{StaticResource HBDark_ListViewItem}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Header="Plugin Type"

@@ -130,12 +130,29 @@
                             Visibility="Visible"
                             Command="{x:Static SystemCommands.MaximizeWindowCommand}"/>
                 <Button x:Name="CloseButton"
-                            buttons:ButtonAttachedProperties.CornerRadius="0 5 0 0"
-                            Style="{StaticResource CloseButtonRed}" 
-                            Width="50"
-                            WindowChrome.IsHitTestVisibleInChrome="True" 
-                            ToolTip="Close"
-                            Command="{x:Static SystemCommands.CloseWindowCommand}"/>
+                        Width="50"
+                        WindowChrome.IsHitTestVisibleInChrome="True"
+                        ToolTip="Close"
+                        Command="{x:Static SystemCommands.CloseWindowCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource CloseButtonRed}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                             Value="Maximized">
+                                    <Setter Property="buttons:ButtonAttachedProperties.CornerRadius"
+                                            Value="0" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Path=WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                             Value="Normal">
+                                    <Setter Property="buttons:ButtonAttachedProperties.CornerRadius"
+                                            Value="0 5 0 0" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </StackPanel>
 
             <Border BorderBrush="{StaticResource HBDark_Border}" Grid.Column="0" Grid.Row="1"

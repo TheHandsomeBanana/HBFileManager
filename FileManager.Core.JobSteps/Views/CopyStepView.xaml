@@ -142,8 +142,7 @@
 
                     <ListView Style="{StaticResource HBDark_ListView}"
                               ItemsSource="{Binding SourceItems}"
-                              SelectedItem="{Binding SelectedSource}"
-                              BorderThickness="1">
+                              SelectedItem="{Binding SelectedSource}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Header="Type"
@@ -241,8 +240,7 @@
 
                     <ListView Style="{StaticResource HBDark_ListView}"
                               ItemsSource="{Binding DestinationItems}"
-                              SelectedItem="{Binding SelectedDestination}"
-                              BorderThickness="0.5">
+                              SelectedItem="{Binding SelectedDestination}">
                         <ListView.View>
                             <GridView>
                                 <GridViewColumn Header="Type"
@@ -273,7 +271,7 @@
                             </ContextMenu>
                         </ListView.Resources>
 
-                        <ListView.ItemContainerStyle>
+                        <ListView.ItemContainerStyle> 
                             <Style TargetType="ListViewItem"
                                    BasedOn="{StaticResource HBDark_ListViewItem}">
                                 <Setter Property="ContextMenu"

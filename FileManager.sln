@@ -37,7 +37,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.Services.Logging"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.Core.JobSteps", "FileManager.Core.JobSteps\FileManager.Core.JobSteps.csproj", "{76832B5D-F39A-408F-AB26-0D30C2F7AAA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManager.Core.JobSteps.PluginTest", "FileManager.Core.JobSteps.PluginTest\FileManager.Core.JobSteps.PluginTest.csproj", "{9AA0DF51-00D9-4D4F-970A-8A9308B75D90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileManager.Core.JobSteps.PluginTest", "FileManager.Core.JobSteps.PluginTest\FileManager.Core.JobSteps.PluginTest.csproj", "{9AA0DF51-00D9-4D4F-970A-8A9308B75D90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8FBCF63A-EA6F-438D-B4CC-B773829439FF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

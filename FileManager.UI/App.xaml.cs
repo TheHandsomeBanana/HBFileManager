@@ -36,11 +36,10 @@ namespace FileManager.UI {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
-        public static bool StateSaved { get; set; } = false;
         public App() {
-            this.Exit += (_, _) => SaveApplicationStateOnExit();
-            AppDomain.CurrentDomain.ProcessExit += (_, _) => SaveApplicationStateOnExit();
-            AppDomain.CurrentDomain.UnhandledException += (_, _) => SaveApplicationStateOnExit();
+            this.Exit += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
+            AppDomain.CurrentDomain.ProcessExit += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
+            AppDomain.CurrentDomain.UnhandledException += (_, _) => AppStateHandler.SaveApplicationStateOnExit();
 
 
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
@@ -207,7 +206,8 @@ namespace FileManager.UI {
         private static void AddJobServices(IUnityContainer container) {
             container.RegisterType<IJobService, JobService>();
         }
-
+        // This gets called OnStartup after login
+        // -> Requires logged in user id
         private static void AddPluginManager(IUnityContainer container) {
             string storagePath = GetPluginStoragePath(container);
 
@@ -232,58 +232,18 @@ namespace FileManager.UI {
         }
         #endregion
 
-        #region StateHelper
-        public static void SaveApplicationStateOnExit() {
-            if (StateSaved) {
-                return;
-            }
 
-            StateSaved = true;
-
-            IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
-            if (container is null)
-                return;
-
-            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-            applicationStorage.SaveAll();
-        }
-        public static void SaveApplicationState() {
-            IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
-            if (container is null)
-                return;
-
-            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-            applicationStorage.SaveAll();
-        }
-
-        public bool CanShutdown { get; private set; } = true;
-        public void PreventShutdown() {
-            CanShutdown = false;
-        }
-
-        public void AllowShutdown() {
-            CanShutdown = true;
-        }
-        #endregion
-
-        private static Mutex? mutex = null;
         protected override async void OnStartup(StartupEventArgs e) {
             try {
                 IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
-                // Mutex to dissallow multiple window instances
-                mutex = new Mutex(true, appSettings.ApplicationName, out bool createdNew);
-                if (!createdNew) {
-                    Focus();
-                    Application.Current.Shutdown();
+                // Do not allow multiple main window instances
+                if (AppStateHandler.HandleInstanceRunning(this, appSettings.ApplicationName!)) {
                     return;
                 }
 
-
-
                 IAccountService accountService = container.Resolve<IAccountService>();
-
 
                 ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName!);
 
@@ -327,7 +287,7 @@ namespace FileManager.UI {
                 base.OnStartup(e);
             }
             catch {
-                SaveApplicationState();
+                AppStateHandler.SaveApplicationStateOnExit();
                 Shutdown();
             }
         }
@@ -342,11 +302,12 @@ namespace FileManager.UI {
             };
 
             MainWindow.Closed += (_, _) => {
-                if (CanShutdown) {
+                if (AppStateHandler.CanShutdown) {
                     Shutdown();
                 }
                 else {
-                    CanShutdown = true;
+                    // Allow shutdown on next close
+                    AppStateHandler.AllowShutdown();
                 }
             };
 
@@ -355,41 +316,9 @@ namespace FileManager.UI {
 
 
         protected override void OnExit(ExitEventArgs e) {
-            mutex?.Dispose();
-            mutex = null;
+            AppStateHandler.ExitInstance();
 
             base.OnExit(e);
         }
-
-
-        // Logic to bring existing window to front
-        // Windows API for sending messages
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool IsIconic(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        private const int SW_RESTORE = 9;
-        private void Focus() {
-            IntPtr hWnd = FindWindow(null, "HB File Manager"); 
-
-            if (hWnd != IntPtr.Zero) {
-                // If the window is minimized, restore it
-                if (IsIconic(hWnd)) {
-                    ShowWindow(hWnd, SW_RESTORE);
-                }
-
-                // Bring the window to the foreground
-                SetForegroundWindow(hWnd);
-            }
-        }
-
     }
 }

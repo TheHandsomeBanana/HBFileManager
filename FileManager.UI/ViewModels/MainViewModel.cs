@@ -73,7 +73,7 @@ public class MainViewModel : ViewModelBase {
         AccountViewModel accountViewModel = new AccountViewModel(obj,
             accountService,
             commonAppSettings, s => UserSwitchCallback(obj, s),
-            ((App)Application.Current).PreventShutdown
+            AppStateHandler.PreventShutdown
         );
 
         HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, accountViewModel);
@@ -81,7 +81,7 @@ public class MainViewModel : ViewModelBase {
     }
 
     private void SaveApplicationState(object? obj) {
-        App.SaveApplicationState();
+        AppStateHandler.SaveApplicationState();
         HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
     }
 
@@ -103,12 +103,12 @@ public class MainViewModel : ViewModelBase {
             };
 
             obj.Closed += (_, _) => {
-                App currentApp = (App)Application.Current;
-                if (currentApp.CanShutdown) {
+                
+                if (AppStateHandler.CanShutdown) {
                     Application.Current.Shutdown();
                 }
                 else {
-                    currentApp.AllowShutdown();
+                    AppStateHandler.AllowShutdown();
                 }
             };
 

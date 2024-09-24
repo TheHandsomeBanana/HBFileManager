@@ -1,0 +1,11 @@
+﻿[*.cs]
+
+# Enable nullable reference types (C# 8.0+ feature)
+dotnet_diagnostic.CS8618.severity = error  # Non-nullable field/property is uninitialized
+dotnet_diagnostic.CS8600.severity = error  # Null assignment to non-nullable variable
+dotnet_diagnostic.CS8601.severity = error  # Possible null reference assignment
+dotnet_diagnostic.CS8602.severity = error  # Dereference of a possibly null reference
+dotnet_diagnostic.CS8603.severity = error  # Possible null return value
+dotnet_diagnostic.CS8604.severity = error  # Null passed as a parameter where it's not allowed
+dotnet_diagnostic.CS8625.severity = error  # Cannot convert null literal to non-nullable reference type
+dotnet_diagnostic.CS8762.severity = error  # Nullability mismatch in return type of an overriding member
