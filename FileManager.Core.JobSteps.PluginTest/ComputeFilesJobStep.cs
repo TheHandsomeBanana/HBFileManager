@@ -17,7 +17,7 @@ public class ComputeFilesJobStep : JobStep {
         return Task.CompletedTask;
     }
 
-    public override UserControl? GetJobStepView() {
+    public override UserControl? GetJobStepView(bool createDataContext) {
         return null;
     }
 

@@ -340,8 +340,8 @@ namespace FileManager.UI {
 
         protected override void OnExit(ExitEventArgs e) {
             AppStateHandler.ExitInstance();
-
             AppStateHandler.SaveAppStateOnExit();
+
             base.OnExit(e);
         }
     }

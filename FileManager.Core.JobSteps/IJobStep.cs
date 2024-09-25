@@ -11,13 +11,15 @@ public interface IJobStep {
     public Guid Id { get; }
     public string Name { get; set; }
     public bool IsAsync { get; set; }
+    public bool IsEnabled { get; set; }
+    public int ExecutionOrder { get; set; }
     public void Execute(IServiceProvider serviceProvider);
     public ImmutableResultCollection Validate(IServiceProvider serviceProvider);
 
     public Task ExecuteAsync(IServiceProvider serviceProvider);
     public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider);
 
-    public System.Windows.Controls.UserControl? GetJobStepView();
+    public System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext);
 }
 
 

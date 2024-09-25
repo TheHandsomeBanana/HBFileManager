@@ -5,6 +5,8 @@ using HBLibrary.Common.Extensions;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Container;
 using HBLibrary.Services.IO.Storage.Entries;
+using System.Diagnostics.Eventing.Reader;
+using System.Security.Permissions;
 
 namespace FileManager.UI.Services.JobService;
 public class JobService : IJobService {
@@ -47,36 +49,57 @@ public class JobService : IJobService {
 
     public void AddOrUpdateStep(Guid jobId, JobStep step) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
-        job.Steps[step.Id] = step;
+
+        if (!job.Steps.Contains(step)) {
+            step.ExecutionOrder = job.Steps.LastOrDefault()?.ExecutionOrder ?? 0;
+            job.Steps.Add(step);
+            return;
+        }
+
+        JobStep oldStep = job.Steps.First(e => e.Id == step.Id);
+
+        int index = job.Steps.IndexOf(oldStep);
+        job.Steps[index] = step;
     }
 
     public void DeleteStep(Guid jobId, JobStep step) {
-        DeleteStep(jobId, step.Id);
+        JobItemModel? job = GetById(jobId) 
+            ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
+
+        job.Steps.Remove(step);
     }
 
-    public void DeleteStep(Guid jobId, Guid stepId) {
-        JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
-        job.Steps.Remove(stepId);
-    }
-    
-    public void DeleteStep(Guid stepId) {
-        JobItemModel? job = GetAll().Where(e => e.Steps.Any(e => e.Key == stepId)).FirstOrDefault();
-        job?.Steps.Remove(stepId);
+
+    public void DeleteStep(JobStep step) {
+        JobItemModel? foundJob = null;
+        JobStep? foundStep = null;
+
+        foreach(JobItemModel job in GetAll()) {
+            foreach(JobStep jobStep in job.Steps) {
+                if(jobStep.Id == step.Id) {
+                    foundStep = jobStep;
+                    foundJob = job;
+                    break;
+                }
+            }
+        }
+
+        if (foundJob is null || foundStep is null) {
+            return;
+        }
+
+        foundJob?.Steps.Remove(foundStep);
     }
 
     public JobStep? GetStepById(Guid jobId, Guid stepId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
-        if (job.Steps.TryGetValue(stepId, out JobStep? step)) {
-            return step;
-        }
-
-        return null;
+        return job.Steps.FirstOrDefault(e => e.Id == stepId);
     }
 
     public JobStep[] GetSteps(Guid jobId) {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
-        return [.. job.Steps.Values];
+        return [.. job.Steps];
     }
 }

@@ -7,16 +7,24 @@ using System.Windows.Controls;
 namespace FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 
 public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
+
     public UserControl? StepView {
         get {
-            UserControl? stepView = Model.GetJobStepView();
+            bool createNewVm = stepViewModel == null;
+
+            UserControl? stepView = Model.GetJobStepView(createNewVm);
             if (stepView is not null) {
-                StepViewModel = stepView.DataContext as ViewModelBase;
+                if (createNewVm) {
+                    StepViewModel = stepView.DataContext as ViewModelBase;
+                }
+                else {
+                    stepView.DataContext = stepViewModel;
+                }
             }
             else {
                 stepView = new FallbackStepView();
                 StepViewModel = new FallbackStepViewModel(Model);
-                stepView.DataContext = StepViewModel;
+                stepView.DataContext = stepViewModel;
             }
 
             return stepView;
@@ -27,7 +35,6 @@ public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
     private ViewModelBase? stepViewModel;
     public ViewModelBase? StepViewModel {
         get {
-            stepViewModel ??= StepView?.DataContext as ViewModelBase;
             return stepViewModel;
         }
         set {

@@ -1,4 +1,6 @@
 ﻿using FileManager.Core.JobSteps;
+using FileManager.Core.JobSteps.Models;
+using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
 using FileManager.UI.Models.JobModels;
 using FileManager.UI.Services.JobService;
@@ -6,18 +8,20 @@ using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using Unity;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
-public class JobItemViewModel : ViewModelBase<JobItemModel> {
+public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;
     private readonly IPluginManager pluginManager;
@@ -80,8 +84,23 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
     public JobStepWrapperViewModel? SelectedStep {
         get => selectedStep;
         set {
+
+            // Remove the event handler for the event "ExecutionOrderChanged" using reflection
+            // No way to access it otherwise -> bad architecture :(
+            if (selectedStep?.StepViewModel is not null) {
+                selectedStep.StepViewModel.GetType()
+                    .GetEvent("ExecutionOrderChanged")?
+                    .RemoveEventHandler(selectedStep.StepViewModel, JobStepViewModel_ExecutionOrderChanged);
+            }
+
             selectedStep = value;
             NotifyPropertyChanged();
+
+            // Add the event handler for the event "ExecutionOrderChanged" using reflection
+            // No way to access it otherwise -> bad architecture :(
+            value?.StepViewModel?.GetType()
+               .GetEvent("ExecutionOrderChanged")?
+               .AddEventHandler(value.StepViewModel, JobStepViewModel_ExecutionOrderChanged);
         }
     }
 
@@ -110,8 +129,6 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
         SelectedStep = steps.FirstOrDefault();
     }
 
-    public JobItemViewModel() : this(new JobItemModel()) { }
-
 
     private void AddStep(object? obj) {
         AddJobStepViewModel addJobViewModel = new AddJobStepViewModel(pluginManager);
@@ -130,7 +147,6 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
     }
 
 
-
     public void DeleteStep(JobStepWrapperViewModel stepViewModel) {
         MessageBoxResult result = HBDarkMessageBox.Show("Delete step",
             "Are you sure you want to delete this step?",
@@ -139,19 +155,50 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
 
         if (result == MessageBoxResult.Yes) {
             steps.Remove(stepViewModel);
-            jobService.DeleteStep(Model.Id, stepViewModel.Model.Id);
+            jobService.DeleteStep(Model.Id, stepViewModel.Model);
             SelectedStep = steps.FirstOrDefault();
         }
     }
 
 
     private void LoadJobSteps() {
-        foreach (JobStep step in Model.Steps.Values) {
+        foreach (JobStep step in Model.Steps) {
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(step);
             this.steps.Add(stepViewModel);
         }
     }
 
+    private void JobStepViewModel_ExecutionOrderChanged(int oldValue, JobStep target) {
+        JobStepWrapperViewModel? foundVM = steps.FirstOrDefault(e => e.Model == target);
+
+        if (foundVM is null) {
+            return;
+        }
+
+        int index = steps.IndexOf(foundVM);
+        int newIndex = index;
+
+        if (target.ExecutionOrder > oldValue) {
+
+            while ((newIndex + 1) < steps.Count && target.ExecutionOrder > steps[newIndex + 1].Model.ExecutionOrder) {
+                newIndex++;
+            }
+        }
+        else if(target.ExecutionOrder < oldValue) {
+            while(newIndex > 0 && target.ExecutionOrder < steps[newIndex - 1].Model.ExecutionOrder) {
+                newIndex--;
+            }
+        }
+
+        if (newIndex != index) {
+            steps.Move(index, newIndex);
+            SelectedStep = steps[newIndex];
+
+            // Apply new indexed list
+            Model.Steps.Clear();
+            Model.Steps.AddRange(steps.Select(e => e.Model));
+        }
+    }
 
     private bool FilterJobSteps(object obj) {
         if (obj is JobStepWrapperViewModel step) {
@@ -162,5 +209,26 @@ public class JobItemViewModel : ViewModelBase<JobItemModel> {
 
     private void StepsView_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
         SelectedStep = stepsView.Cast<JobStepWrapperViewModel>().FirstOrDefault();
+    }
+
+    public void MoveItem(object source, object target) {
+        if (source is JobStepWrapperViewModel sourceItem && target is JobStepWrapperViewModel targetItem) {
+            int oldIndex = steps.IndexOf(sourceItem);
+            int newIndex = steps.IndexOf(targetItem);
+
+            if (oldIndex != newIndex) {
+                steps.Move(oldIndex, newIndex);
+                NotifyPropertyChanged(nameof(StepsView));
+                SelectedStep = sourceItem;
+
+                // Apply new indexed list
+                Model.Steps.Clear();
+                Model.Steps.AddRange(steps.Select(e => e.Model));
+
+                if (targetItem.Model.ExecutionOrder != sourceItem.Model.ExecutionOrder) {
+                    sourceItem.Model.ExecutionOrder = targetItem.Model.ExecutionOrder;
+                }
+            }
+        }
     }
 }

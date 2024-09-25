@@ -29,7 +29,19 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : Job
         }
     }
 
-    public UserControl? StepView => Model.GetJobStepView();
+
+    public event Action<int, TModel>? ExecutionOrderChanged;
+    public int ExecutionOrder {
+        get => Model.ExecutionOrder;
+        set {
+            int oldValue = Model.ExecutionOrder;
+
+            Model.ExecutionOrder = value;
+            NotifyPropertyChanged();
+            ExecutionOrderChanged?.Invoke(oldValue, Model);
+        }
+    }
+
     public PluginMetadata Metadata => PluginManager.GetPluginMetadata(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {

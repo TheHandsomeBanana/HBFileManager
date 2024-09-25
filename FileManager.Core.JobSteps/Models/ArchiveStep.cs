@@ -16,7 +16,7 @@ public class ArchiveStep : JobStep {
         throw new NotImplementedException();
     }
 
-    public override System.Windows.Controls.UserControl? GetJobStepView() {
+    public override System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext) {
         return null;
     }
 

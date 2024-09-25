@@ -11,6 +11,8 @@
              xmlns:views="clr-namespace:FileManager.UI.Views.JobViews.JobStepViews"
              xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
+             xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="500"
              d:DesignWidth="800">
@@ -157,7 +159,13 @@
                     <ListView Style="{StaticResource HBDark_ListView}"
                               ItemsSource="{Binding StepsView}"
                               SelectedItem="{Binding SelectedStep}"
-                              Grid.Row="3">
+                              Grid.Row="3"
+                              AllowDrop="True">
+
+                        <i:Interaction.Behaviors>
+                            <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type viewModels:JobStepWrapperViewModel}"/>
+                        </i:Interaction.Behaviors>
+                        
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn Width="60">

@@ -21,7 +21,7 @@ public class UpdateAzureStorage : JobStep {
         throw new NotImplementedException();
     }
 
-    public override UserControl? GetJobStepView() {
+    public override UserControl? GetJobStepView(bool createDataContext) {
         return null;
     }
 

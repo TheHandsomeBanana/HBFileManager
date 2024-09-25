@@ -58,8 +58,13 @@ public class JobsViewModel : ViewModelBase {
 
         jobsView = CollectionViewSource.GetDefaultView(jobs);
         jobsView.Filter = FilterJobs;
+        jobsView.CollectionChanged += JobsView_CollectionChanged;
 
         SelectedJob = jobs.FirstOrDefault();
+    }
+
+    private void JobsView_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        SelectedJob = jobsView.Cast<JobItemViewModel>().FirstOrDefault();
     }
 
     private bool FilterJobs(object obj) {
@@ -72,7 +77,8 @@ public class JobsViewModel : ViewModelBase {
     private void LoadJobs() {
         JobItemModel[] jobs = jobService.GetAll();
         foreach (JobItemModel item in jobs) {
-            this.jobs.Add(new JobItemViewModel(item));
+            JobItemViewModel jobItemViewModel = new JobItemViewModel(item);
+            this.jobs.Add(jobItemViewModel);
         }
     }
 

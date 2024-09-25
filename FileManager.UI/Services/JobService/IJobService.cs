@@ -11,8 +11,7 @@ public interface IJobService {
 
     public void AddOrUpdateStep(Guid jobId, JobStep step);
     public void DeleteStep(Guid jobId, JobStep step);
-    public void DeleteStep(Guid jobId, Guid stepId);
-    public void DeleteStep(Guid stepId);
+    public void DeleteStep(JobStep step);
     public JobStep? GetStepById(Guid jobId, Guid stepId);
     public JobStep[] GetSteps(Guid jobId);
 }

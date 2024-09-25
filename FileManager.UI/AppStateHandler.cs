@@ -12,8 +12,7 @@ using Unity;
 
 namespace FileManager.UI;
 
-public static class AppStateHandler
-{
+public static class AppStateHandler {
     #region State Saving
     public static bool StateSaved { get; set; } = false;
     public static void SaveAppStateOnExit() {
@@ -27,8 +26,13 @@ public static class AppStateHandler
         if (container is null)
             return;
 
-        IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-        applicationStorage.SaveAll();
+        try {
+            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+            applicationStorage.SaveAll();
+        }
+        catch {
+            // TODO: This only occurs if the login window is closed
+        }
     }
     public static void SaveAppState() {
         IUnityContainer? container = UnityBase.GetChildContainer(nameof(FileManager));
@@ -52,7 +56,7 @@ public static class AppStateHandler
 
     public static void SaveAppStateBeforeExit() {
         Window mainWindow = Application.Current.MainWindow;
-        
+
         WindowState windowState = mainWindow.WindowState == WindowState.Minimized
                 ? WindowState.Normal
                 : mainWindow.WindowState;
@@ -99,7 +103,7 @@ public static class AppStateHandler
         }
     }
 
-   
+
     public static bool HandleInstanceRunning(Application application, string appName) {
         mutex = new Mutex(true, appName, out bool createdNew);
         if (!createdNew) {

@@ -26,8 +26,8 @@
     </UserControl.Resources>
 
     <StackPanel>
-        
-  
+
+
         <TextBlock Style="{StaticResource HBDark_TextBlock}"
                    Text="Name"
                    Grid.Row="0"
@@ -54,6 +54,23 @@
                        Margin="0 0 5 0" />
             <TextBlock Style="{StaticResource HBDark_TextBlock2}"
                        Text="{Binding Metadata.Description}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+
+            <TextBlock Text="Execution order:" 
+                   Style="{StaticResource HBDark_TextBlock}"
+                   Margin="0 0 5 0"/>
+
+            <controls:NumberBox Minimum="0"
+                                Height="20"
+                                Background="Transparent"
+                                Foreground="{StaticResource Foreground}"
+                                UpArrowColor="{StaticResource Foreground}"
+                                DownArrowColor="{StaticResource Foreground}"
+                                BorderThickness="0"
+                                HorizontalAlignment="Left"
+                                Value="{Binding ExecutionOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
 
         <controls:SlideToggleButton CornerRadius="6"

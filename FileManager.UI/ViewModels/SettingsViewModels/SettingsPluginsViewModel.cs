@@ -96,7 +96,7 @@ public class SettingsPluginsViewModel : ViewModelBase {
         PluginType[] types = pluginManager.TypeProvider.GetByAttribute<JobStep>([pluginManager.GetLoadedAssembly(obj.Name!)!]);
 
         List<Tuple<JobStep, PluginType>> foundSteps = [];
-        foreach (JobStep jobStep in jobService.GetAll().SelectMany(e => e.Steps.Values)) {
+        foreach (JobStep jobStep in jobService.GetAll().SelectMany(e => e.Steps)) {
             foreach (PluginType type in types) {
                 if (jobStep.GetType() == type.ConcreteType) {
                     foundSteps.Add(new(jobStep, type));
@@ -105,7 +105,7 @@ public class SettingsPluginsViewModel : ViewModelBase {
         }
 
         string message;
-        if (foundSteps.Any()) {
+        if (foundSteps.Count != 0) {
             message = $"If you delete this plugin, the following Job-Steps will be deleted as well:\n- " +
             $"{string.Join("\n- ", foundSteps.Select(e => $"[Name: {e.Item1.Name} | Type: {e.Item2.ConcreteType}]"))}";
         }
@@ -118,8 +118,8 @@ public class SettingsPluginsViewModel : ViewModelBase {
         MessageBoxResult result = HBDarkMessageBox.Show("Remove plugin", message, MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes) {
-            foreach (Guid jobStepId in foundSteps.Select(e => e.Item1.Id)) {
-                jobService.DeleteStep(jobStepId);
+            foreach (JobStep jobStep in foundSteps.Select(e => e.Item1)) {
+                jobService.DeleteStep(jobStep);
             }
 
             assemblies.Remove(obj);

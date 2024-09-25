@@ -142,7 +142,7 @@ public class CopyStep : JobStep {
             }
         }
 
-        
+
         return Task.FromResult(results.ToImmutableResultCollection());
     }
 
@@ -193,9 +193,13 @@ public class CopyStep : JobStep {
     }
     #endregion
 
-    public override System.Windows.Controls.UserControl? GetJobStepView() {
+    public override System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext) {
         CopyStepView copyStepView = new CopyStepView();
-        copyStepView.DataContext = new CopyStepViewModel(this);
+        
+        if (createDataContext) {
+            copyStepView.DataContext = new CopyStepViewModel(this);
+        }
+
         return copyStepView;
     }
 }
