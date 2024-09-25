@@ -1,4 +1,6 @@
 ﻿using HBLibrary.Common;
+using HBLibrary.Wpf.ViewModels;
+using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps;
 
@@ -19,7 +21,8 @@ public interface IJobStep {
     public Task ExecuteAsync(IServiceProvider serviceProvider);
     public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider);
 
-    public System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext);
+    public UserControl? GetJobStepView();
+    public ViewModelBase? GetJobStepDataContext();
 }
 
 

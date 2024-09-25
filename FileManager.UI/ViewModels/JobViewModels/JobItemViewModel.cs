@@ -28,6 +28,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
 
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
+    public RelayCommand EnableAllStepsCommand { get; set; }
+    public RelayCommand DisableAllStepsCommand { get; set; }
 
     public string Name {
         get => Model.Name;
@@ -119,6 +121,9 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
+        EnableAllStepsCommand = new RelayCommand(EnableSteps, true);
+        DisableAllStepsCommand = new RelayCommand(DisableSteps, true);
+
 
         LoadJobSteps();
 
@@ -129,6 +134,18 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
         SelectedStep = steps.FirstOrDefault();
     }
 
+    private void DisableSteps(object? obj) {
+        foreach (JobStepWrapperViewModel? step in steps) {
+            // TODO: Fix Model
+        }
+
+    }
+
+    private void EnableSteps(object? obj) {
+        foreach (JobStepWrapperViewModel? step in steps) {
+            // TODO: Fix Model
+        }
+    }
 
     private void AddStep(object? obj) {
         AddJobStepViewModel addJobViewModel = new AddJobStepViewModel(pluginManager);

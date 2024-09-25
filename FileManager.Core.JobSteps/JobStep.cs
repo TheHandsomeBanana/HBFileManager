@@ -1,4 +1,5 @@
 ﻿using HBLibrary.Common;
+using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,8 @@ public abstract class JobStep : IJobStep {
 
     public abstract void Execute(IServiceProvider serviceProvider);
     public abstract Task ExecuteAsync(IServiceProvider serviceProvider);
-    public abstract UserControl? GetJobStepView(bool createDataContext);
+    public abstract UserControl? GetJobStepView();
+    public abstract ViewModelBase? GetJobStepDataContext();
     public abstract ImmutableResultCollection Validate(IServiceProvider serviceProvider);
     public abstract Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider);
 }

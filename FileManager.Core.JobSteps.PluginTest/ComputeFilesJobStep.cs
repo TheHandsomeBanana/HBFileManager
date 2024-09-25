@@ -1,6 +1,7 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using HBLibrary.Common;
 using HBLibrary.Common.Plugins.Attributes;
+using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.PluginTest;
@@ -17,7 +18,11 @@ public class ComputeFilesJobStep : JobStep {
         return Task.CompletedTask;
     }
 
-    public override UserControl? GetJobStepView(bool createDataContext) {
+    public override UserControl? GetJobStepView() {
+        return null;
+    }
+
+    public override ViewModelBase? GetJobStepDataContext() {
         return null;
     }
 

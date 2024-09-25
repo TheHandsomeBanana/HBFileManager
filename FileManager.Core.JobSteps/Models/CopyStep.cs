@@ -6,6 +6,7 @@ using HBLibrary.Common.Plugins.Attributes;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Models;
+using HBLibrary.Wpf.ViewModels;
 using System.IO;
 
 namespace FileManager.Core.JobSteps.Models;
@@ -193,14 +194,12 @@ public class CopyStep : JobStep {
     }
     #endregion
 
-    public override System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext) {
-        CopyStepView copyStepView = new CopyStepView();
-        
-        if (createDataContext) {
-            copyStepView.DataContext = new CopyStepViewModel(this);
-        }
+    public override System.Windows.Controls.UserControl? GetJobStepView() {
+        return new CopyStepView();
+    }
 
-        return copyStepView;
+    public override ViewModelBase? GetJobStepDataContext() {
+        return new CopyStepViewModel(this);
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using HBLibrary.Common;
 using HBLibrary.Common.Plugins.Attributes;
+using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,11 @@ public class UpdateAzureStorage : JobStep {
         throw new NotImplementedException();
     }
 
-    public override UserControl? GetJobStepView(bool createDataContext) {
+    public override UserControl? GetJobStepView() {
+        return null;
+    }
+
+    public override ViewModelBase? GetJobStepDataContext() {
         return null;
     }
 

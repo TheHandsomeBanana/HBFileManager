@@ -1,6 +1,8 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
+using FileManager.Core.JobSteps.ViewModels;
 using HBLibrary.Common;
 using HBLibrary.Common.Plugins.Attributes;
+using HBLibrary.Wpf.ViewModels;
 
 namespace FileManager.Core.JobSteps.Models;
 
@@ -16,7 +18,11 @@ public class ArchiveStep : JobStep {
         throw new NotImplementedException();
     }
 
-    public override System.Windows.Controls.UserControl? GetJobStepView(bool createDataContext) {
+    public override System.Windows.Controls.UserControl? GetJobStepView() {
+        return null;
+    }
+
+    public override ViewModelBase? GetJobStepDataContext() {
         return null;
     }
 

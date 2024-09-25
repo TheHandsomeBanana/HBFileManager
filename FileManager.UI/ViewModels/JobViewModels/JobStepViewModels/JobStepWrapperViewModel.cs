@@ -10,16 +10,9 @@ public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
 
     public UserControl? StepView {
         get {
-            bool createNewVm = stepViewModel == null;
-
-            UserControl? stepView = Model.GetJobStepView(createNewVm);
+            UserControl? stepView = Model.GetJobStepView();
             if (stepView is not null) {
-                if (createNewVm) {
-                    StepViewModel = stepView.DataContext as ViewModelBase;
-                }
-                else {
-                    stepView.DataContext = stepViewModel;
-                }
+                stepView.DataContext = StepViewModel;
             }
             else {
                 stepView = new FallbackStepView();
@@ -44,5 +37,6 @@ public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
     }
 
     public JobStepWrapperViewModel(JobStep model) : base(model) {
+        StepViewModel = Model.GetJobStepDataContext();
     }
 }
