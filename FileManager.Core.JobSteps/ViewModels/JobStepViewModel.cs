@@ -3,7 +3,7 @@ using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 
 namespace FileManager.Core.JobSteps.ViewModels;
-public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : JobStep {
+public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext where TModel : JobStep {
 
     public string Name {
         get => Model.Name;
@@ -29,8 +29,16 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel> where TModel : Job
         }
     }
 
+    public bool CanExecute {
+        get => Model.CanExecute;
+        set { 
+            Model.CanExecute = value;
+            NotifyPropertyChanged();
+        }
+    }
 
-    public event Action<int, TModel>? ExecutionOrderChanged;
+
+    public event Action<int, JobStep>? ExecutionOrderChanged;
     public int ExecutionOrder {
         get => Model.ExecutionOrder;
         set {

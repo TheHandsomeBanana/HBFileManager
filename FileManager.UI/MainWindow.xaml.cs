@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace FileManager.UI {
     /// <summary>
@@ -13,21 +14,18 @@ namespace FileManager.UI {
 
         public MainWindow(ApplicationState appState) : this() {
             WindowState = appState.WindowState;
-            
-            if(appState.Left is not null) {
+
+            if (appState.Left is not null) {
                 Left = appState.Left.Value;
             }
-            
-            if(appState.Top is not null) {
+
+            if (appState.Top is not null) {
                 Top = appState.Top!.Value;
             }
 
 
             if (WindowState == WindowState.Maximized) {
-                MainBorder.Margin = new Thickness(8);
-                MainBorder.BorderThickness = new Thickness(0);
-                RestoreButton.Visibility = Visibility.Visible;
-                MaximizeButton.Visibility = Visibility.Collapsed;
+                SetMaximizedState();
             }
         }
 
@@ -59,10 +57,7 @@ namespace FileManager.UI {
         // State change
         private void MainWindowStateChangeRaised(object? sender, EventArgs e) {
             if (WindowState == WindowState.Maximized) {
-                MainBorder.Margin = new Thickness(8);
-                MainBorder.BorderThickness = new Thickness(0);
-                RestoreButton.Visibility = Visibility.Visible;
-                MaximizeButton.Visibility = Visibility.Collapsed;
+                SetMaximizedState();
             }
             else {
                 MainBorder.Margin = new Thickness(0);
@@ -70,6 +65,15 @@ namespace FileManager.UI {
                 RestoreButton.Visibility = Visibility.Collapsed;
                 MaximizeButton.Visibility = Visibility.Visible;
             }
+        }
+
+
+        private void SetMaximizedState() {
+            // Margin = WindowChrome ResizeBorder and CaptionHeight
+            MainBorder.Margin = new Thickness(5, 5, 5, 45);
+            MainBorder.BorderThickness = new Thickness(0);
+            RestoreButton.Visibility = Visibility.Visible;
+            MaximizeButton.Visibility = Visibility.Collapsed;
         }
     }
 }

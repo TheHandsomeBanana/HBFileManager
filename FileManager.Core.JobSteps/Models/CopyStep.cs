@@ -8,6 +8,7 @@ using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Models;
 using HBLibrary.Wpf.ViewModels;
 using System.IO;
+using Unity;
 
 namespace FileManager.Core.JobSteps.Models;
 
@@ -26,9 +27,9 @@ public class CopyStep : JobStep {
     #endregion
 
     #region Logic
-    public override void Execute(IServiceProvider serviceProvider) {
-        ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
-        IFileEntryService fileEntryService = (IFileEntryService)serviceProvider.GetService(typeof(IFileEntryService))!;
+    public override void Execute(IUnityContainer container) {
+        ILogger logger = container.Resolve<ILogger>();
+        IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
 
         IEnumerable<string> filteredSource = GetFilteredSourceItems();
 
@@ -41,9 +42,9 @@ public class CopyStep : JobStep {
         }
     }
 
-    public override async Task ExecuteAsync(IServiceProvider serviceProvider) {
-        IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
-        IFileEntryService fileEntryService = (IFileEntryService)serviceProvider.GetService(typeof(IFileEntryService))!;
+    public override async Task ExecuteAsync(IUnityContainer container) {
+        IAsyncLogger logger = container.Resolve<IAsyncLogger>();
+        IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
 
         IEnumerable<string> filteredSource = GetFilteredSourceItems();
 
@@ -72,8 +73,8 @@ public class CopyStep : JobStep {
         await Task.WhenAll(copyTasks);
     }
 
-    public override ImmutableResultCollection Validate(IServiceProvider serviceProvider) {
-        ILogger logger = (ILogger)serviceProvider.GetService(typeof(ILogger))!;
+    public override ImmutableResultCollection Validate(IUnityContainer container) {
+        ILogger logger = container.Resolve<ILogger>();
         ResultCollection results = [];
 
         foreach (Entry source in SourceItems) {
@@ -108,8 +109,8 @@ public class CopyStep : JobStep {
         return results;
     }
 
-    public override Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider) {
-        IAsyncLogger logger = (IAsyncLogger)serviceProvider.GetService(typeof(IAsyncLogger))!;
+    public override Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container) {
+        IAsyncLogger logger = container.Resolve<IAsyncLogger>();
         ResultCollection results = [];
 
         foreach (Entry source in SourceItems) {
@@ -198,7 +199,7 @@ public class CopyStep : JobStep {
         return new CopyStepView();
     }
 
-    public override ViewModelBase? GetJobStepDataContext() {
+    public override IJobStepContext? GetJobStepDataContext() {
         return new CopyStepViewModel(this);
     }
 }

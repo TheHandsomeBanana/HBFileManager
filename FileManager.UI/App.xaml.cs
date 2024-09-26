@@ -17,6 +17,7 @@ using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Builder;
 using HBLibrary.Services.IO.Storage.Entries;
 using HBLibrary.Services.IO.Storage.Settings;
+using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
@@ -30,6 +31,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Threading;
 using Unity;
 using Unity.Lifetime;
 
@@ -39,17 +41,31 @@ namespace FileManager.UI {
     /// </summary>
     public partial class App : Application {
         public App() {
-            AppDomain.CurrentDomain.UnhandledException += (_, _) => AppStateHandler.SaveAppStateOnExit();
-
-
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            this.DispatcherUnhandledException += AppOnUnhandledException;
+           
             IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
             AddConfiguration(container);
             AddNavigation(container);
+            AddLogging(container);
 
             container.RegisterType<IDialogService, DialogService>();
 
             AddAuthentication(container);
             container.RegisterType<ISettingsService, SettingsService>();
+        }
+
+        private void AppOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
+            HBDarkMessageBox.Show("Unexpected error", 
+                e.Exception.Message,
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            e.Handled = true;
+        }
+
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e) {            
+            AppStateHandler.SaveAppState();
         }
 
         #region Services
@@ -74,6 +90,11 @@ namespace FileManager.UI {
             navigationStore.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
             container.RegisterInstance<INavigationStore>(navigationStore);
             container.RegisterSingleton<INavigationService, NavigationService>();
+        }
+        private static void AddLogging(IUnityContainer container) {
+            ILoggerRegistry registry = LoggerRegistry.FromConfiguration(e => e.Build());
+            container.RegisterInstance(registry);
+            container.RegisterType<ILoggerFactory, LoggerFactory>();
         }
         private static void AddAuthentication(IUnityContainer container) {
             AzureAdOptions azureAdOptions = container.Resolve<AzureAdOptions>();

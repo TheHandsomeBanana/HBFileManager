@@ -1,8 +1,11 @@
-﻿using FileManager.UI.Models.JobModels;
+﻿using FileManager.Core.JobSteps.Views;
+using FileManager.UI.Models.JobModels;
 using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels;
+using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -14,7 +17,7 @@ using System.Windows.Data;
 using Unity;
 
 namespace FileManager.UI.ViewModels;
-public class JobsViewModel : ViewModelBase {
+public sealed class JobsViewModel : ViewModelBase, IDisposable, IDragDropTarget {
     private readonly IJobService jobService;
     private readonly IDialogService dialogService;
     private readonly ObservableCollection<JobItemViewModel> jobs = [];
@@ -109,6 +112,25 @@ public class JobsViewModel : ViewModelBase {
             jobs.Remove(jobItemViewModel);
             jobService.Delete(jobItemViewModel.Model.Id);
             SelectedJob = jobs.FirstOrDefault();
+        }
+    }
+
+    public void Dispose() {
+        foreach(JobItemViewModel job in jobs) {
+            job.Dispose();
+        }
+    }
+
+    public void MoveItem(object source, object target) {
+        if (source is JobItemViewModel sourceItem && target is JobItemViewModel targetItem) {
+            int oldIndex = jobs.IndexOf(sourceItem);
+            int newIndex = jobs.IndexOf(targetItem);
+
+            if (oldIndex != newIndex) {
+                jobs.Move(oldIndex, newIndex);
+                NotifyPropertyChanged(nameof(JobsView));
+                SelectedJob = sourceItem;
+            }
         }
     }
 }

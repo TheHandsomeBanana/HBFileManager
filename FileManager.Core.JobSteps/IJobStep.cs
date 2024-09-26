@@ -1,6 +1,8 @@
-﻿using HBLibrary.Common;
+﻿using FileManager.Core.JobSteps.ViewModels;
+using HBLibrary.Common;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
+using Unity;
 
 namespace FileManager.Core.JobSteps;
 
@@ -15,14 +17,14 @@ public interface IJobStep {
     public bool IsAsync { get; set; }
     public bool IsEnabled { get; set; }
     public int ExecutionOrder { get; set; }
-    public void Execute(IServiceProvider serviceProvider);
-    public ImmutableResultCollection Validate(IServiceProvider serviceProvider);
+    public void Execute(IUnityContainer container);
+    public ImmutableResultCollection Validate(IUnityContainer container);
 
-    public Task ExecuteAsync(IServiceProvider serviceProvider);
-    public Task<ImmutableResultCollection> ValidateAsync(IServiceProvider serviceProvider);
+    public Task ExecuteAsync(IUnityContainer container);
+    public Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container);
 
     public UserControl? GetJobStepView();
-    public ViewModelBase? GetJobStepDataContext();
+    public IJobStepContext? GetJobStepDataContext();
 }
 
 

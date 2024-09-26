@@ -27,16 +27,39 @@
 
     <StackPanel>
 
+        <Grid Margin="0 0 0 10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+            <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
+                                   FromFill="#ffac14"
+                                   ToFill="#888484"
+                                   FromShadowEffect="#ffdf14"
+                                   ToShadowEffect="Transparent"
+                                   FromShadowBlurRadius="3"
+                                   ToShadowBlurRadius="0"
+                                   Height="30"
+                                   State="{Binding IsEnabled}"
+                                   HorizontalAlignment="Left">
+                <controls:AnimatedPath.ShadowEffect>
+                    <DropShadowEffect ShadowDepth="0" Direction="0"/>
+                </controls:AnimatedPath.ShadowEffect>
+            </controls:AnimatedPath>
+            
+            <StackPanel Grid.Column="1">
+
+                <TextBlock Style="{StaticResource HBDark_TextBlock}"
                    Text="Name"
                    Grid.Row="0"
                    Margin="0 0 0 3" />
 
-        <TextBox Style="{StaticResource HBDark_TextBox}"
+                <TextBox Style="{StaticResource HBDark_TextBox}"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Row="1"
-                 Margin="0 0 0 10" />
+                 Grid.Row="1"/>
+            </StackPanel>
+        </Grid>
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
@@ -72,13 +95,5 @@
                                 HorizontalAlignment="Left"
                                 Value="{Binding ExecutionOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
-
-        <controls:SlideToggleButton CornerRadius="6"
-                                    SliderCornerRadius="6"
-                                    IsChecked="{Binding IsEnabled}"
-                                    HorizontalAlignment="Left">
-
-        </controls:SlideToggleButton>
-
     </StackPanel>
 </UserControl>

@@ -8,6 +8,7 @@ public interface IJobService {
     public void Delete(Guid jobId);
     public JobItemModel[] GetAll();
     public JobItemModel? GetById(Guid jobId);
+    public void Reorder(JobItemModel[] newValues);
 
     public void AddOrUpdateStep(Guid jobId, JobStep step);
     public void DeleteStep(Guid jobId, JobStep step);

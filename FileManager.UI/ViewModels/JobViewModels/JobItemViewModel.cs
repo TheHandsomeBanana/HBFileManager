@@ -6,8 +6,12 @@ using FileManager.UI.Models.JobModels;
 using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
+using HBLibrary.Common;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Services.IO;
+using HBLibrary.Services.Logging;
+using HBLibrary.Services.Logging.Loggers;
 using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
@@ -18,23 +22,39 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
+using System.Xml.Serialization;
 using Unity;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
-public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
+public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemModel>, IDragDropTarget, IDisposable {
+    private readonly IUnityContainer fileManagerContainer;
     private readonly IDialogService dialogService;
     private readonly IJobService jobService;
     private readonly IPluginManager pluginManager;
 
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
-    public RelayCommand EnableAllStepsCommand { get; set; }
-    public RelayCommand DisableAllStepsCommand { get; set; }
 
     public string Name {
         get => Model.Name;
         set {
             Model.Name = value;
+            NotifyPropertyChanged();
+        }
+    }
+    public bool IsEnabled {
+        get => Model.IsEnabled;
+        set {
+            Model.IsEnabled = value;
+            NotifyPropertyChanged();
+
+            CheckCanRun();
+        }
+    }
+    public bool CanRun {
+        get => Model.CanRun;
+        set {
+            Model.CanRun = value;
             NotifyPropertyChanged();
         }
     }
@@ -86,23 +106,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
     public JobStepWrapperViewModel? SelectedStep {
         get => selectedStep;
         set {
-
-            // Remove the event handler for the event "ExecutionOrderChanged" using reflection
-            // No way to access it otherwise -> bad architecture :(
-            if (selectedStep?.StepViewModel is not null) {
-                selectedStep.StepViewModel.GetType()
-                    .GetEvent("ExecutionOrderChanged")?
-                    .RemoveEventHandler(selectedStep.StepViewModel, JobStepViewModel_ExecutionOrderChanged);
-            }
-
             selectedStep = value;
             NotifyPropertyChanged();
-
-            // Add the event handler for the event "ExecutionOrderChanged" using reflection
-            // No way to access it otherwise -> bad architecture :(
-            value?.StepViewModel?.GetType()
-               .GetEvent("ExecutionOrderChanged")?
-               .AddEventHandler(value.StepViewModel, JobStepViewModel_ExecutionOrderChanged);
         }
     }
 
@@ -114,37 +119,47 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
 
 
     public JobItemViewModel(JobItemModel model) : base(model) {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-        this.dialogService = container.Resolve<IDialogService>();
-        this.jobService = container.Resolve<IJobService>();
-        this.pluginManager = container.Resolve<IPluginManager>();
+        fileManagerContainer = UnityBase.GetChildContainer(nameof(FileManager))!;
+        this.dialogService = fileManagerContainer.Resolve<IDialogService>();
+        this.jobService = fileManagerContainer.Resolve<IJobService>();
+        this.pluginManager = fileManagerContainer.Resolve<IPluginManager>();
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
-        EnableAllStepsCommand = new RelayCommand(EnableSteps, true);
-        DisableAllStepsCommand = new RelayCommand(DisableSteps, true);
 
-
-        LoadJobSteps();
 
         stepsView = CollectionViewSource.GetDefaultView(steps);
         stepsView.Filter = FilterJobSteps;
         stepsView.CollectionChanged += StepsView_CollectionChanged;
 
+    }
+
+    protected override async Task InitializeViewModelAsync() {
+        LoadJobSteps();
         SelectedStep = steps.FirstOrDefault();
-    }
 
-    private void DisableSteps(object? obj) {
-        foreach (JobStepWrapperViewModel? step in steps) {
-            // TODO: Fix Model
+
+        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+
+        bool canRun = true;
+        foreach (JobStepWrapperViewModel step in steps) {
+            UnityContainer tempContainer = new UnityContainer();
+
+            IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(step.Model.Name);
+            tempContainer.RegisterInstance(tempLogger);
+            tempContainer.RegisterType<IFileEntryService, FileEntryService>();
+
+
+            ImmutableResultCollection res = await step.Model.ValidateAsync(tempContainer);
+            canRun = canRun && res.IsSuccess;
+            tempContainer.Dispose();
         }
 
+        CanRun = IsEnabled && canRun;
     }
 
-    private void EnableSteps(object? obj) {
-        foreach (JobStepWrapperViewModel? step in steps) {
-            // TODO: Fix Model
-        }
+    protected override void OnException(Exception exception) {
+        // TODO: IMPLEMENT EXCEPTION HANDLING
     }
 
     private void AddStep(object? obj) {
@@ -160,6 +175,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
             steps.Add(stepViewModel);
             jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
             SelectedStep = steps[steps.IndexOf(stepViewModel)];
+
+            stepViewModel.StepContext!.ExecutionOrderChanged += JobStepViewModel_ExecutionOrderChanged;
         }
     }
 
@@ -171,6 +188,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
             MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes) {
+            stepViewModel.StepContext!.ExecutionOrderChanged -= JobStepViewModel_ExecutionOrderChanged;
+
             steps.Remove(stepViewModel);
             jobService.DeleteStep(Model.Id, stepViewModel.Model);
             SelectedStep = steps.FirstOrDefault();
@@ -181,6 +200,8 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
     private void LoadJobSteps() {
         foreach (JobStep step in Model.Steps) {
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(step);
+
+            stepViewModel.StepContext!.ExecutionOrderChanged += JobStepViewModel_ExecutionOrderChanged;
             this.steps.Add(stepViewModel);
         }
     }
@@ -196,13 +217,12 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
         int newIndex = index;
 
         if (target.ExecutionOrder > oldValue) {
-
             while ((newIndex + 1) < steps.Count && target.ExecutionOrder > steps[newIndex + 1].Model.ExecutionOrder) {
                 newIndex++;
             }
         }
-        else if(target.ExecutionOrder < oldValue) {
-            while(newIndex > 0 && target.ExecutionOrder < steps[newIndex - 1].Model.ExecutionOrder) {
+        else if (target.ExecutionOrder < oldValue) {
+            while (newIndex > 0 && target.ExecutionOrder < steps[newIndex - 1].Model.ExecutionOrder) {
                 newIndex--;
             }
         }
@@ -247,5 +267,34 @@ public class JobItemViewModel : ViewModelBase<JobItemModel>, IDragDropTarget {
                 }
             }
         }
+    }
+
+    private void CheckCanRun() {
+        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+
+        bool canRun = IsEnabled;
+
+        foreach (JobStepWrapperViewModel step in steps) {
+            UnityContainer tempContainer = new UnityContainer();
+
+            ILogger tempLogger = loggerFactory.CreateLogger(step.Model.Name);
+            tempContainer.RegisterInstance(tempLogger);
+            tempContainer.RegisterType<IFileEntryService, FileEntryService>();
+
+
+            ImmutableResultCollection res = step.Model.Validate(tempContainer);
+            canRun = canRun && res.IsSuccess;
+            tempContainer.Dispose();
+        }
+
+        CanRun = canRun;
+    }
+
+    public void Dispose() {
+        foreach (JobStepWrapperViewModel step in steps) {
+            step.StepContext!.ExecutionOrderChanged -= JobStepViewModel_ExecutionOrderChanged;
+        }
+
+        stepsView.CollectionChanged -= StepsView_CollectionChanged;
     }
 }

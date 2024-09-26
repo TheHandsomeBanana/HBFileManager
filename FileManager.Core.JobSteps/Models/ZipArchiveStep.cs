@@ -1,21 +1,17 @@
-﻿using FileManager.Core.JobSteps.ViewModels;
+﻿using FileManager.Core.JobSteps.Attributes;
+using FileManager.Core.JobSteps.ViewModels;
 using HBLibrary.Common;
 using HBLibrary.Common.Plugins.Attributes;
 using HBLibrary.Wpf.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
 using Unity;
 
-namespace FileManager.Core.JobSteps.PluginTest;
+namespace FileManager.Core.JobSteps.Models;
 
 [Plugin<JobStep>]
-[PluginTypeName("Update Azure Storage")]
-[PluginDescription("Used to update a specified Azure storage with many adaptions and whatever lorem ipsum")]
-public class UpdateAzureStorage : JobStep {
+[PluginTypeName("ZipArchive")]
+[PluginDescription("With this step you can create ZIP archives")]
+public class ZipArchiveStep : JobStep {
+
     public override void Execute(IUnityContainer container) {
         throw new NotImplementedException();
     }
@@ -24,7 +20,7 @@ public class UpdateAzureStorage : JobStep {
         throw new NotImplementedException();
     }
 
-    public override UserControl? GetJobStepView() {
+    public override System.Windows.Controls.UserControl? GetJobStepView() {
         return null;
     }
 

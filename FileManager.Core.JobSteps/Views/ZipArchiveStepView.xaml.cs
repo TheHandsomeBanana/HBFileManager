@@ -4,8 +4,8 @@ namespace FileManager.Core.JobSteps.Views;
 /// <summary>
 /// Interaction logic for ArchiveStepView.xaml
 /// </summary>
-public partial class ArchiveStepView : UserControl {
-    public ArchiveStepView() {
+public partial class ZipArchiveStepView : UserControl {
+    public ZipArchiveStepView() {
         InitializeComponent();
     }
 }

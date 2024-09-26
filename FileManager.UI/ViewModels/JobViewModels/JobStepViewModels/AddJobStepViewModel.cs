@@ -14,8 +14,8 @@ public class AddJobStepViewModel : ViewModelBase {
             Metadata = PluginManager.GetPluginMetadata(typeof(CopyStep))
         },
         new JobStepInfo {
-            StepType = typeof(ArchiveStep),
-            Metadata = PluginManager.GetPluginMetadata(typeof(ArchiveStep))
+            StepType = typeof(ZipArchiveStep),
+            Metadata = PluginManager.GetPluginMetadata(typeof(ZipArchiveStep))
         }
     ];
 

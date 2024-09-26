@@ -10,6 +10,9 @@
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
+             xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
@@ -26,12 +29,15 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:NullToVisibilityConverter x:Key="n2v" />
+            <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -90,11 +96,63 @@
 
                 </TextBox>
 
-                <ListBox Style="{StaticResource HBDark_ListBox}"
-                         ItemsSource="{Binding JobsView}"
-                         SelectedItem="{Binding SelectedJob}"
-                         Grid.Row="3">
-                    <ListBox.Resources>
+                <ListView Style="{StaticResource HBDark_ListView}"
+                          ItemsSource="{Binding JobsView}"
+                          SelectedItem="{Binding SelectedJob}"
+                          Grid.Row="3"
+                          AllowDrop="True">
+
+                    <i:Interaction.Behaviors>
+                        <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type jobViewModels:JobItemViewModel}" />
+                    </i:Interaction.Behaviors>
+
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Width="25">
+                                <GridViewColumn.Header>
+                                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                               FontWeight="Bold" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
+                                                               FromFill="#ffac14"
+                                                               ToFill="#888484"
+                                                               FromShadowEffect="#ffdf14"
+                                                               ToShadowEffect="Transparent"
+                                                               FromShadowBlurRadius="3"
+                                                               ToShadowBlurRadius="0"
+                                                               Height="20"
+                                                               State="{Binding CanRun}">
+                                            <controls:AnimatedPath.ShadowEffect>
+                                                <DropShadowEffect ShadowDepth="0"
+                                                                  Direction="0" />
+                                            </controls:AnimatedPath.ShadowEffect>
+                                        </controls:AnimatedPath>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+
+                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
+                                <GridViewColumn.Header>
+                                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                               FontWeight="Bold"
+                                               Text="Name" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.Width>
+                                    <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
+                                                  ConverterParameter="*">
+                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
+                                                 Path="ActualWidth" />
+                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
+                                        <Binding RelativeSource="{RelativeSource Self}" />
+                                    </MultiBinding>
+                                </GridViewColumn.Width>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+
+                    <ListView.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                      Style="{StaticResource HBDark_ContextMenu}">
@@ -109,27 +167,23 @@
                                 </menus:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
-                    </ListBox.Resources>
+                    </ListView.Resources>
 
-                    <ListBox.InputBindings>
+                    <ListView.InputBindings>
                         <KeyBinding Key="Delete"
                                     Command="{Binding DeleteJobCommand}"
                                     CommandParameter="{Binding SelectedJob}" />
-                    </ListBox.InputBindings>
+                    </ListView.InputBindings>
 
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem"
-                               BasedOn="{StaticResource HBDark_ListBoxItem}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem"
+                               BasedOn="{StaticResource HBDark_ListViewItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ContextMenu>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ContextMenu>
                         <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
                             <MenuItem Header="Add new job"
                                       Command="{Binding AddJobCommand}">
@@ -140,11 +194,8 @@
                                 </menus:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
-                    </ListBox.ContextMenu>
-                </ListBox>
-
-
-
+                    </ListView.ContextMenu>
+                </ListView>
             </Grid>
         </Border>
 

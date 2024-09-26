@@ -102,4 +102,7 @@ public class JobService : IJobService {
 
         return [.. job.Steps];
     }
+
+    public void Reorder(JobItemModel[] newValues) {
+    }
 }

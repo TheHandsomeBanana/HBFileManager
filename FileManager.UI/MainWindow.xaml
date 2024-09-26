@@ -16,7 +16,7 @@
         Width="1280"
         MinHeight="620"
         MinWidth="620"
-        WindowStyle="SingleBorderWindow"
+        WindowStyle="None"
         ResizeMode="CanResizeWithGrip"
         Background="Transparent"
         WindowStartupLocation="CenterScreen">
