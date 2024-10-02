@@ -135,6 +135,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         SourceItems.CollectionChanged += (_, _) => {
             Model.SourceItems.Clear();
             Model.SourceItems.AddRange(SourceItems);
+            NotifyValidationRequired();
         };
 
         DestinationItems = new ObservableCollection<Entry>(Model.DestinationItems);
@@ -143,6 +144,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         DestinationItems.CollectionChanged += (_, _) => {
             Model.DestinationItems.Clear();
             Model.DestinationItems.AddRange(DestinationItems);
+            NotifyValidationRequired();
         };
 
         BrowseSourceCommand = new RelayCommand(BrowseSource, _ => SourceType is not null);

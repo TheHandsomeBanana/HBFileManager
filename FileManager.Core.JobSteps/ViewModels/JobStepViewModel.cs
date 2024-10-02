@@ -1,4 +1,5 @@
-﻿using HBLibrary.Common.Plugins;
+﻿using HBLibrary.Common.Extensions;
+using HBLibrary.Common.Plugins;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 
@@ -26,17 +27,23 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
         set {
             Model.IsEnabled = value;
             NotifyPropertyChanged();
+
+            if (value && !AsyncValidationRunning) {
+                InvokeAsyncValidation()
+                    .ContinueWith(e => {
+                        IsValid = e.Result;
+                    });
+            }
         }
     }
 
-    public bool CanExecute {
-        get => Model.CanExecute;
-        set { 
-            Model.CanExecute = value;
+    public bool IsValid {
+        get => Model.IsValid;
+        set {
+            Model.IsValid = value;
             NotifyPropertyChanged();
         }
     }
-
 
     public event Action<int, JobStep>? ExecutionOrderChanged;
     public int ExecutionOrder {
@@ -50,9 +57,38 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
         }
     }
 
+    public event Func<JobStep, bool>? ValidationRequired;
+    public event Func<JobStep, Task<bool>>? AsyncValidationRequired;
+
+    public bool ValidationRunning { get; private set; }
+    public bool AsyncValidationRunning { get; private set; }
+
     public PluginMetadata Metadata => PluginManager.GetPluginMetadata(Model.GetType());
 
     public JobStepViewModel(TModel model) : base(model) {
+    }
 
+    public void NotifyValidationRequired() {
+        try {
+            ValidationRunning = true;
+            IsValid = ValidationRequired?.Invoke(Model) ?? false;
+        }
+        finally {
+            ValidationRunning = false;
+        }
+    }
+
+    public async Task NotifyAsyncValidationRequired() {
+        IsValid = await InvokeAsyncValidation();
+    }
+
+    private async Task<bool> InvokeAsyncValidation() {
+        try {
+            AsyncValidationRunning = true;
+            return await (AsyncValidationRequired?.Invoke(Model) ?? Task.FromResult(false));
+        }
+        finally {
+            AsyncValidationRunning = false;
+        }
     }
 }

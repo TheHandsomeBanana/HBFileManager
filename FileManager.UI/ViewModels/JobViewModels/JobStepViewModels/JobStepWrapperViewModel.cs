@@ -3,6 +3,7 @@ using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
+using Unity;
 
 namespace FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 
@@ -30,4 +31,7 @@ public class JobStepWrapperViewModel : ViewModelBase<JobStep> {
         StepContext = Model.GetJobStepDataContext()
             ?? new FallbackStepViewModel(Model);
     }
+
+   
+
 }

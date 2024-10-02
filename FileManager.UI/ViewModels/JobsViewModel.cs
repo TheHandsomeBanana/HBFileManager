@@ -17,7 +17,7 @@ using System.Windows.Data;
 using Unity;
 
 namespace FileManager.UI.ViewModels;
-public sealed class JobsViewModel : ViewModelBase, IDisposable, IDragDropTarget {
+public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDragDropTarget {
     private readonly IJobService jobService;
     private readonly IDialogService dialogService;
     private readonly ObservableCollection<JobItemViewModel> jobs = [];
@@ -57,12 +57,13 @@ public sealed class JobsViewModel : ViewModelBase, IDisposable, IDragDropTarget 
         AddJobCommand = new RelayCommand(AddJob, true);
         DeleteJobCommand = new RelayCommand<JobItemViewModel>(DeleteJob, true);
 
-        LoadJobs();
-
         jobsView = CollectionViewSource.GetDefaultView(jobs);
         jobsView.Filter = FilterJobs;
         jobsView.CollectionChanged += JobsView_CollectionChanged;
+    }
 
+    protected override void InitializeViewModel() {
+        LoadJobs();
         SelectedJob = jobs.FirstOrDefault();
     }
 
@@ -119,6 +120,8 @@ public sealed class JobsViewModel : ViewModelBase, IDisposable, IDragDropTarget 
         foreach(JobItemViewModel job in jobs) {
             job.Dispose();
         }
+
+        JobsView.CollectionChanged -= JobsView_CollectionChanged;
     }
 
     public void MoveItem(object source, object target) {

@@ -41,7 +41,7 @@
                                    FromShadowBlurRadius="3"
                                    ToShadowBlurRadius="0"
                                    Height="30"
-                                   State="{Binding IsEnabled}"
+                                   State="{Binding IsValid}"
                                    HorizontalAlignment="Left">
                 <controls:AnimatedPath.ShadowEffect>
                     <DropShadowEffect ShadowDepth="0" Direction="0"/>

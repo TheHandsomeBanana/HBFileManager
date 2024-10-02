@@ -8,6 +8,7 @@ using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Plugins;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.Logging;
@@ -22,6 +23,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Xml.Serialization;
 using Unity;
 
@@ -48,7 +50,14 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             Model.IsEnabled = value;
             NotifyPropertyChanged();
 
-            CheckCanRun();
+            if (!value) {
+                CanRun = false;
+            }
+            else {
+                CheckAllIsValid()
+                    .ContinueWith(e => CanRun = e.Result, TaskContinuationOptions.OnlyOnRanToCompletion)
+                    .FireAndForget(OnInitializeException);
+            }
         }
     }
     public bool CanRun {
@@ -102,6 +111,19 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     }
 
 
+    public FlowDocument? ValidationLog { get; }
+    private bool validationLogVisible;
+
+    public bool ValidationLogVisible {
+        get { return validationLogVisible; }
+        set { 
+            validationLogVisible = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+
+
     private JobStepWrapperViewModel? selectedStep;
     public JobStepWrapperViewModel? SelectedStep {
         get => selectedStep;
@@ -117,7 +139,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     public ICollectionView StepsView => stepsView;
 
 
-
     public JobItemViewModel(JobItemModel model) : base(model) {
         fileManagerContainer = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = fileManagerContainer.Resolve<IDialogService>();
@@ -131,34 +152,24 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
         stepsView = CollectionViewSource.GetDefaultView(steps);
         stepsView.Filter = FilterJobSteps;
         stepsView.CollectionChanged += StepsView_CollectionChanged;
-
     }
 
     protected override async Task InitializeViewModelAsync() {
         LoadJobSteps();
         SelectedStep = steps.FirstOrDefault();
 
-
-        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
-
         bool canRun = true;
         foreach (JobStepWrapperViewModel step in steps) {
-            UnityContainer tempContainer = new UnityContainer();
+            ImmutableResultCollection res = await ValidateAsync(step.Model);
 
-            IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(step.Model.Name);
-            tempContainer.RegisterInstance(tempLogger);
-            tempContainer.RegisterType<IFileEntryService, FileEntryService>();
-
-
-            ImmutableResultCollection res = await step.Model.ValidateAsync(tempContainer);
+            // TODO: Handle faulted result
             canRun = canRun && res.IsSuccess;
-            tempContainer.Dispose();
         }
 
         CanRun = IsEnabled && canRun;
     }
 
-    protected override void OnException(Exception exception) {
+    protected override void OnInitializeException(Exception exception) {
         // TODO: IMPLEMENT EXCEPTION HANDLING
     }
 
@@ -168,18 +179,20 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
 
         bool result = dialogService.ShowCompactDialog(addJobView, addJobViewModel, "Add Step");
         if (result == true) {
-            JobStep? jobStep = Activator.CreateInstance(addJobViewModel.SelectedStepType!.StepType!) as JobStep;
-            jobStep!.Name = addJobViewModel.Name;
+            JobStep jobStep = (JobStep)Activator.CreateInstance(addJobViewModel.SelectedStepType!.StepType!)!;
+            jobStep.IsValid = true;
+            jobStep.Name = addJobViewModel.Name;
 
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(jobStep);
             steps.Add(stepViewModel);
             jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
             SelectedStep = steps[steps.IndexOf(stepViewModel)];
 
-            stepViewModel.StepContext!.ExecutionOrderChanged += JobStepViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ExecutionOrderChanged += JobItemViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ValidationRequired += JobItemViewModel_ValidationRequired;
+            stepViewModel.StepContext!.AsyncValidationRequired += JobItemViewModel_AsyncValidationRequired;
         }
     }
-
 
     public void DeleteStep(JobStepWrapperViewModel stepViewModel) {
         MessageBoxResult result = HBDarkMessageBox.Show("Delete step",
@@ -188,25 +201,32 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes) {
-            stepViewModel.StepContext!.ExecutionOrderChanged -= JobStepViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ExecutionOrderChanged -= JobItemViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ValidationRequired -= JobItemViewModel_ValidationRequired;
+            stepViewModel.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
 
             steps.Remove(stepViewModel);
             jobService.DeleteStep(Model.Id, stepViewModel.Model);
             SelectedStep = steps.FirstOrDefault();
+
+            CheckAllIsValid()
+                .ContinueWith(e => CanRun = e.Result, TaskContinuationOptions.OnlyOnRanToCompletion)
+                .FireAndForget(OnInitializeException);
         }
     }
-
 
     private void LoadJobSteps() {
         foreach (JobStep step in Model.Steps) {
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(step);
 
-            stepViewModel.StepContext!.ExecutionOrderChanged += JobStepViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ExecutionOrderChanged += JobItemViewModel_ExecutionOrderChanged;
+            stepViewModel.StepContext!.ValidationRequired += JobItemViewModel_ValidationRequired;
+            stepViewModel.StepContext!.AsyncValidationRequired += JobItemViewModel_AsyncValidationRequired;
             this.steps.Add(stepViewModel);
         }
     }
 
-    private void JobStepViewModel_ExecutionOrderChanged(int oldValue, JobStep target) {
+    private void JobItemViewModel_ExecutionOrderChanged(int oldValue, JobStep target) {
         JobStepWrapperViewModel? foundVM = steps.FirstOrDefault(e => e.Model == target);
 
         if (foundVM is null) {
@@ -269,32 +289,77 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
         }
     }
 
-    private void CheckCanRun() {
-        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
-
-        bool canRun = IsEnabled;
-
-        foreach (JobStepWrapperViewModel step in steps) {
-            UnityContainer tempContainer = new UnityContainer();
-
-            ILogger tempLogger = loggerFactory.CreateLogger(step.Model.Name);
-            tempContainer.RegisterInstance(tempLogger);
-            tempContainer.RegisterType<IFileEntryService, FileEntryService>();
-
-
-            ImmutableResultCollection res = step.Model.Validate(tempContainer);
-            canRun = canRun && res.IsSuccess;
-            tempContainer.Dispose();
-        }
-
-        CanRun = canRun;
-    }
-
     public void Dispose() {
         foreach (JobStepWrapperViewModel step in steps) {
-            step.StepContext!.ExecutionOrderChanged -= JobStepViewModel_ExecutionOrderChanged;
+            step.StepContext!.ExecutionOrderChanged -= JobItemViewModel_ExecutionOrderChanged;
+            step.StepContext!.ValidationRequired -= JobItemViewModel_ValidationRequired;
+            step.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
         }
 
         stepsView.CollectionChanged -= StepsView_CollectionChanged;
     }
+
+    #region Validation Logic
+    private async Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {
+        ImmutableResultCollection res = await ValidateAsync(arg);
+        // TODO: Handle faulted case
+
+        CanRun = res.IsSuccess;
+        
+
+        return res.IsSuccess;
+    }
+
+    private bool JobItemViewModel_ValidationRequired(JobStep jobStep) {
+        ImmutableResultCollection res = Validate(jobStep);
+
+        CanRun = res.IsSuccess;
+
+        // TODO: Handle faulted case
+        return res.IsSuccess;
+    }
+
+    private ImmutableResultCollection Validate(JobStep jobStep) {
+        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+        UnityContainer tempContainer = new UnityContainer();
+
+        ILogger tempLogger = loggerFactory.CreateLogger(jobStep.Name);
+        tempContainer.RegisterInstance(tempLogger);
+        tempContainer.RegisterType<IFileEntryService, FileEntryService>();
+
+        ImmutableResultCollection res = jobStep.Validate(tempContainer);
+
+        tempContainer.Dispose();
+        return res;
+    }
+
+    private async Task<ImmutableResultCollection> ValidateAsync(JobStep jobStep) {
+        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+        UnityContainer tempContainer = new UnityContainer();
+
+        IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(jobStep.Name);
+        tempContainer.RegisterInstance(tempLogger);
+        tempContainer.RegisterType<IFileEntryService, FileEntryService>();
+
+        ImmutableResultCollection res = await jobStep.ValidateAsync(tempContainer);
+
+        tempContainer.Dispose();
+        return res;
+    }
+
+    private async Task<bool> CheckAllIsValid() {
+        bool canRun = true;
+
+        foreach (JobStepWrapperViewModel step in steps) {
+            while (step.StepContext!.AsyncValidationRunning || step.StepContext.ValidationRunning) {
+                // Wait for Validation to finish
+                await Task.Delay(100);
+            }
+
+            canRun = canRun && step.StepContext.IsValid;
+        }
+
+        return canRun;
+    }
+    #endregion
 }

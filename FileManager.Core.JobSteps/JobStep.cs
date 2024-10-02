@@ -21,7 +21,7 @@ public abstract class JobStep : IJobStep {
     public string Name { get; set; } = "";
     public bool IsAsync { get; set; }
     public bool IsEnabled { get; set; }
-    public bool CanExecute { get; set; }
+    public bool IsValid { get; set; }
     public int ExecutionOrder { get; set; }
 
     public abstract void Execute(IUnityContainer container);

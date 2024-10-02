@@ -29,10 +29,12 @@ public class ZipArchiveStep : JobStep {
     }
 
     public override ImmutableResultCollection Validate(IUnityContainer container) {
+        Thread.Sleep(2000);
         return ImmutableResultCollection.Ok();
     }
 
-    public override Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container) {
-        return Task.FromResult(ImmutableResultCollection.Ok());
+    public override async Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container) {
+        await Task.Delay(2000);
+        return ImmutableResultCollection.Ok();
     }
 }

@@ -1,4 +1,4 @@
-﻿using HBLibrary.Common.Initializer;
+﻿using FileManager.UI.ViewModels.JobViewModels;
 using System.Windows.Controls;
 
 namespace FileManager.UI.Views.JobViews;
@@ -7,20 +7,15 @@ namespace FileManager.UI.Views.JobViews;
 /// </summary>
 public partial class JobItemView : UserControl {
     public JobItemView() {
+        this.DataContextChanged += JobItemView_DataContextChanged;
         InitializeComponent();
-        this.Loaded += JobItemView_Loaded;
-        this.Unloaded += JobItemView_Unloaded;
     }
 
-    private async void JobItemView_Loaded(object sender, System.Windows.RoutedEventArgs e) {
-        if (DataContext is IAsyncInitializer initializer) {
-            await initializer.InitializeAsync();
-        }
-    }
-
-    private void JobItemView_Unloaded(object sender, System.Windows.RoutedEventArgs e) {
-        if(DataContext is IDisposable disposableDataContext) {
-            disposableDataContext.Dispose();
-        }
+    private void JobItemView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e) {
+        if (e.NewValue is JobItemViewModel jobItemViewModel && !jobItemViewModel.IsInitialized) {
+            this.Dispatcher.InvokeAsync(async () => {
+                await jobItemViewModel.InitializeAsync();
+            });
+        };
     }
 }

@@ -68,6 +68,10 @@ public class JobService : IJobService {
 
         job.Steps.Remove(step);
     }
+    
+    public void DeleteStep(JobItemModel job, JobStep step) {
+        job.Steps.Remove(step);
+    }
 
 
     public void DeleteStep(JobStep step) {
@@ -101,8 +105,5 @@ public class JobService : IJobService {
         JobItemModel? job = GetById(jobId) ?? throw new InvalidOperationException($"Could not find job with id {jobId}");
 
         return [.. job.Steps];
-    }
-
-    public void Reorder(JobItemModel[] newValues) {
     }
 }

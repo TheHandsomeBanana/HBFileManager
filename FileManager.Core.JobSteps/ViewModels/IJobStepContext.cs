@@ -7,10 +7,15 @@ using System.Threading.Tasks;
 namespace FileManager.Core.JobSteps.ViewModels;
 
 public interface IJobStepContext {
-    public string Name { get; }
-    public bool IsAsync { get; }
-    public bool IsEnabled { get; }
-    public bool CanExecute { get; }
-    public int ExecutionOrder { get; }
+    public string Name { get; set; }
+    public bool IsAsync { get; set; }
+    public bool IsEnabled { get; set; }
+    public bool IsValid { get; set; }
+    public int ExecutionOrder { get; set; }
     public event Action<int, JobStep>? ExecutionOrderChanged;
+    public event Func<JobStep, bool>? ValidationRequired;
+    public event Func<JobStep, Task<bool>>? AsyncValidationRequired;
+    public bool ValidationRunning { get; }
+    public bool AsyncValidationRunning { get; }
+
 }

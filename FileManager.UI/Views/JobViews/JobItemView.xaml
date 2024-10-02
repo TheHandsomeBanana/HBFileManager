@@ -26,6 +26,8 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/RichTextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Expander/Expanders.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
@@ -70,7 +72,7 @@
                                            Height="30"
                                            IconHeight="30"
                                            IconWidth="30"
-                                           IsChecked="{Binding IsEnabled, Mode=TwoWay, FallbackValue=False}"
+                                           IsChecked="{Binding IsEnabled}"
                                            FromFill="#50c4fd"
                                            ToFill="#fd0000"
                                            FromShadowEffect="#50ffff"
@@ -202,7 +204,7 @@
                                 <GridViewColumn Width="55">
                                     <GridViewColumn.Header>
                                         <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                                   FontWeight="Bold"/>
+                                                   FontWeight="Bold" />
                                     </GridViewColumn.Header>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
@@ -218,7 +220,7 @@
                                 <GridViewColumn Width="25">
                                     <GridViewColumn.Header>
                                         <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                                   FontWeight="Bold"/>
+                                                   FontWeight="Bold" />
                                     </GridViewColumn.Header>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
@@ -230,7 +232,7 @@
                                                                    FromShadowBlurRadius="3"
                                                                    ToShadowBlurRadius="0"
                                                                    Height="20"
-                                                                   State="{Binding StepContext.IsEnabled}">
+                                                                   State="{Binding StepContext.IsValid}">
                                                 <controls:AnimatedPath.ShadowEffect>
                                                     <DropShadowEffect ShadowDepth="0"
                                                                       Direction="0" />
@@ -311,18 +313,32 @@
                 </Grid>
             </Border>
 
-            <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
-                          scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
-                          scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
-                          scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          Padding="0 0 20 10"
-                          Grid.Column="1"
-                          Margin="10 0 0 0">
+            <StackPanel Grid.Column="1"
+                        Orientation="Vertical">
 
-                <ContentControl Content="{Binding SelectedStep.StepView}" />
-            </ScrollViewer>
+                <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                              scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                              scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                              scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="0 0 20 10"
+                              Margin="10 0 0 0"
+                              PanningMode="Both">
+
+                    <ContentControl Content="{Binding SelectedStep.StepView}" />
+                </ScrollViewer>
+
+                <Expander Style="{StaticResource HBDark_Expander}"
+                          Header="Validation Log"
+                          IsExpanded="{Binding ValidationLogVisible}"
+                          ExpandDirection="Down">
+                    <RichTextBox Style="{StaticResource HBDark_RichTextBox}"
+                                 IsReadOnlyCaretVisible="True">
+
+                    </RichTextBox>
+                </Expander>
+            </StackPanel>
         </Grid>
     </Grid>
 

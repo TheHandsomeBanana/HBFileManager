@@ -106,7 +106,9 @@ public class CopyStep : JobStep {
             }
         }
 
-        return results;
+        return results.Count != 0 
+            ? results 
+            : ImmutableResultCollection.Ok();
     }
 
     public override Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container) {
@@ -145,7 +147,9 @@ public class CopyStep : JobStep {
         }
 
 
-        return Task.FromResult(results.ToImmutableResultCollection());
+        return results.Count != 0 
+            ? Task.FromResult(results.ToImmutableResultCollection())
+            : Task.FromResult(ImmutableResultCollection.Ok());
     }
 
 
