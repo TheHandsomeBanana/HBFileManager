@@ -86,10 +86,8 @@ namespace FileManager.UI {
             container.RegisterInstance(commonAppSettings, new SingletonLifetimeManager());
         }
         private static void AddNavigation(IUnityContainer container) {
-            INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder();
-            storeBuilder.DisposeOnLeave();
-                //.AddDefaultViewModel(nameof(MainViewModel), new ExplorerViewModel())
-                //.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
+            INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder()
+                .DisposeOnLeave();
 
             container.RegisterInstance(storeBuilder.Build());
             container.RegisterType<INavigationService, NavigationService>();
