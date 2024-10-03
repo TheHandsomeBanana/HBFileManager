@@ -57,12 +57,12 @@ public class MainViewModel : ViewModelBase {
         NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
 
 
-        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
 
         SaveApplicationStateCommand = new RelayCommand(SaveApplicationState, true);
         OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview, true);
 
         NavigateToExplorerCommand.Execute(NavigateCommandParameter);
+        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
 
         Application.Current.Dispatcher.InvokeAsync(() => {
             pluginManager.LoadAssemblies();

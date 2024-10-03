@@ -20,6 +20,7 @@ using HBLibrary.Services.IO.Storage.Settings;
 using HBLibrary.Services.Logging;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.Services.NavigationService;
+using HBLibrary.Wpf.Services.NavigationService.Builder;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.ViewModels.Login;
 using HBLibrary.Wpf.Views;
@@ -85,11 +86,13 @@ namespace FileManager.UI {
             container.RegisterInstance(commonAppSettings, new SingletonLifetimeManager());
         }
         private static void AddNavigation(IUnityContainer container) {
-            NavigationStore navigationStore = new NavigationStore();
-            navigationStore.AddDefaultViewModel(nameof(MainViewModel), new ExplorerViewModel());
-            navigationStore.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
-            container.RegisterInstance<INavigationStore>(navigationStore);
-            container.RegisterSingleton<INavigationService, NavigationService>();
+            INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder();
+            storeBuilder.DisposeOnLeave();
+                //.AddDefaultViewModel(nameof(MainViewModel), new ExplorerViewModel())
+                //.AddDefaultViewModel(nameof(SettingsViewModel), new SettingsEnvironmentViewModel());
+
+            container.RegisterInstance(storeBuilder.Build());
+            container.RegisterType<INavigationService, NavigationService>();
         }
         private static void AddLogging(IUnityContainer container) {
             ILoggerRegistry registry = LoggerRegistry.FromConfiguration(e => e.Build());

@@ -314,7 +314,8 @@
             </Border>
 
             <StackPanel Grid.Column="1"
-                        Orientation="Vertical">
+                        Orientation="Vertical"
+                        Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}">
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
                               scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"

@@ -23,8 +23,6 @@ public class SettingsViewModel : ViewModelBase {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         INavigationService navigationService = container.Resolve<INavigationService>();
 
-        this.navigationStore = container.Resolve<INavigationStore>();
-        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
         settingsService = container.Resolve<ISettingsService>();
 
         SettingsEnvironmentModel environmentModel = settingsService.GetOrSetNew(() => new SettingsEnvironmentModel());
@@ -36,6 +34,9 @@ public class SettingsViewModel : ViewModelBase {
         NavigateToPluginsCommand = new NavigateCommand<SettingsPluginsViewModel>(navigationService, () => new SettingsPluginsViewModel());
 
         NavigateToEnvironmentCommand.Execute(NavigateCommandParameter);
+
+        this.navigationStore = container.Resolve<INavigationStore>();
+        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
     }
 
     private void SettingsViewModel_CurrentViewModelChanged() {
