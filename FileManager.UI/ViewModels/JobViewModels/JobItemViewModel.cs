@@ -13,6 +13,7 @@ using HBLibrary.Common.Plugins;
 using HBLibrary.Services.IO;
 using HBLibrary.Services.Logging;
 using HBLibrary.Services.Logging.Loggers;
+using HBLibrary.Wpf;
 using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
@@ -21,6 +22,7 @@ using HBLibrary.Wpf.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
+using System.Security.RightsManagement;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -36,6 +38,8 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
 
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
+    public AsyncRelayCommand<JobStepWrapperViewModel> ValidateStepCommand { get; set; }
+    public RelayCommand ClearValidationLogCommand { get; set; }
 
     public string Name {
         get => Model.Name;
@@ -111,12 +115,13 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     }
 
 
-    public FlowDocument? ValidationLog { get; }
-    private bool validationLogVisible;
+    public LogFlowDocument ValidationLog { get; } = new LogFlowDocument();
 
+
+    private bool validationLogVisible;
     public bool ValidationLogVisible {
         get { return validationLogVisible; }
-        set { 
+        set {
             validationLogVisible = value;
             NotifyPropertyChanged();
         }
@@ -134,7 +139,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     }
 
 
-    private readonly ObservableCollection<JobStepWrapperViewModel> steps = [];
+    public ObservableCollection<JobStepWrapperViewModel> Steps { get; } = [];
     private readonly ICollectionView stepsView;
     public ICollectionView StepsView => stepsView;
 
@@ -147,30 +152,37 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
+        ValidateStepCommand = new AsyncRelayCommand<JobStepWrapperViewModel>(ValidateStep, CanExecuteValidation, OnValidationException);
+        ClearValidationLogCommand = new RelayCommand(ClearValidationLog, true);
 
-
-        stepsView = CollectionViewSource.GetDefaultView(steps);
+        stepsView = CollectionViewSource.GetDefaultView(Steps);
         stepsView.Filter = FilterJobSteps;
         stepsView.CollectionChanged += StepsView_CollectionChanged;
     }
 
     protected override async Task InitializeViewModelAsync() {
         LoadJobSteps();
-        SelectedStep = steps.FirstOrDefault();
+        SelectedStep = Steps.FirstOrDefault();
 
         bool canRun = true;
-        foreach (JobStepWrapperViewModel step in steps) {
-            ImmutableResultCollection res = await ValidateAsync(step.Model);
+        List<Task<bool>> validationTasks = [];
+        foreach (JobStepWrapperViewModel step in Steps) {
+            validationTasks.Add(ValidateJobStepAsync(step.Model));
+        }
 
-            // TODO: Handle faulted result
-            canRun = canRun && res.IsSuccess;
+        bool[] res = await Task.WhenAll(validationTasks);
+        for (int i = 0; i < res.Length; i++) {
+            canRun &= res[i];
         }
 
         CanRun = IsEnabled && canRun;
     }
 
     protected override void OnInitializeException(Exception exception) {
-        // TODO: IMPLEMENT EXCEPTION HANDLING
+        HBDarkMessageBox.Show("Initialization error", 
+            exception.Message, 
+            MessageBoxButton.OK, 
+            MessageBoxImage.Error);
     }
 
     private void AddStep(object? obj) {
@@ -184,9 +196,9 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             jobStep.Name = addJobViewModel.Name;
 
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(jobStep);
-            steps.Add(stepViewModel);
+            Steps.Add(stepViewModel);
             jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
-            SelectedStep = steps[steps.IndexOf(stepViewModel)];
+            SelectedStep = Steps[Steps.IndexOf(stepViewModel)];
 
             stepViewModel.StepContext!.ExecutionOrderChanged += JobItemViewModel_ExecutionOrderChanged;
             stepViewModel.StepContext!.ValidationRequired += JobItemViewModel_ValidationRequired;
@@ -205,15 +217,17 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             stepViewModel.StepContext!.ValidationRequired -= JobItemViewModel_ValidationRequired;
             stepViewModel.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
 
-            steps.Remove(stepViewModel);
+            Steps.Remove(stepViewModel);
             jobService.DeleteStep(Model.Id, stepViewModel.Model);
-            SelectedStep = steps.FirstOrDefault();
+            SelectedStep = Steps.FirstOrDefault();
 
             CheckAllIsValid()
                 .ContinueWith(e => CanRun = e.Result, TaskContinuationOptions.OnlyOnRanToCompletion)
                 .FireAndForget(OnInitializeException);
         }
     }
+
+    
 
     private void LoadJobSteps() {
         foreach (JobStep step in Model.Steps) {
@@ -222,38 +236,38 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             stepViewModel.StepContext!.ExecutionOrderChanged += JobItemViewModel_ExecutionOrderChanged;
             stepViewModel.StepContext!.ValidationRequired += JobItemViewModel_ValidationRequired;
             stepViewModel.StepContext!.AsyncValidationRequired += JobItemViewModel_AsyncValidationRequired;
-            this.steps.Add(stepViewModel);
+            this.Steps.Add(stepViewModel);
         }
     }
 
     private void JobItemViewModel_ExecutionOrderChanged(int oldValue, JobStep target) {
-        JobStepWrapperViewModel? foundVM = steps.FirstOrDefault(e => e.Model == target);
+        JobStepWrapperViewModel? foundVM = Steps.FirstOrDefault(e => e.Model == target);
 
         if (foundVM is null) {
             return;
         }
 
-        int index = steps.IndexOf(foundVM);
+        int index = Steps.IndexOf(foundVM);
         int newIndex = index;
 
         if (target.ExecutionOrder > oldValue) {
-            while ((newIndex + 1) < steps.Count && target.ExecutionOrder > steps[newIndex + 1].Model.ExecutionOrder) {
+            while ((newIndex + 1) < Steps.Count && target.ExecutionOrder > Steps[newIndex + 1].Model.ExecutionOrder) {
                 newIndex++;
             }
         }
         else if (target.ExecutionOrder < oldValue) {
-            while (newIndex > 0 && target.ExecutionOrder < steps[newIndex - 1].Model.ExecutionOrder) {
+            while (newIndex > 0 && target.ExecutionOrder < Steps[newIndex - 1].Model.ExecutionOrder) {
                 newIndex--;
             }
         }
 
         if (newIndex != index) {
-            steps.Move(index, newIndex);
-            SelectedStep = steps[newIndex];
+            Steps.Move(index, newIndex);
+            SelectedStep = Steps[newIndex];
 
             // Apply new indexed list
             Model.Steps.Clear();
-            Model.Steps.AddRange(steps.Select(e => e.Model));
+            Model.Steps.AddRange(Steps.Select(e => e.Model));
         }
     }
 
@@ -270,17 +284,17 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
 
     public void MoveItem(object source, object target) {
         if (source is JobStepWrapperViewModel sourceItem && target is JobStepWrapperViewModel targetItem) {
-            int oldIndex = steps.IndexOf(sourceItem);
-            int newIndex = steps.IndexOf(targetItem);
+            int oldIndex = Steps.IndexOf(sourceItem);
+            int newIndex = Steps.IndexOf(targetItem);
 
             if (oldIndex != newIndex) {
-                steps.Move(oldIndex, newIndex);
+                Steps.Move(oldIndex, newIndex);
                 NotifyPropertyChanged(nameof(StepsView));
                 SelectedStep = sourceItem;
 
                 // Apply new indexed list
                 Model.Steps.Clear();
-                Model.Steps.AddRange(steps.Select(e => e.Model));
+                Model.Steps.AddRange(Steps.Select(e => e.Model));
 
                 if (targetItem.Model.ExecutionOrder != sourceItem.Model.ExecutionOrder) {
                     sourceItem.Model.ExecutionOrder = targetItem.Model.ExecutionOrder;
@@ -290,7 +304,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     }
 
     public void Dispose() {
-        foreach (JobStepWrapperViewModel step in steps) {
+        foreach (JobStepWrapperViewModel step in Steps) {
             step.StepContext!.ExecutionOrderChanged -= JobItemViewModel_ExecutionOrderChanged;
             step.StepContext!.ValidationRequired -= JobItemViewModel_ValidationRequired;
             step.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
@@ -300,23 +314,58 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     }
 
     #region Validation Logic
-    private async Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {
-        ImmutableResultCollection res = await ValidateAsync(arg);
-        // TODO: Handle faulted case
+    private void ClearValidationLog(object? obj) {
+        ValidationLog.Clear();
+    }
+
+    private Task ValidateStep(JobStepWrapperViewModel model) {
+        return ValidateJobStepAsync(model.Model);
+    }
+
+    private bool CanExecuteValidation(JobStepWrapperViewModel obj) {
+        return !(obj.StepContext?.ValidationRunning ?? true) && !(obj.StepContext?.AsyncValidationRunning ?? true);
+    }
+
+    private void OnValidationException(Exception exception) {
+        HBDarkMessageBox.Show("Validation error",
+                    exception.Message,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+    }
+
+    public bool ValidateJobStep(JobStep jobStep) {
+        ValidationLogVisible = true;
+        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+
+        ImmutableResultCollection res = Validate(jobStep);
+        HandleLogs(res, jobStep);
 
         CanRun = res.IsSuccess;
-        
+
+        // TODO: Handle faulted case
+        return res.IsSuccess;
+    }
+
+    public async Task<bool> ValidateJobStepAsync(JobStep jobStep) {
+        Application.Current.Dispatcher.Invoke(() => ValidationLogVisible = true);
+
+        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+
+        ImmutableResultCollection res = await ValidateAsync(jobStep);
+
+        HandleLogs(res, jobStep);
+
+        CanRun = res.IsSuccess;
 
         return res.IsSuccess;
     }
 
+    private Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {
+        return ValidateJobStepAsync(arg);
+    }
+
     private bool JobItemViewModel_ValidationRequired(JobStep jobStep) {
-        ImmutableResultCollection res = Validate(jobStep);
-
-        CanRun = res.IsSuccess;
-
-        // TODO: Handle faulted case
-        return res.IsSuccess;
+        return ValidateJobStep(jobStep);
     }
 
     private ImmutableResultCollection Validate(JobStep jobStep) {
@@ -350,7 +399,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     private async Task<bool> CheckAllIsValid() {
         bool canRun = true;
 
-        foreach (JobStepWrapperViewModel step in steps) {
+        foreach (JobStepWrapperViewModel step in Steps) {
             while (step.StepContext!.AsyncValidationRunning || step.StepContext.ValidationRunning) {
                 // Wait for Validation to finish
                 await Task.Delay(100);
@@ -360,6 +409,25 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
         }
 
         return canRun;
+    }
+
+    private void HandleLogs(ImmutableResultCollection res, JobStep arg) {
+        if (res.IsSuccess) {
+            ValidationLog.AddSuccessParagraph($"{arg.Name} validated successfully");
+        }
+        else {
+            ValidationLog.AddErrorParagraph($"{arg.Name} validation error:");
+
+            foreach (Result result in res) {
+                result.TapError(e => {
+                    ValidationLog.AddParagraph(new Paragraph(new Run("- " + e.Message)) {
+                        TextIndent = 10,
+                        Margin = ValidationLog.ParagraphMargin,
+                        Foreground = ValidationLog.ErrorBrush
+                    });
+                });
+            }
+        }
     }
     #endregion
 }

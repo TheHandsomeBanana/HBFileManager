@@ -10,7 +10,7 @@ namespace FileManager.UI.ViewModels;
 public class SettingsViewModel : ViewModelBase {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
-    public ViewModelBase CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
+    public ViewModelBase? CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
     public string NavigateCommandParameter => nameof(SettingsViewModel);
 
 

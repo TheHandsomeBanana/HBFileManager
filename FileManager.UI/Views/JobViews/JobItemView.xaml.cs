@@ -1,5 +1,7 @@
 ﻿using FileManager.UI.ViewModels.JobViewModels;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace FileManager.UI.Views.JobViews;
 /// <summary>
@@ -13,9 +15,7 @@ public partial class JobItemView : UserControl {
 
     private void JobItemView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e) {
         if (e.NewValue is JobItemViewModel jobItemViewModel && !jobItemViewModel.IsInitialized) {
-            this.Dispatcher.InvokeAsync(async () => {
-                await jobItemViewModel.InitializeAsync();
-            });
+            this.Dispatcher.InvokeAsync(jobItemViewModel.InitializeAsync);
         };
     }
 }

@@ -15,8 +15,7 @@
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
-             d:DesignWidth="800"
-             IsEnabled="{Binding SelectedJob.IsInitialized, FallbackValue=True}">
+             d:DesignWidth="800">
     <!--<UserControl.DataContext>
         <viewModels:JobsViewModel/>
     </UserControl.DataContext>-->
@@ -50,10 +49,11 @@
         </Grid.ColumnDefinitions>
 
         <Border Style="{StaticResource HBDark_ControlBorder}"
-                Grid.Column="0">
+                Grid.Column="0"
+                IsEnabled="{Binding SelectedJob.IsInitialized, FallbackValue=True}">
+
+
             <Grid Margin="5">
-
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="30" />
                     <RowDefinition Height="30" />
@@ -87,6 +87,20 @@
                                         IconFill="{StaticResource VSRed}"
                                         Command="{Binding DeleteJobCommand}"
                                         CommandParameter="{Binding SelectedJob}">
+                    </buttons:IconButton>
+
+                    <buttons:IconButton BorderThickness="1"
+                                        Visibility="{Binding SelectedJob, Converter={StaticResource n2v}}"
+                                        ToolTip="Validate job"
+                                        Height="24"
+                                        Width="24"
+                                        IconHeight="18"
+                                        IconStretch="Uniform"
+                                        IconData="M11 15H6L13 1V9H18L11 23V15Z"
+                                        IconFill="#ffac14"
+                                        Command="{Binding ValidateJobCommand}"
+                                        CommandParameter="{Binding SelectedJob}">
+                        
                     </buttons:IconButton>
                 </StackPanel>
 

@@ -32,7 +32,7 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
                 InvokeAsyncValidation()
                     .ContinueWith(e => {
                         IsValid = e.Result;
-                    });
+                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
     }

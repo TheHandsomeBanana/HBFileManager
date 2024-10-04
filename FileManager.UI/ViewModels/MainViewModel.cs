@@ -21,7 +21,7 @@ public class MainViewModel : ViewModelBase {
     private readonly IApplicationStorage applicationStorage;
     private readonly IPluginManager pluginManager;
     private readonly CommonAppSettings commonAppSettings;
-    public ViewModelBase CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
+    public ViewModelBase? CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
     public NavigateCommand<ExplorerViewModel> NavigateToExplorerCommand { get; set; }
     public NavigateCommand<JobsViewModel> NavigateToJobsCommand { get; set; }

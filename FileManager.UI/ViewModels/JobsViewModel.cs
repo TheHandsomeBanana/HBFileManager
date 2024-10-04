@@ -24,6 +24,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
     public RelayCommand AddJobCommand { get; set; }
     public RelayCommand<JobItemViewModel> DeleteJobCommand { get; set; }
+    public AsyncRelayCommand<JobItemViewModel> ValidateJobCommand { get; set; }
 
 
     private JobItemViewModel? selectedJob;
@@ -56,10 +57,31 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
         AddJobCommand = new RelayCommand(AddJob, true);
         DeleteJobCommand = new RelayCommand<JobItemViewModel>(DeleteJob, true);
+        ValidateJobCommand = new AsyncRelayCommand<JobItemViewModel>(ValidateJob, ValidationCanRun, OnValidationException);
 
         jobsView = CollectionViewSource.GetDefaultView(jobs);
         jobsView.Filter = FilterJobs;
         jobsView.CollectionChanged += JobsView_CollectionChanged;
+    }
+
+    private void OnValidationException(Exception exception) {
+        HBDarkMessageBox.Show("Validation error", 
+            exception.Message,
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+    }
+
+    private Task ValidateJob(JobItemViewModel model) {
+        List<Task> validationTasks = [];
+        foreach(JobStepWrapperViewModel step in model.Steps) {
+            validationTasks.Add(model.ValidateJobStepAsync(step.Model));
+        }
+
+        return Task.WhenAll(validationTasks);
+    }
+
+    private bool ValidationCanRun(JobItemViewModel obj) {
+        return obj.Steps.All(e => !(e.StepContext?.ValidationRunning ?? false) && !(e.StepContext?.AsyncValidationRunning ?? false));
     }
 
     protected override void InitializeViewModel() {
@@ -117,7 +139,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     public void Dispose() {
-        foreach(JobItemViewModel job in jobs) {
+        foreach (JobItemViewModel job in jobs) {
             job.Dispose();
         }
 

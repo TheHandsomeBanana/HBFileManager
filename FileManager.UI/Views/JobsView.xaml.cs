@@ -7,16 +7,14 @@ namespace FileManager.UI.Views;
 /// </summary>
 public partial class JobsView : UserControl {
     public JobsView() {
-        this.Loaded += JobsView_Loaded; ;
+        this.Loaded += JobsView_Loaded;
         InitializeComponent();
     }
 
     // Disposal is handled by NavigationService
     private void JobsView_Loaded(object sender, System.Windows.RoutedEventArgs e) {
         if (DataContext is JobsViewModel newJobsViewModel) {
-            this.Dispatcher.InvokeAsync(() => {
-                newJobsViewModel.Initialize();
-            });
+            this.Dispatcher.InvokeAsync(newJobsViewModel.Initialize);
         }
     }
 }

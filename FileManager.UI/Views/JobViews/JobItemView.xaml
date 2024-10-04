@@ -12,6 +12,7 @@
              xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
+             xmlns:textBox="clr-namespace:HBLibrary.Wpf.Styles.TextBox;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="500"
@@ -43,304 +44,370 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Margin="10 10 10 0">
+    <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                  scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+        <Grid Margin="10 10 10 0">
 
-        <StackPanel Orientation="Vertical"
-                    Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
-                       Text="Properties"
-                       Margin="0 0 0 10">
-            </TextBlock>
+            <StackPanel Orientation="Vertical"
+                        Grid.Row="0"
+                        IsEnabled="{Binding IsInitialized, FallbackValue=True}">
 
-            <Grid Margin="0 0 0 10">
+                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                           Text="Properties"
+                           Margin="0 0 0 10">
+                </TextBlock>
+
+                <Grid Margin="0 0 0 10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <controls:IconToggleButton Data="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
+                                               HorizontalAlignment="Left"
+                                               HorizontalContentAlignment="Center"
+                                               VerticalContentAlignment="Center"
+                                               Width="30"
+                                               Height="30"
+                                               IconHeight="30"
+                                               IconWidth="30"
+                                               IsChecked="{Binding IsEnabled}"
+                                               FromFill="#50c4fd"
+                                               ToFill="#fd0000"
+                                               FromShadowEffect="#50ffff"
+                                               ToShadowEffect="#ff7676">
+                        <controls:IconToggleButton.ShadowEffect>
+                            <DropShadowEffect BlurRadius="5"
+                                              Direction="0"
+                                              ShadowDepth="0" />
+                        </controls:IconToggleButton.ShadowEffect>
+                    </controls:IconToggleButton>
+
+                    <StackPanel Orientation="Vertical"
+                                Grid.Column="1">
+
+                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                   Text="Name"
+                                   Margin="0 0 0 3">
+                        </TextBlock>
+                        <TextBox Style="{StaticResource HBDark_TextBox}"
+                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
+                        </TextBox>
+                    </StackPanel>
+                </Grid>
+                <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                          IsChecked="{Binding OnDemand}"
+                          Content="On Demand"
+                          Margin="0 0 0 10"></CheckBox>
+                <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                          IsChecked="{Binding Scheduled}"
+                          Content="Scheduled"
+                          Margin="0 0 0 10"></CheckBox>
+
+
+                <controls:TimePicker Visibility="{Binding Scheduled, Converter={StaticResource b2v}, FallbackValue=Visible}"
+                                     SelectedTime="{Binding ScheduledAt, Mode=TwoWay}"
+                                     SeperatorStyle="{StaticResource HBDark_TextBlock}"
+                                     MinuteStyle="{StaticResource HBDark_ComboBox}"
+                                     HourStyle="{StaticResource HBDark_ComboBox}"
+                                     HorizontalAlignment="Left"
+                                     Margin="0 0 0 10">
+
+                    <controls:TimePicker.Icon>
+                        <Path Data="M12 20C16.4 20 20 16.4 20 12S16.4 4 12 4 4 7.6 4 12 7.6 20 12 20M12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M12.5 12.8L7.7 15.6L7 14.2L11 11.9V7H12.5V12.8Z"
+                              Fill="{StaticResource VSAccentViolet}"
+                              Stroke="{StaticResource VSViolet}"
+                              StrokeThickness="0.5"
+                              Stretch="Uniform"></Path>
+                    </controls:TimePicker.Icon>
+
+                </controls:TimePicker>
+
+                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                           Text="Description"
+                           Margin="0 0 0 3">
+                </TextBlock>
+
+                <TextBox Style="{StaticResource HBDark_TextBox}"
+                         Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                         VerticalContentAlignment="Top"
+                         Height="100"
+                         Margin="0 0 0 10">
+                </TextBox>
+            </StackPanel>
+
+
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="300" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <controls:IconToggleButton Data="M16.56,5.44L15.11,6.89C16.84,7.94 18,9.83 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12C6,9.83 7.16,7.94 8.88,6.88L7.44,5.44C5.36,6.88 4,9.28 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,9.28 18.64,6.88 16.56,5.44M13,3H11V13H13"
-                                           HorizontalAlignment="Left"
-                                           HorizontalContentAlignment="Center"
-                                           VerticalContentAlignment="Center"
-                                           Width="30"
-                                           Height="30"
-                                           IconHeight="30"
-                                           IconWidth="30"
-                                           IsChecked="{Binding IsEnabled}"
-                                           FromFill="#50c4fd"
-                                           ToFill="#fd0000"
-                                           FromShadowEffect="#50ffff"
-                                           ToShadowEffect="#ff7676">
-                    <controls:IconToggleButton.ShadowEffect>
-                        <DropShadowEffect BlurRadius="5"
-                                          Direction="0"
-                                          ShadowDepth="0" />
-                    </controls:IconToggleButton.ShadowEffect>
-                </controls:IconToggleButton>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                <StackPanel Orientation="Vertical"
-                            Grid.Column="1">
+                <Border Style="{StaticResource HBDark_ControlBorder}"
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        IsEnabled="{Binding IsInitialized, FallbackValue=True}">
 
-                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                               Text="Name"
-                               Margin="0 0 0 3">
-                    </TextBlock>
-                    <TextBox Style="{StaticResource HBDark_TextBox}"
-                             Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
-                    </TextBox>
-                </StackPanel>
-            </Grid>
-            <CheckBox Style="{StaticResource HBDark_CheckBox}"
-                      IsChecked="{Binding OnDemand}"
-                      Content="On Demand"
-                      Margin="0 0 0 10"></CheckBox>
-            <CheckBox Style="{StaticResource HBDark_CheckBox}"
-                      IsChecked="{Binding Scheduled}"
-                      Content="Scheduled"
-                      Margin="0 0 0 10"></CheckBox>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="30" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
+                        <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                                   Text="Steps"
+                                   Grid.Row="0">
+                        </TextBlock>
 
-            <controls:TimePicker Visibility="{Binding Scheduled, Converter={StaticResource b2v}, FallbackValue=Visible}"
-                                 SelectedTime="{Binding ScheduledAt, Mode=TwoWay}"
-                                 SeperatorStyle="{StaticResource HBDark_TextBlock}"
-                                 MinuteStyle="{StaticResource HBDark_ComboBox}"
-                                 HourStyle="{StaticResource HBDark_ComboBox}"
-                                 HorizontalAlignment="Left"
-                                 Margin="0 0 0 10">
+                        <StackPanel Grid.Row="1"
+                                    HorizontalAlignment="Left"
+                                    Orientation="Horizontal">
 
-                <controls:TimePicker.Icon>
-                    <Path Data="M12 20C16.4 20 20 16.4 20 12S16.4 4 12 4 4 7.6 4 12 7.6 20 12 20M12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M12.5 12.8L7.7 15.6L7 14.2L11 11.9V7H12.5V12.8Z"
-                          Fill="{StaticResource VSAccentViolet}"
-                          Stroke="{StaticResource VSViolet}"
-                          StrokeThickness="0.5"
-                          Stretch="Uniform"></Path>
-                </controls:TimePicker.Icon>
+                            <buttons:IconButton BorderThickness="1"
+                                                Height="24"
+                                                Width="24"
+                                                IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                                IconFill="{StaticResource VSGreen}"
+                                                Command="{Binding AddStepCommand}">
+                            </buttons:IconButton>
 
-            </controls:TimePicker>
+                            <buttons:IconButton BorderThickness="1"
+                                                Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
+                                                ToolTip="Delete step"
+                                                Height="24"
+                                                Width="24"
+                                                IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                                IconFill="{StaticResource VSRed}"
+                                                Command="{Binding DeleteStepCommand}"
+                                                CommandParameter="{Binding SelectedStep}">
+                            </buttons:IconButton>
 
-            <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                       Text="Description"
-                       Margin="0 0 0 3">
-            </TextBlock>
+                            <buttons:IconButton BorderThickness="1"
+                                                Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
+                                                ToolTip="Validate job"
+                                                Height="24"
+                                                Width="24"
+                                                IconHeight="18"
+                                                IconStretch="Uniform"
+                                                IconData="M11 15H6L13 1V9H18L11 23V15Z"
+                                                IconFill="#ffac14"
+                                                Command="{Binding ValidateStepCommand}"
+                                                CommandParameter="{Binding SelectedStep}">
 
-            <TextBox Style="{StaticResource HBDark_TextBox}"
-                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
-                     VerticalContentAlignment="Top"
-                     Height="100"
-                     Margin="0 0 0 10">
-            </TextBox>
-        </StackPanel>
+                            </buttons:IconButton>
+                        </StackPanel>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+                        <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                 VerticalAlignment="Top"
+                                 Tag="Search Job Steps"
+                                 Grid.Row="2">
+                        </TextBox>
 
-            <Border Style="{StaticResource HBDark_ControlBorder}"
-                    Grid.Column="0">
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="30" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+                        <ListView Style="{StaticResource HBDark_ListView}"
+                                  ItemsSource="{Binding StepsView}"
+                                  SelectedItem="{Binding SelectedStep}"
+                                  Grid.Row="3"
+                                  AllowDrop="True">
 
-                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
-                               Text="Steps"
-                               Grid.Row="0">
-                    </TextBlock>
+                            <i:Interaction.Behaviors>
+                                <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type viewModels:JobStepWrapperViewModel}" />
+                            </i:Interaction.Behaviors>
 
-                    <StackPanel Grid.Row="1"
-                                HorizontalAlignment="Left"
-                                Orientation="Horizontal">
+                            <ListView.View>
+                                <GridView AllowsColumnReorder="False">
+                                    <GridViewColumn Width="55">
+                                        <GridViewColumn.Header>
+                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                       FontWeight="Bold" />
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <controls:SlideToggleButton IsChecked="{Binding StepContext.IsEnabled}"
+                                                                            CornerRadius="6"
+                                                                            SliderCornerRadius="6"
+                                                                            HorizontalAlignment="Left">
 
-                        <buttons:IconButton BorderThickness="1"
-                                            Height="24"
-                                            Width="24"
-                                            IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                            IconFill="{StaticResource VSGreen}"
-                                            Command="{Binding AddStepCommand}">
-                        </buttons:IconButton>
+                                                </controls:SlideToggleButton>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                    <GridViewColumn Width="25">
+                                        <GridViewColumn.Header>
+                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                       FontWeight="Bold" />
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
+                                                                       FromFill="#ffac14"
+                                                                       ToFill="#888484"
+                                                                       FromShadowEffect="#ffdf14"
+                                                                       ToShadowEffect="Transparent"
+                                                                       FromShadowBlurRadius="3"
+                                                                       ToShadowBlurRadius="0"
+                                                                       Height="20"
+                                                                       State="{Binding StepContext.IsValid}">
+                                                    <controls:AnimatedPath.ShadowEffect>
+                                                        <DropShadowEffect ShadowDepth="0"
+                                                                          Direction="0" />
+                                                    </controls:AnimatedPath.ShadowEffect>
+                                                </controls:AnimatedPath>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
 
-                        <buttons:IconButton BorderThickness="1"
-                                            Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
-                                            ToolTip="Delete step"
-                                            Height="24"
-                                            Width="24"
-                                            IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                            IconFill="{StaticResource VSRed}"
+                                    <GridViewColumn DisplayMemberBinding="{Binding StepContext.Name}">
+                                        <GridViewColumn.Header>
+                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                       FontWeight="Bold"
+                                                       Text="Name" />
+                                        </GridViewColumn.Header>
+                                        <GridViewColumn.Width>
+                                            <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
+                                                          ConverterParameter="*">
+                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
+                                                         Path="ActualWidth" />
+                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
+                                                <Binding RelativeSource="{RelativeSource Self}" />
+                                            </MultiBinding>
+                                        </GridViewColumn.Width>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+
+                            <ListView.Resources>
+                                <Style TargetType="GridViewHeaderRowPresenter">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed" />
+                                </Style>
+
+                                <ContextMenu x:Key="contextMenu"
+                                             DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                             Style="{StaticResource HBDark_ContextMenu}">
+                                    <MenuItem Header="Delete step"
+                                              Command="{Binding DeleteStepCommand}"
+                                              CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                        <menus:MenuItemAttachedProperties.IconPath>
+                                            <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                                  Fill="{StaticResource VSRed}"
+                                                  Stretch="Uniform" />
+                                        </menus:MenuItemAttachedProperties.IconPath>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ListView.Resources>
+
+                            <ListView.InputBindings>
+                                <KeyBinding Key="Delete"
                                             Command="{Binding DeleteStepCommand}"
-                                            CommandParameter="{Binding SelectedStep}">
-                        </buttons:IconButton>
-                    </StackPanel>
+                                            CommandParameter="{Binding SelectedStep}" />
+                            </ListView.InputBindings>
 
-                    <TextBox Style="{StaticResource HBDark_VSFilterBox}"
-                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             VerticalAlignment="Top"
-                             Tag="Search Job Steps"
-                             Grid.Row="2">
-                    </TextBox>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem"
+                                       BasedOn="{StaticResource HBDark_ListViewItem}">
+                                    <Setter Property="ContextMenu"
+                                            Value="{StaticResource contextMenu}" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
 
-                    <ListView Style="{StaticResource HBDark_ListView}"
-                              ItemsSource="{Binding StepsView}"
-                              SelectedItem="{Binding SelectedStep}"
-                              Grid.Row="3"
-                              AllowDrop="True">
+                            <ListView.ContextMenu>
+                                <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                                    <MenuItem Header="Add new step"
+                                              Command="{Binding AddStepCommand}">
+                                        <menus:MenuItemAttachedProperties.IconPath>
+                                            <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                                  Fill="{StaticResource VSGreen}"
+                                                  Stretch="Uniform" />
+                                        </menus:MenuItemAttachedProperties.IconPath>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                        </ListView>
+                    </Grid>
+                </Border>
 
-                        <i:Interaction.Behaviors>
-                            <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type viewModels:JobStepWrapperViewModel}" />
-                        </i:Interaction.Behaviors>
-
-                        <ListView.View>
-                            <GridView AllowsColumnReorder="False">
-                                <GridViewColumn Width="55">
-                                    <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                                   FontWeight="Bold" />
-                                    </GridViewColumn.Header>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <controls:SlideToggleButton IsChecked="{Binding StepContext.IsEnabled}"
-                                                                        CornerRadius="6"
-                                                                        SliderCornerRadius="6"
-                                                                        HorizontalAlignment="Left">
-
-                                            </controls:SlideToggleButton>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Width="25">
-                                    <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                                   FontWeight="Bold" />
-                                    </GridViewColumn.Header>
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
-                                                                   FromFill="#ffac14"
-                                                                   ToFill="#888484"
-                                                                   FromShadowEffect="#ffdf14"
-                                                                   ToShadowEffect="Transparent"
-                                                                   FromShadowBlurRadius="3"
-                                                                   ToShadowBlurRadius="0"
-                                                                   Height="20"
-                                                                   State="{Binding StepContext.IsValid}">
-                                                <controls:AnimatedPath.ShadowEffect>
-                                                    <DropShadowEffect ShadowDepth="0"
-                                                                      Direction="0" />
-                                                </controls:AnimatedPath.ShadowEffect>
-                                            </controls:AnimatedPath>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-
-                                <GridViewColumn DisplayMemberBinding="{Binding StepContext.Name}">
-                                    <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                                   FontWeight="Bold"
-                                                   Text="Name" />
-                                    </GridViewColumn.Header>
-                                    <GridViewColumn.Width>
-                                        <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                      ConverterParameter="*">
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                     Path="ActualWidth" />
-                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                            <Binding RelativeSource="{RelativeSource Self}" />
-                                        </MultiBinding>
-                                    </GridViewColumn.Width>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-
-                        <ListView.Resources>
-                            <Style TargetType="GridViewHeaderRowPresenter">
-                                <Setter Property="Visibility"
-                                        Value="Collapsed" />
-                            </Style>
-
-                            <ContextMenu x:Key="contextMenu"
-                                         DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                         Style="{StaticResource HBDark_ContextMenu}">
-                                <MenuItem Header="Delete step"
-                                          Command="{Binding DeleteStepCommand}"
-                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-
-                                    <menus:MenuItemAttachedProperties.IconPath>
-                                        <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                              Fill="{StaticResource VSRed}"
-                                              Stretch="Uniform" />
-                                    </menus:MenuItemAttachedProperties.IconPath>
-                                </MenuItem>
-                            </ContextMenu>
-                        </ListView.Resources>
-
-                        <ListView.InputBindings>
-                            <KeyBinding Key="Delete"
-                                        Command="{Binding DeleteStepCommand}"
-                                        CommandParameter="{Binding SelectedStep}" />
-                        </ListView.InputBindings>
-
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem"
-                                   BasedOn="{StaticResource HBDark_ListViewItem}">
-                                <Setter Property="ContextMenu"
-                                        Value="{StaticResource contextMenu}" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-
-                        <ListView.ContextMenu>
-                            <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
-                                <MenuItem Header="Add new step"
-                                          Command="{Binding AddStepCommand}">
-                                    <menus:MenuItemAttachedProperties.IconPath>
-                                        <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                              Fill="{StaticResource VSGreen}"
-                                              Stretch="Uniform" />
-                                    </menus:MenuItemAttachedProperties.IconPath>
-                                </MenuItem>
-                            </ContextMenu>
-                        </ListView.ContextMenu>
-                    </ListView>
-                </Grid>
-            </Border>
-
-            <StackPanel Grid.Column="1"
-                        Orientation="Vertical"
-                        Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}">
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
-                              scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                              IsEnabled="{Binding IsInitialized, FallbackValue=True}"
                               scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
                               scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
                               HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled"
                               Padding="0 0 20 10"
+                              PanningMode="Both"
+                              Grid.Row="0"
+                              Grid.Column="1"
                               Margin="10 0 0 0"
-                              PanningMode="Both">
+                              Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}">
 
                     <ContentControl Content="{Binding SelectedStep.StepView}" />
                 </ScrollViewer>
 
-                <Expander Style="{StaticResource HBDark_Expander}"
-                          Header="Validation Log"
-                          IsExpanded="{Binding ValidationLogVisible}"
-                          ExpandDirection="Down">
-                    <RichTextBox Style="{StaticResource HBDark_RichTextBox}"
-                                 IsReadOnlyCaretVisible="True">
 
-                    </RichTextBox>
+
+                <Expander x:Name="ExpanderValidationLog"
+                          Margin="0 5 0 0"
+                          Style="{StaticResource HBDark_Expander}"
+                          IsExpanded="{Binding ValidationLogVisible}"
+                          ExpandDirection="Down"
+                          Foreground="{StaticResource Foreground}"
+                          Grid.Row="1"
+                          Grid.ColumnSpan="2">
+                    <Expander.Header>
+                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                   Text="Validation Log" />
+                    </Expander.Header>
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0"
+                                    Visibility="{Binding IsExpanded, ElementName=ExpanderValidationLog, Converter={StaticResource b2v}}">
+                            <buttons:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
+                                                IconFill="{StaticResource VSRed}"
+                                                BorderThickness="1"
+                                                Width="25"
+                                                Height="25"
+                                                ToolTip="Clear log"
+                                                IconWidth="20"
+                                                IconStretch="Uniform"
+                                                HorizontalAlignment="Left"
+                                                Command="{Binding ClearValidationLogCommand}">
+
+                            </buttons:IconButton>
+                        </StackPanel>
+
+                        <RichTextBox Style="{StaticResource HBDark_RichTextBox}"
+                                     Grid.Column="1"
+                                     IsReadOnly="True"
+                                     IsReadOnlyCaretVisible="True"
+                                     FlowDirection="LeftToRight"
+                                     textBox:RichTextBoxAttachedProperties.BindableDocument="{Binding ValidationLog.Document}">
+                        </RichTextBox>
+                    </Grid>
                 </Expander>
-            </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 
 </UserControl>
