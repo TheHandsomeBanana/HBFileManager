@@ -13,6 +13,7 @@ using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Json;
 using HBLibrary.Common.Plugins;
 using HBLibrary.Common.Plugins.Builder;
+using HBLibrary.Common.Workspace;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Builder;
 using HBLibrary.Services.IO.Storage.Entries;
@@ -53,6 +54,7 @@ namespace FileManager.UI {
             container.RegisterType<IDialogService, DialogService>();
 
             AddAuthentication(container);
+            AddWorkspace(container);
             container.RegisterType<ISettingsService, SettingsService>();
         }
 
@@ -101,7 +103,7 @@ namespace FileManager.UI {
             AzureAdOptions azureAdOptions = container.Resolve<AzureAdOptions>();
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService(commonAppSettings.ApplicationName!);
+            LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService();
 
 
             IPublicClientApplication app = PublicClientApplicationBuilder.Create(azureAdOptions.ClientId)
@@ -120,8 +122,20 @@ namespace FileManager.UI {
             container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new SingletonLifetimeManager());
             container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new SingletonLifetimeManager());
 
-
+            container.RegisterType<IAccountStorage, AccountStorage>();
             container.RegisterSingleton<IAccountService, AccountService>();
+        }
+        private static void AddWorkspace(IUnityContainer container) {
+            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
+
+            container.RegisterFactory<WorkspaceLocationCache>(c => {
+                return new WorkspaceLocationCache(commonAppSettings.ApplicationName!);
+            });
+
+            container.RegisterFactory<IApplicationWorkspaceManager>(c => {
+                IAccountStorage accountStorage = c.Resolve<IAccountStorage>();
+                return new ApplicationWorkspaceManager(commonAppSettings.ApplicationName!, accountStorage);
+            });
         }
 
         // This is required for user switching
@@ -267,7 +281,7 @@ namespace FileManager.UI {
 
                 IAccountService accountService = container.Resolve<IAccountService>();
 
-                ApplicationAccountInfo? lastAccount = accountService.GetLastAccount(appSettings.ApplicationName!);
+                AccountInfo? lastAccount = accountService.AccountStorage.GetLatestAccount(appSettings.ApplicationName!);
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                     MSAuthCredentials? credentials = MSAuthCredentials

@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Common\HBLibrary.Common.csproj" />
+  </ItemGroup>
+
 </Project>
