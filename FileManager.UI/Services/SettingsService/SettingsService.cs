@@ -7,10 +7,8 @@ using HBLibrary.Services.IO.Storage.Entries;
 namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {
     private readonly IStorageEntryContainer container;
-    public SettingsService(IApplicationStorage applicationStorage, IAccountService accountService) {
-        string containerString = accountService.Account!.AccountId + nameof(SettingsService);
-
-        this.container = applicationStorage.GetContainer(containerString.ToGuid());
+    public SettingsService(IApplicationStorage applicationStorage) {
+        this.container = applicationStorage.GetContainer(typeof(SettingsService));
     }
 
     public TSetting? GetSetting<TSetting>() where TSetting : class {

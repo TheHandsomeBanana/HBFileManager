@@ -1,26 +1,33 @@
 ﻿using FileManager.Core.JobSteps;
+using FileManager.Core.Workspace;
 using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using HBLibrary.Common;
 using HBLibrary.Common.Account;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Common.Workspace;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.Views;
+using System.Collections.ObjectModel;
 using System.Windows;
 using Unity;
 
 namespace FileManager.UI.ViewModels;
-public class MainViewModel : ViewModelBase {
+public class MainViewModel : AsyncInitializerViewModelBase {
+    private readonly IUnityContainer container;
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
     private readonly IAccountService accountService;
     private readonly IApplicationStorage applicationStorage;
     private readonly IPluginManager pluginManager;
     private readonly CommonAppSettings commonAppSettings;
+    private readonly IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager;
+    private WorkspaceLocationCache? workspaceLocationCache;
+
     public ViewModelBase? CurrentViewModel => navigationStore[nameof(MainViewModel)].ViewModel;
 
     public NavigateCommand<ExplorerViewModel> NavigateToExplorerCommand { get; set; }
@@ -30,14 +37,44 @@ public class MainViewModel : ViewModelBase {
     public NavigateCommand<SettingsViewModel> NavigateToSettingsCommand { get; set; }
     public NavigateCommand<ApplicationLogViewModel> NavigateToApplicationLogCommand { get; set; }
     public NavigateCommand<AboutViewModel> NavigateToAboutCommand { get; set; }
-
+    public NavigateCommand<WorkspacesViewModel> NavigateToWorkspacesCommand { get; set; }
     public string NavigateCommandParameter => nameof(MainViewModel);
 
     public RelayCommand SaveApplicationStateCommand { get; set; }
     public RelayCommand<Window> OpenAccountOverviewCommand { get; set; }
 
+    public ObservableCollection<string> Workspaces { get; set; } = [];
+    private string? selectedWorkspace;
+
+    public string? SelectedWorkspace {
+        get {
+            return selectedWorkspace;
+        }
+        set {
+            selectedWorkspace = value;
+            NotifyPropertyChanged();
+
+            if (selectedWorkspace is not null) {
+
+                SwitchWorkspaceAsync()
+                    .ContinueWith(e => {
+                        if (e.Result.IsFaulted) {
+                            selectedWorkspace = null;
+                            NotifyPropertyChanged();
+
+                            HBDarkMessageBox.Show("Workspace switch error",
+                                e.Result.Exception!.Message,
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        }
+                    });
+            }
+        }
+    }
+
+
     public MainViewModel() {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        container = UnityBase.GetChildContainer(nameof(FileManager))!;
 
         this.applicationStorage = container.Resolve<IApplicationStorage>();
         this.settingsService = container.Resolve<ISettingsService>();
@@ -45,6 +82,7 @@ public class MainViewModel : ViewModelBase {
         this.accountService = container.Resolve<IAccountService>();
         this.commonAppSettings = container.Resolve<CommonAppSettings>();
         this.pluginManager = container.Resolve<IPluginManager>();
+        this.workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
 
         INavigationService navigationService = container.Resolve<INavigationService>();
 
@@ -55,18 +93,44 @@ public class MainViewModel : ViewModelBase {
         NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService, () => new SettingsViewModel());
         NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService, () => new ApplicationLogViewModel());
         NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
-
+        NavigateToWorkspacesCommand = new NavigateCommand<WorkspacesViewModel>(navigationService, () => new WorkspacesViewModel());
 
 
         SaveApplicationStateCommand = new RelayCommand(SaveApplicationState, true);
         OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview, true);
 
-        NavigateToExplorerCommand.Execute(NavigateCommandParameter);
+        NavigateToWorkspacesCommand.Execute(NavigateCommandParameter);
         navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
+    }
 
-        Application.Current.Dispatcher.InvokeAsync(() => {
-            pluginManager.LoadAssemblies();
+    protected override async Task InitializeViewModelAsync() {
+        IWorkspaceLocationManager workspaceLocationManager = container.Resolve<IWorkspaceLocationManager>();
+        workspaceLocationCache = await workspaceLocationManager.GetWorkspaceLocationsAsync();
+        Workspaces = new ObservableCollection<string>(workspaceLocationCache.WorkspaceLocations);
+
+        if (workspaceLocationCache.LastWorkspace is not null) {
+            SelectedWorkspace = workspaceLocationCache.LastWorkspace;
+            NavigateToExplorerCommand.Execute(NavigateCommandParameter);
+        }
+
+        await Application.Current.Dispatcher.InvokeAsync(() => {
+            ImmutableResultCollection loadResult = pluginManager.LoadAssemblies();
+            if (loadResult.IsFaulted) {
+                foreach (Result result in loadResult.Where(e => e.IsFaulted)) {
+                    HBDarkMessageBox.Show("Plugin load error",
+                        result.Exception!.Message,
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
+                }
+            }
         });
+    }
+
+    protected override void OnInitializeException(Exception exception) {
+        HBDarkMessageBox.Show("Initialization error",
+            exception.Message,
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
     }
 
     private void OpenAccountOverview(Window obj) {
@@ -115,7 +179,7 @@ public class MainViewModel : ViewModelBase {
             };
 
             obj.Closed += (_, _) => {
-                
+
                 if (AppStateHandler.CanShutdown) {
                     Application.Current.Shutdown();
                 }
@@ -131,5 +195,20 @@ public class MainViewModel : ViewModelBase {
         else {
             Application.Current.Shutdown();
         }
+    }
+
+    private async Task<Result> SwitchWorkspaceAsync() {
+        if (workspaceManager.CurrentWorkspace is not null) {
+            await workspaceManager.CurrentWorkspace.CloseAsync();
+        }
+
+        Result<HBFileManagerWorkspace> workspaceResult = await workspaceManager.OpenAsync(workspaceLocationCache!.LastWorkspace!, accountService.Account!);
+
+
+        if (workspaceResult.IsFaulted) {
+            return workspaceResult.Error!;
+        }
+
+        return Result.Ok();
     }
 }

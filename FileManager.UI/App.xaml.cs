@@ -1,6 +1,6 @@
 ﻿using FileManager.Core.JobSteps;
 using FileManager.Core.JobSteps.Converters;
-using FileManager.UI.Services.JobService;
+using FileManager.Core.Workspace;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels;
 using FileManager.UI.ViewModels.SettingsViewModels;
@@ -56,6 +56,9 @@ namespace FileManager.UI {
             AddAuthentication(container);
             AddWorkspace(container);
             container.RegisterType<ISettingsService, SettingsService>();
+
+            AddPluginManager(container);
+            AddApplicationStorage(container);
         }
 
         private void AppOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
@@ -117,7 +120,7 @@ namespace FileManager.UI {
             MSTokenStorage.Create(commonAppSettings.ApplicationName!, app);
 
             PublicMSAuthenticationService publicMSAuthenticationService
-                = new PublicMSAuthenticationService(app, commonAppSettings);
+                = new PublicMSAuthenticationService(app);
 
             container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new SingletonLifetimeManager());
             container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new SingletonLifetimeManager());
@@ -128,14 +131,13 @@ namespace FileManager.UI {
         private static void AddWorkspace(IUnityContainer container) {
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
-            container.RegisterFactory<WorkspaceLocationCache>(c => {
-                return new WorkspaceLocationCache(commonAppSettings.ApplicationName!);
-            });
+            IAccountStorage accountStorage = container.Resolve<IAccountStorage>();
 
-            container.RegisterFactory<IApplicationWorkspaceManager>(c => {
-                IAccountStorage accountStorage = c.Resolve<IAccountStorage>();
-                return new ApplicationWorkspaceManager(commonAppSettings.ApplicationName!, accountStorage);
-            });
+            IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager =
+                new ApplicationWorkspaceManager<HBFileManagerWorkspace>(commonAppSettings.ApplicationName!, accountStorage);
+
+            container.RegisterInstance(workspaceManager, new SingletonLifetimeManager());
+            container.RegisterType<IWorkspaceLocationManager, WorkspaceLocationManager>();
         }
 
         // This is required for user switching
@@ -162,32 +164,10 @@ namespace FileManager.UI {
                 });
                 return b.Build();
             });
-
-            storage.CreateContainer($"{accountId + nameof(JobService)}".ToGuid(), b => {
-                b.SetContainerPath($"{Path.Combine(accountId, "jobs")}");
-
-                b.ConfigureFileServices(fs => {
-                    fs.UseJsonFileService(jfs => {
-                        jfs.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = {
-                                new TimeOnlyConverter(),
-                                new JobStepConverter(pluginManager)
-                            },
-                            WriteIndented = true
-                        });
-
-                        jfs.UseBase64 = true;
-                    });
-                });
-
-                return b.Build();
-            });
         }
 
-        // This gets called OnStartup after login
-        // -> Requires logged in user id
+        
         private static void AddApplicationStorage(IUnityContainer container) {
-            Account account = container.Resolve<IAccountService>().Account!;
 
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
 
@@ -195,8 +175,8 @@ namespace FileManager.UI {
 
             IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
 
-            appStorageBuilder.AddContainer($"{account.AccountId + nameof(SettingsService)}".ToGuid(), b => {
-                b.SetContainerPath($"{Path.Combine(account.AccountId, "settings")}");
+            appStorageBuilder.AddContainer(typeof(SettingsService), b => {
+                b.SetContainerPath("settings");
 
                 b.ConfigureFileServices(c => {
                     c.UseJsonFileService(jfs => {
@@ -214,36 +194,17 @@ namespace FileManager.UI {
                 return b.Build();
             });
 
-            appStorageBuilder.AddContainer($"{account.AccountId + nameof(JobService)}".ToGuid(), b => {
-                b.SetContainerPath($"{Path.Combine(account.AccountId, "jobs")}");
-
-                b.ConfigureFileServices(fs => {
-                    fs.UseJsonFileService(jfs => {
-                        jfs.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = {
-                                new TimeOnlyConverter(),
-                                new JobStepConverter(container.Resolve<IPluginManager>())
-                            },
-                            WriteIndented = true
-                        });
-
-                        jfs.UseBase64 = true;
-                    });
-                });
-
-                return b.Build();
-            });
+            appStorageBuilder.AddContainer(typeof(WorkspaceLocationManager), b =>
+                b.SetContainerPath("workspacelocations")
+                .ConfigureFileServices(fs => {
+                    fs.UseJsonFileService();
+                })
+                .Build()
+            );
 
             container.RegisterInstance(appStorageBuilder.Build(), InstanceLifetime.Singleton);
         }
-
-        // This gets called OnStartup after login
-        // -> Requires logged in user id
-        private static void AddJobServices(IUnityContainer container) {
-            container.RegisterType<IJobService, JobService>();
-        }
-        // This gets called OnStartup after login
-        // -> Requires logged in user id
+        
         private static void AddPluginManager(IUnityContainer container) {
             string storagePath = GetPluginStoragePath(container);
 
@@ -259,11 +220,9 @@ namespace FileManager.UI {
 
         public static string GetPluginStoragePath(IUnityContainer container) {
             CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-            IAccountService accountService = container.Resolve<IAccountService>();
 
             return Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
                 commonAppSettings.ApplicationName!,
-                accountService.Account!.AccountId,
                 "plugins");
         }
         #endregion
@@ -285,7 +244,7 @@ namespace FileManager.UI {
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                     MSAuthCredentials? credentials = MSAuthCredentials
-                       .CreateFromParameterStorage(appSettings.ApplicationName!, lastAccount.Username);
+                       .CreateFromParameterStorage(lastAccount.Username);
 
                     // Cached credentials have been found, automatically log in using the cached account identifier
                     // -> Do not trigger login UI
@@ -329,11 +288,6 @@ namespace FileManager.UI {
         }
 
         private void MainWindowStartup(IUnityContainer container) {
-            AddPluginManager(container);
-            AddApplicationStorage(container);
-            AddJobServices(container);
-
-
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
 
 

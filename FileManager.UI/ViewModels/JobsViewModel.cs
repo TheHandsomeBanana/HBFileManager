@@ -1,10 +1,11 @@
-﻿using FileManager.Core.JobSteps.Views;
-using FileManager.UI.Models.JobModels;
-using FileManager.UI.Services.JobService;
+﻿using FileManager.Core.Job;
+using FileManager.Core.JobSteps.Views;
+using FileManager.Core.Workspace;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews;
 using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Workspace;
 using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
@@ -18,7 +19,7 @@ using Unity;
 
 namespace FileManager.UI.ViewModels;
 public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDragDropTarget {
-    private readonly IJobService jobService;
+    private readonly IJobManager jobManager;
     private readonly IDialogService dialogService;
     private readonly ObservableCollection<JobItemViewModel> jobs = [];
 
@@ -52,8 +53,10 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
     public JobsViewModel() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
-        this.jobService = container.Resolve<IJobService>();
         this.dialogService = container.Resolve<IDialogService>();
+        IApplicationWorkspaceManager<HBFileManagerWorkspace>  workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+
+        this.jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
 
         AddJobCommand = new RelayCommand(AddJob, true);
         DeleteJobCommand = new RelayCommand<JobItemViewModel>(DeleteJob, true);
@@ -101,8 +104,8 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     private void LoadJobs() {
-        JobItemModel[] jobs = jobService.GetAll();
-        foreach (JobItemModel item in jobs) {
+        Job[] jobs = jobManager.GetAll();
+        foreach (Job item in jobs) {
             JobItemViewModel jobItemViewModel = new JobItemViewModel(item);
             this.jobs.Add(jobItemViewModel);
         }
@@ -114,13 +117,13 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
         bool result = dialogService.ShowCompactDialog(addJobView, addJobViewModel, "Add Job");
         if (result == true) {
-            JobItemModel newJob = new JobItemModel() { Id = Guid.NewGuid(), Name = addJobViewModel.Name };
+            Job newJob = new Job() { Id = Guid.NewGuid(), Name = addJobViewModel.Name };
 
             JobItemViewModel jobItemViewModel = new JobItemViewModel(newJob);
             jobs.Add(jobItemViewModel);
             SelectedJob = jobItemViewModel;
 
-            jobService.AddOrUpdate(newJob);
+            jobManager.AddOrUpdate(newJob);
             SelectedJob = jobs.LastOrDefault();
         }
     }
@@ -133,7 +136,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
         if (result == MessageBoxResult.Yes) {
             jobs.Remove(jobItemViewModel);
-            jobService.Delete(jobItemViewModel.Model.Id);
+            jobManager.Delete(jobItemViewModel.Model.Id);
             SelectedJob = jobs.FirstOrDefault();
         }
     }

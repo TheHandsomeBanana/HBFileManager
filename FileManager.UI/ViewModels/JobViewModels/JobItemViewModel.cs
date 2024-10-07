@@ -2,8 +2,6 @@
 using FileManager.Core.JobSteps.Models;
 using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
-using FileManager.UI.Models.JobModels;
-using FileManager.UI.Services.JobService;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common;
@@ -28,12 +26,15 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Xml.Serialization;
 using Unity;
+using FileManager.Core.Job;
+using HBLibrary.Common.Workspace;
+using FileManager.Core.Workspace;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
-public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemModel>, IDragDropTarget, IDisposable {
+public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IDisposable {
     private readonly IUnityContainer fileManagerContainer;
     private readonly IDialogService dialogService;
-    private readonly IJobService jobService;
+    private readonly JobManager jobManager;
     private readonly IPluginManager pluginManager;
 
     public RelayCommand AddStepCommand { get; set; }
@@ -144,11 +145,14 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
     public ICollectionView StepsView => stepsView;
 
 
-    public JobItemViewModel(JobItemModel model) : base(model) {
+    public JobItemViewModel(Job model) : base(model) {
         fileManagerContainer = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = fileManagerContainer.Resolve<IDialogService>();
-        this.jobService = fileManagerContainer.Resolve<IJobService>();
         this.pluginManager = fileManagerContainer.Resolve<IPluginManager>();
+
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = fileManagerContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        this.jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
+
 
         AddStepCommand = new RelayCommand(AddStep, true);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, true);
@@ -197,7 +201,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
 
             JobStepWrapperViewModel stepViewModel = new JobStepWrapperViewModel(jobStep);
             Steps.Add(stepViewModel);
-            jobService.AddOrUpdateStep(Model.Id, stepViewModel.Model);
+            jobManager.AddOrUpdateStep(Model.Id, stepViewModel.Model);
             SelectedStep = Steps[Steps.IndexOf(stepViewModel)];
 
             stepViewModel.StepContext!.ExecutionOrderChanged += JobItemViewModel_ExecutionOrderChanged;
@@ -218,7 +222,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<JobItemMode
             stepViewModel.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
 
             Steps.Remove(stepViewModel);
-            jobService.DeleteStep(Model.Id, stepViewModel.Model);
+            jobManager.DeleteStep(Model.Id, stepViewModel.Model);
             SelectedStep = Steps.FirstOrDefault();
 
             CheckAllIsValid()

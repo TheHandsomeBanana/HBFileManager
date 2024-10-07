@@ -7,7 +7,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
-             xmlns:stepType="clr-namespace:FileManager.UI.Models.JobModels"
              mc:Ignorable="d" 
              MinHeight="100"
              MinWidth="350">

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using FileManager.UI.ViewModels;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -10,6 +11,13 @@ namespace FileManager.UI {
         public MainWindow() {
             InitializeComponent();
             StateChanged += MainWindowStateChangeRaised;
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+            if(DataContext is MainViewModel mainViewModel) {
+                Dispatcher.InvokeAsync(mainViewModel.InitializeAsync);
+            }
         }
 
         public MainWindow(ApplicationState appState) : this() {

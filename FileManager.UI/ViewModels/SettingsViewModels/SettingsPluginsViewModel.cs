@@ -1,11 +1,12 @@
-﻿using FileManager.Core.JobSteps;
-using FileManager.UI.Models.JobModels;
+﻿using FileManager.Core.Job;
+using FileManager.Core.JobSteps;
+using FileManager.Core.Workspace;
 using FileManager.UI.Models.SettingsModels;
-using FileManager.UI.Services.JobService;
 using HBLibrary.Common;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
 using HBLibrary.Common.Plugins.Loader;
+using HBLibrary.Common.Workspace;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -25,7 +26,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels;
 
 public class SettingsPluginsViewModel : ViewModelBase {
     private readonly IPluginManager pluginManager;
-    private readonly IJobService jobService;
+    private readonly JobManager jobManager;
 
     private string? searchText;
     public string? SearchText {
@@ -74,7 +75,9 @@ public class SettingsPluginsViewModel : ViewModelBase {
     public SettingsPluginsViewModel() : base() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         pluginManager = container.Resolve<IPluginManager>();
-        jobService = container.Resolve<IJobService>();
+
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
 
         assemblies = [.. pluginManager.GetLoadedAssemblies().Select(e => e.GetFirst().GetName())];
 
@@ -97,9 +100,9 @@ public class SettingsPluginsViewModel : ViewModelBase {
     private void DeleteAssembly(AssemblyName obj) {
         PluginType[] types = pluginManager.TypeProvider.GetByAttribute<JobStep>([pluginManager.GetLoadedAssembly(obj.Name!)!]);
 
-        Dictionary<JobItemModel, Tuple<JobStep, PluginType>> found = [];
+        Dictionary<Job, Tuple<JobStep, PluginType>> found = [];
 
-        foreach (JobItemModel job in jobService.GetAll()) {
+        foreach (Job job in jobManager.GetAll()) {
             foreach (JobStep jobStep in job.Steps) {
                 foreach (PluginType type in types) {
                     if (jobStep.GetType() == type.ConcreteType) {
@@ -122,11 +125,11 @@ public class SettingsPluginsViewModel : ViewModelBase {
         MessageBoxResult result = HBDarkMessageBox.Show("Remove plugin", message, MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes) {
-            foreach (KeyValuePair<JobItemModel, Tuple<JobStep, PluginType>> item in found) {
-                jobService.DeleteStep(item.Key, item.Value.Item1);
+            foreach (KeyValuePair<Job, Tuple<JobStep, PluginType>> item in found) {
+                jobManager.DeleteStep(item.Key, item.Value.Item1);
             }
 
-            foreach(JobItemModel job in found.Select(e => e.Key)) {
+            foreach(Job job in found.Select(e => e.Key)) {
                 bool canRun = true;
 
                 foreach(JobStep step in job.Steps) {

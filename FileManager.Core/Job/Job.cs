@@ -1,7 +1,12 @@
 ﻿using FileManager.Core.JobSteps;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace FileManager.UI.Models.JobModels;
-public class JobItemModel {
+namespace FileManager.Core.Job;
+public class Job {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
     public bool IsEnabled { get; set; }
