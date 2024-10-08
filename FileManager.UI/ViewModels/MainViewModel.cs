@@ -202,13 +202,7 @@ public class MainViewModel : AsyncInitializerViewModelBase {
             await workspaceManager.CurrentWorkspace.CloseAsync();
         }
 
-        Result<HBFileManagerWorkspace> workspaceResult = await workspaceManager.OpenAsync(workspaceLocationCache!.LastWorkspace!, accountService.Account!);
-
-
-        if (workspaceResult.IsFaulted) {
-            return workspaceResult.Error!;
-        }
-
-        return Result.Ok();
+        Result workspaceResult = await workspaceManager.OpenAsync(workspaceLocationCache!.LastWorkspace!, accountService.Account!);
+        return workspaceResult;
     }
 }

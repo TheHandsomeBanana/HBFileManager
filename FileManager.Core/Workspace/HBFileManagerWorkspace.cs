@@ -16,11 +16,16 @@ using Unity;
 using HBLibrary.Common.DI.Unity;
 using HBLibrary.Services.IO.Storage.Container;
 using FileManager.Core.Job;
+using System.Text.Json.Serialization;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     public IApplicationStorage? Storage { get; private set; }
     public JobManager? JobManager { get; set; }
+    
+    [JsonIgnore]
+    public override string WorkspaceExtension => ".fmws";
+    
     public HBFileManagerWorkspace() : base() {
     }
 

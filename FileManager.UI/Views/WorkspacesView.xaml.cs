@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,15 @@ namespace FileManager.UI.Views;
 /// </summary>
 public partial class WorkspacesView : UserControl {
     public WorkspacesView() {
+        Loaded += WorkspacesView_Loaded;
         InitializeComponent();
+    }
+
+    private void WorkspacesView_Loaded(object sender, RoutedEventArgs e) {
+        if (DataContext is WorkspacesViewModel workspacesViewModel) {
+            Dispatcher.InvokeAsync(async () => {
+                await workspacesViewModel.InitializeAsync();
+            });
+        }
     }
 }
