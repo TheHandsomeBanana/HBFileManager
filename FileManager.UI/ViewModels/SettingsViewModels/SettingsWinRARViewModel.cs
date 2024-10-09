@@ -74,16 +74,9 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         }
 
 
-
-
-        public SettingsWinRARViewModel() {
-            Model = new SettingsWinRARModel();
+        public SettingsWinRARViewModel(SettingsWinRARModel model) : base(model) {
             DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation, true);
             BrowseLocationCommand = new RelayCommand(BrowseLocation, true);
-        }
-
-        public SettingsWinRARViewModel(SettingsWinRARModel model) : this() {
-            this.Model = model;
 
             if (UseWinRAR && CheckProvidedLocation(model.Location)) {
                 ValidateWinRARLicense();

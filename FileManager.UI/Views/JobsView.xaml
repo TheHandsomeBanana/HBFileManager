@@ -50,7 +50,7 @@
 
         <Border Style="{StaticResource HBDark_ControlBorder}"
                 Grid.Column="0"
-                IsEnabled="{Binding SelectedJob.IsInitialized, FallbackValue=True}">
+                IsEnabled="{Binding SelectedJob.IsInitialized}">
 
 
             <Grid Margin="5">

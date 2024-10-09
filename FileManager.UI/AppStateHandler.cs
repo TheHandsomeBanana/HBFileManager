@@ -1,6 +1,11 @@
-﻿using HBLibrary.Common.DI.Unity;
+﻿using FileManager.Core.Workspace;
+using FileManager.UI.ViewModels;
+using HBLibrary.Common.DI.Unity;
+using HBLibrary.Common.Workspace;
 using HBLibrary.Services.IO.Storage;
 using HBLibrary.Services.IO.Storage.Entries;
+using HBLibrary.Wpf.Services.NavigationService;
+using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +32,10 @@ public static class AppStateHandler {
             return;
 
         try {
+
+            IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+            workspaceManager.CurrentWorkspace?.CloseAsync().GetAwaiter().GetResult();
+
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
             applicationStorage.SaveAll();
         }
@@ -39,8 +48,65 @@ public static class AppStateHandler {
         if (container is null)
             return;
 
+
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        workspaceManager.CurrentWorkspace?.CloseAsync().GetAwaiter().GetResult();
+
         IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
         applicationStorage.SaveAll();
+    }
+    #endregion
+
+    #region User switch
+    public static void UserSwitchCallback(bool success) {
+        if (success) {
+            SaveAppState();
+
+            IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+            IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+
+            ApplicationState appState = new ApplicationState {
+                WindowState = WindowState.Normal,
+            };
+
+            if (applicationStorage.DefaultContainer.TryGet("appstate", out IStorageEntry? entry)) {
+                ApplicationState? appStateEntry = entry.Get<ApplicationState>();
+                if (appStateEntry != null) {
+                    appState = appStateEntry;
+                }
+            }
+
+            MainWindow window = new MainWindow(appState) {
+                DataContext = new MainViewModel()
+            };
+
+            window.Closing += (_, _) => {
+                if (AppStateHandler.CanShutdown) {
+                    AppStateHandler.SaveAppStateBeforeExit();
+                }
+            };
+
+            window.Closed += (s, _) => {
+
+                if (AppStateHandler.CanShutdown) {
+                    Application.Current.Shutdown();
+                }
+                else {
+                    AppStateHandler.AllowShutdown();
+                    if (s is MainWindow { DataContext: IDisposable disposable }) {
+                        disposable.Dispose();
+                    }
+
+                    INavigationStore store = container.Resolve<INavigationStore>();
+                    store.Clear();
+                }
+            };
+
+            window.Show();
+        }
+        else {
+            Application.Current.Shutdown();
+        }
     }
     #endregion
 

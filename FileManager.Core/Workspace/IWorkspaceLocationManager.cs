@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Workspace;
 public interface IWorkspaceLocationManager {
-    public Task<WorkspaceLocationCache> GetWorkspaceLocationsAsync();
-    public Task AddWorkspaceLocationAsync(string location);
-    public Task RemoveWorkspaceLocation(string location);
+    public event Action<bool, WorkspaceLocation[]>? WorkspaceLocationsChanged;
+    public WorkspaceLocationCache LocationCache { get; }
+    public void AddWorkspaceLocations(string[] locations);
+    public void RemoveWorkspaceLocations(string[] locations);
+    public void SetLatestWorkspaceLocation(WorkspaceLocation location);
+    public void Update(WorkspaceLocationCache locationCache);
 }

@@ -3,7 +3,10 @@ using FileManager.Core.JobSteps.Converters;
 using FileManager.Core.Workspace;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels;
+using FileManager.UI.ViewModels.JobViewModels;
+using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.ViewModels.SettingsViewModels;
+using FileManager.UI.ViewModels.WorkspaceViewModels;
 using HBLibrary.Common;
 using HBLibrary.Common.Account;
 using HBLibrary.Common.Authentication;
@@ -42,23 +45,12 @@ namespace FileManager.UI {
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
+        public const string ViewModelContainer = "ViewModelContainer";
         public App() {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             this.DispatcherUnhandledException += AppOnUnhandledException;
-           
-            IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
-            AddConfiguration(container);
-            AddNavigation(container);
-            AddLogging(container);
 
-            container.RegisterType<IDialogService, DialogService>();
-
-            AddAuthentication(container);
-            AddWorkspace(container);
-            container.RegisterType<ISettingsService, SettingsService>();
-
-            AddPluginManager(container);
-            AddApplicationStorage(container);
+            AddDIContainer();
         }
 
         private void AppOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
@@ -75,6 +67,25 @@ namespace FileManager.UI {
         }
 
         #region Services
+        
+
+        public static void AddDIContainer() {
+            IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
+
+            AddConfiguration(container);
+            AddNavigation(container);
+            AddLogging(container);
+
+            container.RegisterType<IDialogService, DialogService>();
+
+            AddAuthentication(container);
+            AddWorkspace(container);
+            container.RegisterType<ISettingsService, SettingsService>();
+
+            AddPluginManager(container);
+            AddApplicationStorage(container);
+        }
+
         private static void AddConfiguration(IUnityContainer container) {
             IConfigurationRoot configuration = new ConfigurationBuilder()
                       .SetBasePath(Directory.GetCurrentDirectory())
@@ -87,19 +98,20 @@ namespace FileManager.UI {
             CommonAppSettings commonAppSettings = new CommonAppSettings();
             configuration.GetSection("Application").Bind(commonAppSettings);
 
-            container.RegisterInstance(azureAdOptions, new SingletonLifetimeManager());
-            container.RegisterInstance(commonAppSettings, new SingletonLifetimeManager());
+            container.RegisterInstance(azureAdOptions, new ContainerControlledLifetimeManager());
+            container.RegisterInstance(commonAppSettings, new ContainerControlledLifetimeManager());
         }
         private static void AddNavigation(IUnityContainer container) {
             INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder()
+                .AddParentTypename(nameof(MainViewModel))
                 .DisposeOnLeave();
 
-            container.RegisterInstance(storeBuilder.Build());
+            container.RegisterInstance(storeBuilder.Build(), new ContainerControlledLifetimeManager());
             container.RegisterType<INavigationService, NavigationService>();
         }
         private static void AddLogging(IUnityContainer container) {
             ILoggerRegistry registry = LoggerRegistry.FromConfiguration(e => e.Build());
-            container.RegisterInstance(registry);
+            container.RegisterInstance(registry, new ContainerControlledLifetimeManager());
             container.RegisterType<ILoggerFactory, LoggerFactory>();
         }
         private static void AddAuthentication(IUnityContainer container) {
@@ -117,13 +129,13 @@ namespace FileManager.UI {
                .Build();
 
             // Token cache for handling accounts across sessions
-            MSTokenStorage.Create(commonAppSettings.ApplicationName!, app);
+            MSTokenStorage.Create(app);
 
             PublicMSAuthenticationService publicMSAuthenticationService
                 = new PublicMSAuthenticationService(app);
 
-            container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new SingletonLifetimeManager());
-            container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new SingletonLifetimeManager());
+            container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new ContainerControlledLifetimeManager());
+            container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new ContainerControlledLifetimeManager());
 
             container.RegisterType<IAccountStorage, AccountStorage>();
             container.RegisterSingleton<IAccountService, AccountService>();
@@ -136,36 +148,9 @@ namespace FileManager.UI {
             IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager =
                 new ApplicationWorkspaceManager<HBFileManagerWorkspace>(commonAppSettings.ApplicationName!, accountStorage);
 
-            container.RegisterInstance(workspaceManager, new SingletonLifetimeManager());
-            container.RegisterType<IWorkspaceLocationManager, WorkspaceLocationManager>();
+            container.RegisterInstance(workspaceManager, new ContainerControlledLifetimeManager());
+            container.RegisterSingleton<IWorkspaceLocationManager, WorkspaceLocationManager>();
         }
-
-        // This is required for user switching
-        public static void AddApplicationStorageContainers(IUnityContainer container) {
-            IApplicationStorage storage = container.Resolve<IApplicationStorage>();
-            IAccountService accountService = container.Resolve<IAccountService>();
-            IPluginManager pluginManager = container.Resolve<IPluginManager>();
-
-            string accountId = accountService.Account!.AccountId;
-
-            storage.CreateContainer($"{accountId + nameof(SettingsService)}".ToGuid(), b => {
-                b.SetContainerPath($"{Path.Combine(accountId, "settings")}");
-
-                b.ConfigureFileServices(c => {
-                    c.UseJsonFileService(jfs => {
-                        jfs.UseBase64 = true;
-                        jfs.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = {
-                                new TimeOnlyConverter(),
-                            },
-                            WriteIndented = true
-                        });
-                    });
-                });
-                return b.Build();
-            });
-        }
-
         
         private static void AddApplicationStorage(IUnityContainer container) {
 
@@ -194,15 +179,7 @@ namespace FileManager.UI {
                 return b.Build();
             });
 
-            appStorageBuilder.AddContainer(typeof(WorkspaceLocationManager), b =>
-                b.SetContainerPath("workspacelocations")
-                .ConfigureFileServices(fs => {
-                    fs.UseJsonFileService();
-                })
-                .Build()
-            );
-
-            container.RegisterInstance(appStorageBuilder.Build(), InstanceLifetime.Singleton);
+            container.RegisterInstance(appStorageBuilder.Build(), new ContainerControlledLifetimeManager());
         }
         
         private static void AddPluginManager(IUnityContainer container) {
@@ -215,7 +192,7 @@ namespace FileManager.UI {
                 .SetDefaultTypeResolver()
                 .SetDefaultTypeRegistry();
 
-            container.RegisterInstance(builder.Build(), InstanceLifetime.Singleton);
+            container.RegisterInstance(builder.Build(), new ContainerControlledLifetimeManager());
         }
 
         public static string GetPluginStoragePath(IUnityContainer container) {
@@ -289,7 +266,7 @@ namespace FileManager.UI {
 
         private void MainWindowStartup(IUnityContainer container) {
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
-
+            INavigationStore store = container.Resolve<INavigationStore>();
 
             ApplicationState appState = new ApplicationState {
                 WindowState = WindowState.Normal
@@ -313,13 +290,18 @@ namespace FileManager.UI {
                 }
             };
 
-            MainWindow.Closed += (_, _) => {
+            MainWindow.Closed += (s, e) => {
                 if (AppStateHandler.CanShutdown) {
                     Shutdown();
                 }
                 else {
                     // Allow shutdown on next close
                     AppStateHandler.AllowShutdown();
+                    if (s is MainWindow { DataContext: IDisposable disposable }) {
+                        disposable.Dispose();
+                    }
+
+                    store.Clear();
                 }
             };
 

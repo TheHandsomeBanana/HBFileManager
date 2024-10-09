@@ -56,7 +56,7 @@
 
             <StackPanel Orientation="Vertical"
                         Grid.Row="0"
-                        IsEnabled="{Binding IsInitialized, FallbackValue=True}">
+                        IsEnabled="{Binding IsInitialized, FallbackValue=False}">
 
                 <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
                            Text="Properties"
@@ -158,7 +158,7 @@
                 <Border Style="{StaticResource HBDark_ControlBorder}"
                         Grid.Column="0"
                         Grid.Row="0"
-                        IsEnabled="{Binding IsInitialized, FallbackValue=True}">
+                        IsEnabled="{Binding IsInitialized}">
 
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
@@ -180,6 +180,7 @@
                             <buttons:IconButton BorderThickness="1"
                                                 Height="24"
                                                 Width="24"
+                                                ToolTip="Add step"
                                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                                 IconFill="{StaticResource VSGreen}"
                                                 Command="{Binding AddStepCommand}">
@@ -198,7 +199,7 @@
 
                             <buttons:IconButton BorderThickness="1"
                                                 Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
-                                                ToolTip="Validate job"
+                                                ToolTip="Validate step"
                                                 Height="24"
                                                 Width="24"
                                                 IconHeight="18"
@@ -344,7 +345,7 @@
 
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
-                              IsEnabled="{Binding IsInitialized, FallbackValue=True}"
+                              IsEnabled="{Binding IsInitialized, FallbackValue=False}"
                               scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
                               scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
                               HorizontalScrollBarVisibility="Auto"

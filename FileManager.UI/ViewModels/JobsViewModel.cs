@@ -54,7 +54,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     public JobsViewModel() {
         IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
         this.dialogService = container.Resolve<IDialogService>();
-        IApplicationWorkspaceManager<HBFileManagerWorkspace>  workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
 
         this.jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
 
@@ -68,7 +68,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     private void OnValidationException(Exception exception) {
-        HBDarkMessageBox.Show("Validation error", 
+        HBDarkMessageBox.Show("Validation error",
             exception.Message,
             MessageBoxButton.OK,
             MessageBoxImage.Error);
@@ -76,7 +76,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
     private Task ValidateJob(JobItemViewModel model) {
         List<Task> validationTasks = [];
-        foreach(JobStepWrapperViewModel step in model.Steps) {
+        foreach (JobStepWrapperViewModel step in model.Steps) {
             validationTasks.Add(model.ValidateJobStepAsync(step.Model));
         }
 
@@ -121,10 +121,9 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
             JobItemViewModel jobItemViewModel = new JobItemViewModel(newJob);
             jobs.Add(jobItemViewModel);
-            SelectedJob = jobItemViewModel;
-
             jobManager.AddOrUpdate(newJob);
-            SelectedJob = jobs.LastOrDefault();
+
+            SelectedJob = jobItemViewModel;
         }
     }
 

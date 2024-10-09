@@ -20,15 +20,13 @@ namespace FileManager.UI.Views;
 /// </summary>
 public partial class WorkspacesView : UserControl {
     public WorkspacesView() {
-        Loaded += WorkspacesView_Loaded;
+        DataContextChanged += WorkspacesView_DataContextChanged;
         InitializeComponent();
     }
 
-    private void WorkspacesView_Loaded(object sender, RoutedEventArgs e) {
-        if (DataContext is WorkspacesViewModel workspacesViewModel) {
-            Dispatcher.InvokeAsync(async () => {
-                await workspacesViewModel.InitializeAsync();
-            });
+    private void WorkspacesView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        if (e.NewValue is WorkspacesViewModel workspacesViewModel && !workspacesViewModel.IsInitialized) {
+            Dispatcher.Invoke(workspacesViewModel.InitializeAsync);
         }
     }
 }

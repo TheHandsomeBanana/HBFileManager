@@ -15,7 +15,11 @@ public partial class JobItemView : UserControl {
 
     private void JobItemView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e) {
         if (e.NewValue is JobItemViewModel jobItemViewModel && !jobItemViewModel.IsInitialized) {
-            this.Dispatcher.InvokeAsync(jobItemViewModel.InitializeAsync);
+            this.Dispatcher.Invoke(jobItemViewModel.InitializeAsync);
         };
+
+        if(e.OldValue is IDisposable disposable) {
+            disposable.Dispose();
+        }
     }
 }

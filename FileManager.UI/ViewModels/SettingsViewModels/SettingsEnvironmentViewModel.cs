@@ -12,8 +12,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
             }
         }
         
-        public SettingsEnvironmentViewModel() {
-            Model = new SettingsEnvironmentModel();
+        public SettingsEnvironmentViewModel() : base(new SettingsEnvironmentModel()) {
         }
 
         public SettingsEnvironmentViewModel(SettingsEnvironmentModel model) : base(model) { }

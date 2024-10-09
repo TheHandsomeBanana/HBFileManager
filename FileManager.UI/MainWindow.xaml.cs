@@ -11,14 +11,19 @@ namespace FileManager.UI {
         public MainWindow() {
             InitializeComponent();
             StateChanged += MainWindowStateChangeRaised;
-            Loaded += MainWindow_Loaded;
+            DataContextChanged += MainWindow_DataContextChanged;
         }
 
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e) {
-            if(DataContext is MainViewModel mainViewModel) {
+        private void MainWindow_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+            if (e.NewValue is MainViewModel mainViewModel) {
                 Dispatcher.InvokeAsync(mainViewModel.InitializeAsync);
             }
+
+            if(e.OldValue is IDisposable disposable) {
+                disposable.Dispose();
+            }
         }
+
 
         public MainWindow(ApplicationState appState) : this() {
             WindowState = appState.WindowState;

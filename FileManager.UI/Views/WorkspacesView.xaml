@@ -9,6 +9,7 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
+             xmlns:workspaceViews="clr-namespace:FileManager.UI.Views.WorkspaceViews"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
@@ -20,6 +21,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
@@ -35,132 +37,143 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Grid Margin="5">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="30" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
+        <Border Style="{StaticResource HBDark_ControlBorder}"
+                Grid.Column="0">
+
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
 
-            <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
-                       Text="Workspaces" />
+                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                           Text="Workspaces" />
 
-            <StackPanel Grid.Row="1"
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal">
+                <StackPanel Grid.Row="1"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
 
-                <buttons:IconButton BorderThickness="1"
-                                    ToolTip="Add workspace"
-                                    Height="24"
-                                    Width="24"
-                                    IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                    IconFill="{StaticResource VSGreen}"
-                                    Command="{Binding AddWorkspaceCommand}">
+                    <buttons:IconButton BorderThickness="1"
+                                        ToolTip="Add workspace"
+                                        Height="24"
+                                        Width="24"
+                                        IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                        IconFill="{StaticResource VSGreen}"
+                                        Command="{Binding CreateWorkspaceCommand}">
 
-                </buttons:IconButton>
+                    </buttons:IconButton>
 
-                <buttons:IconButton BorderThickness="1"
-                                    Visibility="{Binding SelectedJob, Converter={StaticResource n2v}}"
-                                    ToolTip="Remove workspace"
-                                    Height="24"
-                                    Width="24"
-                                    IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                    IconFill="{StaticResource VSRed}"
+                    <buttons:IconButton BorderThickness="1"
+                                        Visibility="{Binding SelectedWorkspace, Converter={StaticResource n2v}}"
+                                        ToolTip="Remove workspace"
+                                        Height="24"
+                                        Width="24"
+                                        IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                        IconFill="{StaticResource VSRed}"
+                                        Command="{Binding RemoveWorkspaceCommand}"
+                                        CommandParameter="{Binding SelectedWorkspace}">
+                    </buttons:IconButton>
+
+                    <buttons:IconButton BorderThickness="1"
+                                        Visibility="{Binding SelectedWorkspace, Converter={StaticResource n2v}}"
+                                        ToolTip="Export workspace"
+                                        Height="24"
+                                        Width="24"
+                                        IconHeight="18"
+                                        IconStretch="Uniform"
+                                        IconData="M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M8.93,12.22H16V19.29L13.88,17.17L11.05,20L8.22,17.17L11.05,14.35"
+                                        IconFill="#51b4ff"
+                                        Command="{Binding ExportWorkspaceCommand}"
+                                        CommandParameter="{Binding SelectedWorkspace}">
+
+                    </buttons:IconButton>
+
+                    <buttons:IconButton BorderThickness="1"
+                                        ToolTip="Import workspace"
+                                        Height="24"
+                                        Width="24"
+                                        IconHeight="18"
+                                        IconStretch="Uniform"
+                                        IconData="M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M10.05,11.22L12.88,14.05L15,11.93V19H7.93L10.05,16.88L7.22,14.05"
+                                        IconFill="#51b4ff"
+                                        Command="{Binding ImportWorkspaceCommand}">
+
+                    </buttons:IconButton>
+                </StackPanel>
+
+                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Search Workspaces"
+                         Grid.Row="2">
+
+                </TextBox>
+
+                <ListBox Style="{StaticResource HBDark_ListBox}"
+                         ItemsSource="{Binding WorkspacesView}"
+                         SelectedItem="{Binding SelectedWorkspace}"
+                         Grid.Row="3"
+                         AllowDrop="True"
+                         DisplayMemberPath="Name">
+
+                    <i:Interaction.Behaviors>
+                        <behaviors:ListBoxDragDropBehavior DragDropDataType="{x:Type viewModels:WorkspacesViewModel}" />
+                    </i:Interaction.Behaviors>
+
+                    <ListBox.Resources>
+                        <ContextMenu x:Key="contextMenu"
+                                     DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                     Style="{StaticResource HBDark_ContextMenu}">
+                            <MenuItem Header="Remove workspace"
+                                      Command="{Binding RemoveWorkspaceCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                <menus:MenuItemAttachedProperties.IconPath>
+                                    <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                          Fill="{StaticResource VSRed}"
+                                          Stretch="Uniform" />
+                                </menus:MenuItemAttachedProperties.IconPath>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ListBox.Resources>
+
+                    <ListBox.InputBindings>
+                        <KeyBinding Key="Delete"
                                     Command="{Binding RemoveWorkspaceCommand}"
-                                    CommandParameter="{Binding SelectedJob}">
-                </buttons:IconButton>
+                                    CommandParameter="{Binding SelectedWorkspace}" />
+                    </ListBox.InputBindings>
 
-                <buttons:IconButton BorderThickness="1"
-                                    Visibility="{Binding SelectedJob, Converter={StaticResource n2v}}"
-                                    ToolTip="Export workspace"
-                                    Height="24"
-                                    Width="24"
-                                    IconHeight="18"
-                                    IconStretch="Uniform"
-                                    IconData="M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M8.93,12.22H16V19.29L13.88,17.17L11.05,20L8.22,17.17L11.05,14.35"
-                                    IconFill="#51b4ff"
-                                    Command="{Binding ExportWorkspaceCommand}"
-                                    CommandParameter="{Binding SelectedWorkspace}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem"
+                               BasedOn="{StaticResource HBDark_ListBoxItem}">
+                            <Setter Property="ContextMenu"
+                                    Value="{StaticResource contextMenu}" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
 
-                </buttons:IconButton>
-                
-                <buttons:IconButton BorderThickness="1"
-                                    ToolTip="Import workspace"
-                                    Height="24"
-                                    Width="24"
-                                    IconHeight="18"
-                                    IconStretch="Uniform"
-                                    IconData="M6,2C4.89,2 4,2.9 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,3.5L18.5,9H13M10.05,11.22L12.88,14.05L15,11.93V19H7.93L10.05,16.88L7.22,14.05"
-                                    IconFill="#51b4ff"
-                                    Command="{Binding ImportWorkspaceCommand}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                            <MenuItem Header="Add workspace"
+                                      Command="{Binding CreateWorkspaceCommand}">
+                                <menus:MenuItemAttachedProperties.IconPath>
+                                    <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                          Fill="{StaticResource VSGreen}"
+                                          Stretch="Uniform" />
+                                </menus:MenuItemAttachedProperties.IconPath>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </Grid>
+        </Border>
 
-                </buttons:IconButton>
-            </StackPanel>
 
-            <TextBox Style="{StaticResource HBDark_VSFilterBox}"
-                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                     Tag="Search Workspaces"
-                     Grid.Row="2">
+        <workspaceViews:WorkspaceItemView DataContext="{Binding SelectedWorkspace}"
+                                          Grid.Column="1"
+                                          Visibility="{Binding DataContext.SelectedWorkspace, Converter={StaticResource n2v}, RelativeSource={RelativeSource AncestorType=UserControl}}">
 
-            </TextBox>
-
-            <ListBox Style="{StaticResource HBDark_ListBox}"
-                     ItemsSource="{Binding JobsView}"
-                     SelectedItem="{Binding SelectedWorkspace}"
-                     Grid.Row="3"
-                     AllowDrop="True">
-
-                <i:Interaction.Behaviors>
-                    <behaviors:ListBoxDragDropBehavior DragDropDataType="{x:Type viewModels:WorkspacesViewModel}" />
-                </i:Interaction.Behaviors>
-
-                <ListBox.Resources>
-                    <ContextMenu x:Key="contextMenu"
-                                 DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                 Style="{StaticResource HBDark_ContextMenu}">
-                        <MenuItem Header="Remove workspace"
-                                  Command="{Binding RemoveWorkspaceCommand}"
-                                  CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-
-                            <menus:MenuItemAttachedProperties.IconPath>
-                                <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                      Fill="{StaticResource VSRed}"
-                                      Stretch="Uniform" />
-                            </menus:MenuItemAttachedProperties.IconPath>
-                        </MenuItem>
-                    </ContextMenu>
-                </ListBox.Resources>
-
-                <ListBox.InputBindings>
-                    <KeyBinding Key="Delete"
-                                Command="{Binding RemoveWorkspaceCommand}"
-                                CommandParameter="{Binding SelectedWorkspace}" />
-                </ListBox.InputBindings>
-
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem"
-                           BasedOn="{StaticResource HBDark_ListBoxItem}">
-                        <Setter Property="ContextMenu"
-                                Value="{StaticResource contextMenu}" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-
-                <ListBox.ContextMenu>
-                    <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
-                        <MenuItem Header="Add workspace"
-                                  Command="{Binding AddWorkspaceCommand}">
-                            <menus:MenuItemAttachedProperties.IconPath>
-                                <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                      Fill="{StaticResource VSGreen}"
-                                      Stretch="Uniform" />
-                            </menus:MenuItemAttachedProperties.IconPath>
-                        </MenuItem>
-                    </ContextMenu>
-                </ListBox.ContextMenu>
-            </ListBox>
-        </Grid>
-
+        </workspaceViews:WorkspaceItemView>
     </Grid>
 </UserControl>
