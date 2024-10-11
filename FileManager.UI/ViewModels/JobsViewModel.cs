@@ -52,7 +52,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     public JobsViewModel() {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        IUnityContainer container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         this.dialogService = container.Resolve<IDialogService>();
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
 

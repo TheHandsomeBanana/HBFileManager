@@ -32,7 +32,7 @@ using FileManager.Core.Workspace;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IDisposable {
-    private readonly IUnityContainer fileManagerContainer;
+    private readonly IUnityContainer container;
     private readonly IDialogService dialogService;
     private readonly JobManager jobManager;
     private readonly IPluginManager pluginManager;
@@ -146,11 +146,11 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
 
 
     public JobItemViewModel(Job model) : base(model) {
-        fileManagerContainer = UnityBase.GetChildContainer(nameof(FileManager))!;
-        this.dialogService = fileManagerContainer.Resolve<IDialogService>();
-        this.pluginManager = fileManagerContainer.Resolve<IPluginManager>();
+        container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
+        this.dialogService = container.Resolve<IDialogService>();
+        this.pluginManager = container.Resolve<IPluginManager>();
 
-        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = fileManagerContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
         this.jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
 
 
@@ -373,7 +373,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
 
     private ImmutableResultCollection Validate(JobStep jobStep) {
-        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+        ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
         ILogger tempLogger = loggerFactory.CreateLogger(jobStep.Name);
@@ -387,7 +387,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
 
     private async Task<ImmutableResultCollection> ValidateAsync(JobStep jobStep) {
-        ILoggerFactory loggerFactory = fileManagerContainer.Resolve<ILoggerFactory>();
+        ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
         IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(jobStep.Name);

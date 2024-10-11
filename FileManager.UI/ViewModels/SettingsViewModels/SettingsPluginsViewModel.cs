@@ -73,7 +73,7 @@ public class SettingsPluginsViewModel : ViewModelBase {
     }
 
     public SettingsPluginsViewModel() : base() {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        IUnityContainer container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         pluginManager = container.Resolve<IPluginManager>();
 
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();

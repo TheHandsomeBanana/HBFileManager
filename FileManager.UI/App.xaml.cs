@@ -1,13 +1,4 @@
-﻿using FileManager.Core.JobSteps;
-using FileManager.Core.JobSteps.Converters;
-using FileManager.Core.Workspace;
-using FileManager.UI.Services.SettingsService;
-using FileManager.UI.ViewModels;
-using FileManager.UI.ViewModels.JobViewModels;
-using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
-using FileManager.UI.ViewModels.SettingsViewModels;
-using FileManager.UI.ViewModels.WorkspaceViewModels;
-using HBLibrary.Common;
+﻿using HBLibrary.Common;
 using HBLibrary.Common.Account;
 using HBLibrary.Common.Authentication;
 using HBLibrary.Common.Authentication.Microsoft;
@@ -46,11 +37,15 @@ namespace FileManager.UI {
     /// </summary>
     public partial class App : Application {
         public const string ViewModelContainer = "ViewModelContainer";
+
+        static App() {
+            ApplicationHandler.AddBaseDIContainer();
+            ApplicationHandler.AddChildContainer();
+        }
+
         public App() {
             AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
             this.DispatcherUnhandledException += AppOnUnhandledException;
-
-            AddDIContainer();
         }
 
         private void AppOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
@@ -63,155 +58,17 @@ namespace FileManager.UI {
         }
 
         private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e) {            
-            AppStateHandler.SaveAppState();
+            ApplicationHandler.SaveAppState();
         }
-
-        #region Services
-        
-
-        public static void AddDIContainer() {
-            IUnityContainer container = UnityBase.CreateChildContainer(nameof(FileManager));
-
-            AddConfiguration(container);
-            AddNavigation(container);
-            AddLogging(container);
-
-            container.RegisterType<IDialogService, DialogService>();
-
-            AddAuthentication(container);
-            AddWorkspace(container);
-            container.RegisterType<ISettingsService, SettingsService>();
-
-            AddPluginManager(container);
-            AddApplicationStorage(container);
-        }
-
-        private static void AddConfiguration(IUnityContainer container) {
-            IConfigurationRoot configuration = new ConfigurationBuilder()
-                      .SetBasePath(Directory.GetCurrentDirectory())
-                      .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                      .Build();
-
-            AzureAdOptions azureAdOptions = new AzureAdOptions();
-            configuration.GetSection("AzureAd").Bind(azureAdOptions);
-
-            CommonAppSettings commonAppSettings = new CommonAppSettings();
-            configuration.GetSection("Application").Bind(commonAppSettings);
-
-            container.RegisterInstance(azureAdOptions, new ContainerControlledLifetimeManager());
-            container.RegisterInstance(commonAppSettings, new ContainerControlledLifetimeManager());
-        }
-        private static void AddNavigation(IUnityContainer container) {
-            INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder()
-                .AddParentTypename(nameof(MainViewModel))
-                .DisposeOnLeave();
-
-            container.RegisterInstance(storeBuilder.Build(), new ContainerControlledLifetimeManager());
-            container.RegisterType<INavigationService, NavigationService>();
-        }
-        private static void AddLogging(IUnityContainer container) {
-            ILoggerRegistry registry = LoggerRegistry.FromConfiguration(e => e.Build());
-            container.RegisterInstance(registry, new ContainerControlledLifetimeManager());
-            container.RegisterType<ILoggerFactory, LoggerFactory>();
-        }
-        private static void AddAuthentication(IUnityContainer container) {
-            AzureAdOptions azureAdOptions = container.Resolve<AzureAdOptions>();
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-
-            LocalAuthenticationService localAuthenticationService = new LocalAuthenticationService();
-
-
-            IPublicClientApplication app = PublicClientApplicationBuilder.Create(azureAdOptions.ClientId)
-               .WithAuthority(AzureCloudInstance.AzurePublic, AadAuthorityAudience.AzureAdAndPersonalMicrosoftAccount)
-               .WithRedirectUri(azureAdOptions.RedirectUri)
-               .WithWindowsEmbeddedBrowserSupport()
-               //.WithWindowsDesktopFeatures(new BrokerOptions(BrokerOptions.OperatingSystems.Windows))
-               .Build();
-
-            // Token cache for handling accounts across sessions
-            MSTokenStorage.Create(app);
-
-            PublicMSAuthenticationService publicMSAuthenticationService
-                = new PublicMSAuthenticationService(app);
-
-            container.RegisterInstance<ILocalAuthenticationService>(localAuthenticationService, new ContainerControlledLifetimeManager());
-            container.RegisterInstance<IPublicMSAuthenticationService>(publicMSAuthenticationService, new ContainerControlledLifetimeManager());
-
-            container.RegisterType<IAccountStorage, AccountStorage>();
-            container.RegisterSingleton<IAccountService, AccountService>();
-        }
-        private static void AddWorkspace(IUnityContainer container) {
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-
-            IAccountStorage accountStorage = container.Resolve<IAccountStorage>();
-
-            IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager =
-                new ApplicationWorkspaceManager<HBFileManagerWorkspace>(commonAppSettings.ApplicationName!, accountStorage);
-
-            container.RegisterInstance(workspaceManager, new ContainerControlledLifetimeManager());
-            container.RegisterSingleton<IWorkspaceLocationManager, WorkspaceLocationManager>();
-        }
-        
-        private static void AddApplicationStorage(IUnityContainer container) {
-
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-
-            string storagePath = Path.Combine(GlobalEnvironment.ApplicationDataBasePath, commonAppSettings.ApplicationName!);
-
-            IApplicationStorageBuilder appStorageBuilder = ApplicationStorage.CreateBuilder(storagePath);
-
-            appStorageBuilder.AddContainer(typeof(SettingsService), b => {
-                b.SetContainerPath("settings");
-
-                b.ConfigureFileServices(c => {
-                    c.UseJsonFileService(jfs => {
-                        jfs.UseBase64 = true;
-                        jfs.SetGlobalOptions(new JsonSerializerOptions {
-                            Converters = {
-                                new TimeOnlyConverter(),
-                            },
-                            WriteIndented = true
-                        });
-                    });
-                });
-
-
-                return b.Build();
-            });
-
-            container.RegisterInstance(appStorageBuilder.Build(), new ContainerControlledLifetimeManager());
-        }
-        
-        private static void AddPluginManager(IUnityContainer container) {
-            string storagePath = GetPluginStoragePath(container);
-
-            IPluginManagerBuilder builder = PluginManager.CreateBuilder()
-                .Configure(e => e.SetPluginsLocation(storagePath))
-                .SetDefaultAssemblyLoader()
-                .SetDefaultTypeProvider()
-                .SetDefaultTypeResolver()
-                .SetDefaultTypeRegistry();
-
-            container.RegisterInstance(builder.Build(), new ContainerControlledLifetimeManager());
-        }
-
-        public static string GetPluginStoragePath(IUnityContainer container) {
-            CommonAppSettings commonAppSettings = container.Resolve<CommonAppSettings>();
-
-            return Path.Combine(GlobalEnvironment.ApplicationDataBasePath,
-                commonAppSettings.ApplicationName!,
-                "plugins");
-        }
-        #endregion
 
 
         protected override async void OnStartup(StartupEventArgs e) {
             try {
-                IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+                IUnityContainer container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
 
                 // Do not allow multiple main window instances
-                if (AppStateHandler.HandleInstanceRunning(this, appSettings.ApplicationName!)) {
+                if (ApplicationHandler.HandleInstanceRunning(this, appSettings.ApplicationName!)) {
                     return;
                 }
 
@@ -259,7 +116,7 @@ namespace FileManager.UI {
                 base.OnStartup(e);
             }
             catch {
-                AppStateHandler.SaveAppStateOnExit();
+                ApplicationHandler.SaveAppStateOnExit();
                 Shutdown();
             }
         }
@@ -279,31 +136,7 @@ namespace FileManager.UI {
                 }
             }
 
-            MainWindow = new MainWindow(appState) {
-                DataContext = new MainViewModel(),
-            };
-
-
-            MainWindow.Closing += (_, _) => {
-                if(AppStateHandler.CanShutdown) {
-                    AppStateHandler.SaveAppStateBeforeExit();
-                }
-            };
-
-            MainWindow.Closed += (s, e) => {
-                if (AppStateHandler.CanShutdown) {
-                    Shutdown();
-                }
-                else {
-                    // Allow shutdown on next close
-                    AppStateHandler.AllowShutdown();
-                    if (s is MainWindow { DataContext: IDisposable disposable }) {
-                        disposable.Dispose();
-                    }
-
-                    store.Clear();
-                }
-            };
+            MainWindow = ApplicationHandler.CreateNewMainWindow(container, appState);
 
             MainWindow.Show();
         }
@@ -311,8 +144,8 @@ namespace FileManager.UI {
 
 
         protected override void OnExit(ExitEventArgs e) {
-            AppStateHandler.ExitInstance();
-            AppStateHandler.SaveAppStateOnExit();
+            ApplicationHandler.ExitInstance();
+            ApplicationHandler.SaveAppStateOnExit();
 
             base.OnExit(e);
         }

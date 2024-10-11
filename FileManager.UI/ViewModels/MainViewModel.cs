@@ -105,17 +105,17 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
 
 
     public MainViewModel() {
-        container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
 
         this.applicationStorage = container.Resolve<IApplicationStorage>();
-        this.settingsService = container.Resolve<ISettingsService>();
         this.navigationStore = container.Resolve<INavigationStore>();
         this.accountService = container.Resolve<IAccountService>();
         this.commonAppSettings = container.Resolve<CommonAppSettings>();
         this.pluginManager = container.Resolve<IPluginManager>();
         this.workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
-        this.workspaceLocationManager = container.Resolve<IWorkspaceLocationManager>();
         this.navigationService = container.Resolve<INavigationService>();
+        this.workspaceLocationManager = container.Resolve<IWorkspaceLocationManager>();
+        this.settingsService = container.Resolve<ISettingsService>();
 
         NavigateToExplorerCommand = new NavigateCommand<ExplorerViewModel>(navigationService, () => new ExplorerViewModel());
         NavigateToJobsCommand = new NavigateCommand<JobsViewModel>(navigationService, () => new JobsViewModel());
@@ -196,10 +196,11 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     }
 
     private void OpenAccountOverview(Window obj) {
+
         AccountViewModel accountViewModel = new AccountViewModel(obj,
-            accountService,
-            commonAppSettings, AppStateHandler.UserSwitchCallback,
-            AppStateHandler.PreventShutdown
+            accountService, commonAppSettings, 
+            ApplicationHandler.OnAccountSwitched,
+            ApplicationHandler.OnAccountSwitching
         );
 
         HBDarkAccountWindow accountWindow = new HBDarkAccountWindow(obj, accountViewModel);
@@ -207,7 +208,7 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     }
 
     private void SaveApplicationState(object? obj) {
-        AppStateHandler.SaveAppState();
+        ApplicationHandler.SaveAppState();
         HBDarkMessageBox.Show("Saved", "Application state saved successfully.");
     }
 
@@ -260,8 +261,8 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     }
 
     public void Dispose() {
-        if(CurrentViewModel is IDisposable disposable) {
-            disposable.Dispose();
-        }
+        workspaceLocationManager.WorkspaceLocationsChanged -= WorkspaceLocationManager_WorkspaceLocationsChanged;
+        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged -= MainWindowViewModel_CurrentViewModelChanged;
+        navigationStore.Dispose();
     }
 }

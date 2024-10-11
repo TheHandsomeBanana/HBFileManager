@@ -66,9 +66,8 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
         }
     }
 
-
     public WorkspacesViewModel() {
-        container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid)!;
 
         workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
         locationManager = container.Resolve<IWorkspaceLocationManager>();
@@ -136,11 +135,7 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
             });
 
             workspaceGetResult.TapError(e => {
-                if (e is ApplicationWorkspaceException aex && aex.ExceptionType == ApplicationWorkspaceExceptionType.AccessDenied) {
-                    return;
-                }
-
-                OnException(e, "Workspace create error");
+                OnException(e, "Workspace import error");
             });
         }
     }

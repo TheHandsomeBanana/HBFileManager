@@ -7,7 +7,7 @@ using HBLibrary.Wpf.ViewModels;
 using Unity;
 
 namespace FileManager.UI.ViewModels;
-public class SettingsViewModel : ViewModelBase {
+public class SettingsViewModel : ViewModelBase, IDisposable {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
     public ViewModelBase? CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
@@ -20,7 +20,7 @@ public class SettingsViewModel : ViewModelBase {
     public NavigateCommand<SettingsPluginsViewModel> NavigateToPluginsCommand { get; set; }
 
     public SettingsViewModel() {
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        IUnityContainer container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid)!;
         INavigationService navigationService = container.Resolve<INavigationService>();
 
         settingsService = container.Resolve<ISettingsService>();
@@ -41,5 +41,9 @@ public class SettingsViewModel : ViewModelBase {
 
     private void SettingsViewModel_CurrentViewModelChanged() {
         NotifyPropertyChanged(nameof(CurrentViewModel));
+    }
+
+    public void Dispose() {
+        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged -= SettingsViewModel_CurrentViewModelChanged;
     }
 }

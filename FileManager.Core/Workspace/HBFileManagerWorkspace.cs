@@ -43,7 +43,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
         containerPath = Path.Combine(Path.GetDirectoryName(FullPath!)!, Path.GetFileNameWithoutExtension(FullPath!));
 
-        IUnityContainer container = UnityBase.GetChildContainer(nameof(FileManager))!;
+        IUnityContainer container = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
         IPluginManager pluginManager = container.Resolve<IPluginManager>();
 
 
