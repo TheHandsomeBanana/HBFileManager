@@ -47,6 +47,7 @@
             <CheckBox Style="{StaticResource HBDark_CheckBox}"
                       IsChecked="{Binding UsesEncryption, Mode=OneWay}"
                       Content="Encryption enabled" 
+                      IsEnabled="False"
                       Margin="0 0 0 20"/>
 
             <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"

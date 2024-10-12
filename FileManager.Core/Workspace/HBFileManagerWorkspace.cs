@@ -17,6 +17,10 @@ using HBLibrary.Common.DI.Unity;
 using HBLibrary.Services.IO.Storage.Container;
 using FileManager.Core.Job;
 using System.Text.Json.Serialization;
+using HBLibrary.Services.IO.Storage.Settings;
+using HBLibrary.Common.Security.Keys;
+using HBLibrary.Common;
+using HBLibrary.Services.IO.Storage.Builder;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -25,8 +29,8 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
     public IApplicationStorage? Storage { get; private set; }
     public JobManager? JobManager { get; set; }
-    
-    
+
+
     public HBFileManagerWorkspace() : base() {
     }
 
@@ -46,9 +50,22 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         IUnityContainer container = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
         IPluginManager pluginManager = container.Resolve<IPluginManager>();
 
+        IStorageEntryContainerBuilder jobContainerBuilder = StorageEntryContainer.CreateBuilder(containerPath!);
+        if (UsesEncryption) {
+            jobContainerBuilder.EnableCryptography(new StorageContainerCryptography {
+                CryptographyMode = HBLibrary.Common.Security.CryptographyMode.AES,
+                GetEntryKeyAsync = async () => {
+                    Result<AesKey> keyResult = await GetKeyAsync();
+                    return keyResult.Map<IKey>(e => e);
+                },
+                GetEntryKey = () => {
+                    Result<AesKey> keyResult = GetKey();
+                    return keyResult.Map<IKey>(e => e);
+                }
+            });
+        }
 
-        IStorageEntryContainer jobContainer = StorageEntryContainer.CreateBuilder(containerPath!)
-            .SetContainerPath("jobs")
+        jobContainerBuilder.SetContainerPath("jobs")
             .ConfigureFileServices(fs => fs.UseJsonFileService(jfs =>
                 jfs.SetGlobalOptions(new JsonSerializerOptions {
                     Converters = {
@@ -59,6 +76,8 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
                 }))
             ).Build();
 
+        IStorageEntryContainer jobContainer = jobContainerBuilder.Build();
+            
         Storage = ApplicationStorage.CreateBuilder(Path.GetDirectoryName(FullPath)!)
            .AddContainer(typeof(JobManager), _ => jobContainer)
            .Build();
@@ -66,6 +85,28 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         JobManager = new JobManager(jobContainer);
 
         NotifyOpened();
+    }
+
+    public override async Task SaveAsync() {
+        if (Storage is not null) {
+            await Storage.SaveAllAsync();
+        }
+    }
+
+    public override void Save() {
+        if (Storage is not null) {
+            Storage.SaveAll();
+        }
+    }
+
+    public override void Close() {
+        if (Storage is not null) {
+            Storage.SaveAll();
+        }
+
+        containerPath = null;
+
+        base.Close();
     }
 
     public override async Task CloseAsync() {

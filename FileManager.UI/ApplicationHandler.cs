@@ -38,7 +38,7 @@ public static class ApplicationHandler {
 
         if (UnityBase.Registry.TryGet(FileManagerContainerGuid, out IUnityContainer? container)) {
             IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
-            workspaceManager.CurrentWorkspace?.CloseAsync().GetAwaiter().GetResult();
+            workspaceManager.CurrentWorkspace?.Close();
 
             IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
             applicationStorage.SaveAll();
@@ -49,7 +49,7 @@ public static class ApplicationHandler {
         IUnityContainer container = UnityBase.Registry.Get(FileManagerContainerGuid);
 
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
-        workspaceManager.CurrentWorkspace?.CloseAsync().GetAwaiter().GetResult();
+        workspaceManager.CurrentWorkspace?.Save();
 
         IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
         applicationStorage.SaveAll();

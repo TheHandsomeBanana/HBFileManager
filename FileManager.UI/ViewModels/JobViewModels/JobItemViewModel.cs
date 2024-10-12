@@ -60,7 +60,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             }
             else {
                 CheckAllIsValid()
-                    .ContinueWith(e => CanRun = e.Result, TaskContinuationOptions.OnlyOnRanToCompletion)
+                    .ContinueWith(e => CanRun = e.Result && IsEnabled, TaskContinuationOptions.OnlyOnRanToCompletion)
                     .FireAndForget(OnInitializeException);
             }
         }
@@ -226,7 +226,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             SelectedStep = Steps.FirstOrDefault();
 
             CheckAllIsValid()
-                .ContinueWith(e => CanRun = e.Result, TaskContinuationOptions.OnlyOnRanToCompletion)
+                .ContinueWith(e => CanRun = e.Result && IsEnabled, TaskContinuationOptions.OnlyOnRanToCompletion)
                 .FireAndForget(OnInitializeException);
         }
     }
@@ -344,9 +344,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         ImmutableResultCollection res = Validate(jobStep);
         HandleLogs(res, jobStep);
 
-        CanRun = res.IsSuccess;
-
-        // TODO: Handle faulted case
+        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
         return res.IsSuccess;
     }
 
@@ -359,9 +357,22 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
 
         HandleLogs(res, jobStep);
 
-        CanRun = res.IsSuccess;
-
+        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
         return res.IsSuccess;
+    }
+
+    public async Task ValidateAllJobStepsAsync(IEnumerable<JobStep> jobSteps) {
+        Application.Current.Dispatcher.Invoke(() => ValidationLogVisible = true);
+        bool canRun = true;
+        foreach (JobStep jobStep in jobSteps) {
+            ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+
+            ImmutableResultCollection res = await ValidateAsync(jobStep);
+            HandleLogs(res, jobStep);
+            canRun &= res.IsSuccess;
+        }
+
+        CanRun = canRun && IsEnabled;
     }
 
     private Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {

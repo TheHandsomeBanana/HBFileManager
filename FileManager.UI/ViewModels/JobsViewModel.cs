@@ -76,11 +76,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
     private Task ValidateJob(JobItemViewModel model) {
         List<Task> validationTasks = [];
-        foreach (JobStepWrapperViewModel step in model.Steps) {
-            validationTasks.Add(model.ValidateJobStepAsync(step.Model));
-        }
-
-        return Task.WhenAll(validationTasks);
+        return model.ValidateAllJobStepsAsync(model.Steps.Select(e => e.Model));
     }
 
     private bool ValidationCanRun(JobItemViewModel obj) {
