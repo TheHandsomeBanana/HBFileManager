@@ -27,7 +27,9 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     public const string WorkspaceExtension = ".fmws";
     private string? containerPath;
 
+    [JsonIgnore]
     public IApplicationStorage? Storage { get; private set; }
+    [JsonIgnore]
     public JobManager? JobManager { get; set; }
 
 

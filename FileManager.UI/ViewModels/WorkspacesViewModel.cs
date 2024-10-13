@@ -145,8 +145,8 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
     }
 
 
-    private bool CanRemoveWorkspace(WorkspaceItemViewModel obj) {
-        if (workspaceManager.CurrentWorkspace is null) {
+    private bool CanRemoveWorkspace(WorkspaceItemViewModel? obj) {
+        if (workspaceManager.CurrentWorkspace is null || obj is null) {
             return true;
         }
 

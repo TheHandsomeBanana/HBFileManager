@@ -4,6 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.WorkspaceViews"
+             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
+             xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
+             xmlns:workspaceViews="clr-namespace:FileManager.UI.Views.WorkspaceViews"
+             xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
+             xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
@@ -17,6 +25,8 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <converters:NullToVisibilityConverter x:Key="n2v" />
 
         </ResourceDictionary>
     </UserControl.Resources>
@@ -50,11 +60,106 @@
                       IsEnabled="False"
                       Margin="0 0 0 20"/>
 
-            <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
-                       Text="Access Control"
-                       Margin="0 0 0 10">
-            </TextBlock>
-            
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+
+                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                           Text="Access Control" />
+
+                <StackPanel Grid.Row="1"
+                            HorizontalAlignment="Left"
+                            Orientation="Horizontal">
+
+                    <buttons:IconButton BorderThickness="1"
+                                        ToolTip="Share access"
+                                        Height="24"
+                                        Width="24"
+                                        IconData="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
+                                        IconFill="{StaticResource VSGreen}"
+                                        Command="{Binding ShareAccessCommand}">
+
+                    </buttons:IconButton>
+
+                    <buttons:IconButton BorderThickness="1"
+                                        Visibility="{Binding SelectedAccess, Converter={StaticResource n2v}}"
+                                        ToolTip="Revoke access"
+                                        Height="24"
+                                        Width="24"
+                                        IconData="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
+                                        IconFill="{StaticResource VSRed}"
+                                        Command="{Binding RevokeAccessCommand}"
+                                        CommandParameter="{Binding SelectedAccess}">
+                    </buttons:IconButton>
+                </StackPanel>
+
+                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Tag="Search accounts"
+                         Grid.Row="2">
+
+                </TextBox>
+
+                <ListBox Style="{StaticResource HBDark_ListBox}"
+                         ItemsSource="{Binding AccessControlView}"
+                         SelectedItem="{Binding SelectedAccess}"
+                         Grid.Row="3"
+                         AllowDrop="True"
+                         DisplayMemberPath="Name">
+
+                    <ListBox.Resources>
+                        <ContextMenu x:Key="contextMenu"
+                                     DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                     Style="{StaticResource HBDark_ContextMenu}">
+                            <MenuItem Header="Revoke access"
+                                      Command="{Binding RevokeAccessCommand}"
+                                      CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+
+                                <menus:MenuItemAttachedProperties.IconPath>
+                                    <Path Data="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
+                                          Fill="{StaticResource VSRed}"
+                                          Stretch="Uniform" />
+                                </menus:MenuItemAttachedProperties.IconPath>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ListBox.Resources>
+
+                    <ListBox.InputBindings>
+                        <KeyBinding Key="Delete"
+                                    Command="{Binding RevokeAccessCommand}"
+                                    CommandParameter="{Binding SelectedAccess}" />
+                    </ListBox.InputBindings>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem"
+                               BasedOn="{StaticResource HBDark_ListBoxItem}">
+                            <Setter Property="ContextMenu"
+                                    Value="{StaticResource contextMenu}" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ContextMenu>
+                        <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                            <MenuItem Header="Share access"
+                                      Command="{Binding ShareAccessCommand}">
+                                <menus:MenuItemAttachedProperties.IconPath>
+                                    <Path Data="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
+                                          Fill="{StaticResource VSGreen}"
+                                          Stretch="Uniform" />
+                                </menus:MenuItemAttachedProperties.IconPath>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                </ListBox>
+            </Grid>
+
+
+
         </StackPanel>
     </Grid>
 </UserControl>
