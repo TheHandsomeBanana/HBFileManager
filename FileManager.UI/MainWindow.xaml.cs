@@ -83,7 +83,7 @@ namespace FileManager.UI {
 
         private void SetMaximizedState() {
             // Margin = WindowChrome ResizeBorder and CaptionHeight
-            MainBorder.Margin = new Thickness(5, 5, 5, 45);
+            MainBorder.Margin = new Thickness(5);
             MainBorder.BorderThickness = new Thickness(0);
             RestoreButton.Visibility = Visibility.Visible;
             MaximizeButton.Visibility = Visibility.Collapsed;
