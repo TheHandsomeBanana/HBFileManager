@@ -87,14 +87,14 @@
                     </buttons:IconButton>
 
                     <buttons:IconButton BorderThickness="1"
-                                        Visibility="{Binding SelectedAccess, Converter={StaticResource n2v}}"
+                                        Visibility="{Binding SelectedAccessControl, Converter={StaticResource n2v}}"
                                         ToolTip="Revoke access"
                                         Height="24"
                                         Width="24"
                                         IconData="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
                                         IconFill="{StaticResource VSRed}"
                                         Command="{Binding RevokeAccessCommand}"
-                                        CommandParameter="{Binding SelectedAccess}">
+                                        CommandParameter="{Binding SelectedAccessControl}">
                     </buttons:IconButton>
                 </StackPanel>
 
@@ -107,10 +107,10 @@
 
                 <ListBox Style="{StaticResource HBDark_ListBox}"
                          ItemsSource="{Binding AccessControlView}"
-                         SelectedItem="{Binding SelectedAccess}"
+                         SelectedItem="{Binding SelectedAccessControl}"
                          Grid.Row="3"
                          AllowDrop="True"
-                         DisplayMemberPath="Name">
+                         DisplayMemberPath="Username">
 
                     <ListBox.Resources>
                         <ContextMenu x:Key="contextMenu"
@@ -132,7 +132,7 @@
                     <ListBox.InputBindings>
                         <KeyBinding Key="Delete"
                                     Command="{Binding RevokeAccessCommand}"
-                                    CommandParameter="{Binding SelectedAccess}" />
+                                    CommandParameter="{Binding SelectedAccessControl}" />
                     </ListBox.InputBindings>
 
                     <ListBox.ItemContainerStyle>

@@ -90,21 +90,23 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     }
 
     public override async Task SaveAsync() {
+        await base.SaveAsync();
+
         if (Storage is not null) {
             await Storage.SaveAllAsync();
         }
     }
 
     public override void Save() {
+        base.Save();
+
         if (Storage is not null) {
             Storage.SaveAll();
         }
     }
 
     public override void Close() {
-        if (Storage is not null) {
-            Storage.SaveAll();
-        }
+        Save();
 
         containerPath = null;
 
@@ -112,9 +114,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     }
 
     public override async Task CloseAsync() {
-        if (Storage is not null) {
-            await Storage.SaveAllAsync();
-        }
+        await SaveAsync();
 
         containerPath = null;
 

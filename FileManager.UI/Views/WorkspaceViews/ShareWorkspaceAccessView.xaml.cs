@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels.WorkspaceViewModels;
+using HBLibrary.Common.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +21,13 @@ namespace FileManager.UI.Views.WorkspaceViews;
 /// </summary>
 public partial class ShareWorkspaceAccessView : UserControl {
     public ShareWorkspaceAccessView() {
+        Loaded += ShareWorkspaceAccessView_Loaded;
         InitializeComponent();
+    }
+
+    private void ShareWorkspaceAccessView_Loaded(object sender, RoutedEventArgs e) {
+        if (DataContext is ShareWorkspaceAccessViewModel shareWorkspaceAccessViewModel) {
+            this.Dispatcher.Invoke(shareWorkspaceAccessViewModel.InitializeAsync);
+        }
     }
 }
