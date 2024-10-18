@@ -65,8 +65,8 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
         container = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
         workspaceManager = container.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
 
-        ShareAccessCommand = new AsyncRelayCommand(ShareAccessAsync, _ => true, OnShareAccessException);
-        RevokeAccessCommand = new AsyncRelayCommand<AccountInfo>(RevokeAccessAsync, _ => true, OnRevokeAccessException);
+        ShareAccessCommand = new AsyncRelayCommand(ShareAccessAsync, CanShareAccess, OnShareAccessException);
+        RevokeAccessCommand = new AsyncRelayCommand<AccountInfo>(RevokeAccessAsync, CanRevokeAccess, OnRevokeAccessException);
         AccessControlList = new ObservableCollection<AccountInfo>(Model.SharedAccess);
 
         accessControlView = CollectionViewSource.GetDefaultView(AccessControlList);
@@ -92,7 +92,12 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
 
         IAccountService accountService = container.Resolve<IAccountService>();
 
-        await Model.OpenAsync(accountService.Account!);
+        bool isActiveWorkspace = true;
+        if (!Model.IsOpen) {
+            isActiveWorkspace = false;
+            await Model.OpenAsync(accountService.Account!);
+        }
+
         try {
 
             Result revokeResult = workspaceManager.RevokeAccess(Model, obj);
@@ -107,8 +112,16 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
             }
         }
         finally {
-            await Model.CloseAsync();
+            if (!isActiveWorkspace) {
+                await Model.CloseAsync();
+            }
         }
+    }
+
+    private bool CanRevokeAccess(AccountInfo obj) {
+        IAccountService accountService = container.Resolve<IAccountService>();
+
+        return workspaceManager.IsOwner(Model, accountService.Account!);
     }
 
     private void OnRevokeAccessException(Exception exception) {
@@ -121,7 +134,11 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
     private async Task ShareAccessAsync(object? obj) {
         IAccountService accountService = container.Resolve<IAccountService>();
 
-        await Model.OpenAsync(accountService.Account!);
+        bool isActiveWorkspace = true;
+        if (!Model.IsOpen) {
+            isActiveWorkspace = false;
+            await Model.OpenAsync(accountService.Account!);
+        }
 
         try {
             ShareWorkspaceAccessView view = new ShareWorkspaceAccessView();
@@ -160,8 +177,16 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
             }
         }
         finally {
-            await Model.CloseAsync();
+            if (!isActiveWorkspace) {
+                await Model.CloseAsync();
+            }
         }
+    }
+
+    private bool CanShareAccess(object? obj) {
+        IAccountService accountService = container.Resolve<IAccountService>();
+
+        return workspaceManager.IsOwner(Model, accountService.Account!);
     }
 
     private void OnShareAccessException(Exception exception) {

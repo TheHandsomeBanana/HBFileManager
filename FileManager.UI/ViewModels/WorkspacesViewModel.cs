@@ -87,7 +87,13 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
 
     protected override async Task InitializeViewModelAsync() {
         foreach (WorkspaceLocation location in locationManager.LocationCache.WorkspaceLocations) {
-            Result<HBFileManagerWorkspace> workspaceGetResult = await workspaceManager.GetAsync(location.FullPath, accountService.Account!);
+            Result<HBFileManagerWorkspace> workspaceGetResult;
+            if (location.FullPath == workspaceManager.CurrentWorkspace?.FullPath) {
+                workspaceGetResult = Result<HBFileManagerWorkspace>.Ok(workspaceManager.CurrentWorkspace);
+            }
+            else {
+                workspaceGetResult = await workspaceManager.GetAsync(location.FullPath, accountService.Account!);
+            }
 
             workspaceGetResult.Tap(e => {
                 WorkspaceItemViewModel workspaceViewModel = new WorkspaceItemViewModel(e);
@@ -99,7 +105,7 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
                     return;
                 }
 
-                OnException(e, "Workspace create error");
+                OnException(e, "Workspace get error");
             });
         }
     }
@@ -146,7 +152,15 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
 
 
     private bool CanRemoveWorkspace(WorkspaceItemViewModel? obj) {
-        if (workspaceManager.CurrentWorkspace is null || obj is null) {
+        if(obj is null) {
+            return false;
+        }
+
+        if(!workspaceManager.IsOwner(obj.Model, accountService.Account!)) {
+            return false;
+        }
+
+        if (workspaceManager.CurrentWorkspace is null) {
             return true;
         }
 
