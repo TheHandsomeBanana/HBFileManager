@@ -1,5 +1,5 @@
-﻿using HBLibrary.Common.Extensions;
-using HBLibrary.Common.Plugins;
+﻿using HBLibrary.Interface.Plugins;
+using HBLibrary.Plugins;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 

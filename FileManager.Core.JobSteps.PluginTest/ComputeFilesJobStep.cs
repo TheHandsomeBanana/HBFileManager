@@ -1,7 +1,7 @@
 ﻿using FileManager.Core.JobSteps.Attributes;
 using FileManager.Core.JobSteps.ViewModels;
-using HBLibrary.Common;
-using HBLibrary.Common.Plugins.Attributes;
+using HBLibrary.DataStructures;
+using HBLibrary.Interface.Plugins.Attributes;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 using Unity;

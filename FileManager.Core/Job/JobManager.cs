@@ -1,12 +1,11 @@
 ﻿using FileManager.Core.JobSteps;
-using HBLibrary.Services.IO.Storage.Container;
+using HBLibrary.Interface.IO.Storage.Container;
+using HBLibrary.Interface.IO.Storage.Entries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using HBLibrary.Services.IO.Storage.Entries;
-using HBLibrary.Services.IO.Storage.Settings;
 
 namespace FileManager.Core.Job;
 public class JobManager : IJobManager {

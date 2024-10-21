@@ -1,5 +1,5 @@
 using FileManager.Core.Interpreter.Syntax;
-using HBLibrary.Code.Interpreter;
+using HBLibrary.Interface.Interpreter;
 using System.Collections.Immutable;
 
 namespace FileManager.Core.Interpreter.Tests;

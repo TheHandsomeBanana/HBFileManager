@@ -1,5 +1,6 @@
-﻿using HBLibrary.Code.Interpreter;
-using HBLibrary.Code.Interpreter.Syntax;
+﻿
+using HBLibrary.Interface.Interpreter;
+using HBLibrary.Interface.Interpreter.Syntax;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public readonly struct SyntaxTrivia : ISyntaxTrivia {

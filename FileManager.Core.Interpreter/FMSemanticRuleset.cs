@@ -1,5 +1,5 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
-using HBLibrary.Services.IO;
+using HBLibrary.Interface.IO;
 
 namespace FileManager.Core.Interpreter;
 public static class FMSemanticRuleset {

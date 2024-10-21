@@ -1,4 +1,5 @@
-﻿using HBLibrary.Services.IO;
+﻿
+using HBLibrary.Interface.IO;
 
 namespace FileManager.Core.Interpreter.Operations;
 public abstract class IOOperation {

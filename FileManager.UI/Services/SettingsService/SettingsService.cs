@@ -1,8 +1,8 @@
-﻿using HBLibrary.Common.Account;
-using HBLibrary.Common.Extensions;
-using HBLibrary.Services.IO.Storage;
-using HBLibrary.Services.IO.Storage.Container;
-using HBLibrary.Services.IO.Storage.Entries;
+﻿
+using HBLibrary.Core.Extensions;
+using HBLibrary.Interface.IO.Storage;
+using HBLibrary.Interface.IO.Storage.Container;
+using HBLibrary.Interface.IO.Storage.Entries;
 
 namespace FileManager.UI.Services.SettingsService;
 public class SettingsService : ISettingsService {

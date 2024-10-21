@@ -1,7 +1,8 @@
 ﻿
 
-using HBLibrary.Code.Interpreter;
-using HBLibrary.Code.Interpreter.Syntax;
+
+using HBLibrary.Interface.Interpreter;
+using HBLibrary.Interface.Interpreter.Syntax;
 
 namespace FileManager.Core.Interpreter.Syntax;
 public abstract class SyntaxNode : ISyntaxNode<SyntaxNode, SyntaxToken> {

@@ -1,5 +1,6 @@
-﻿using HBLibrary.Code.Interpreter;
-using HBLibrary.Common.DI.Unity;
+﻿
+using HBLibrary.Interface.DI;
+using HBLibrary.Interface.Interpreter;
 using Unity;
 
 namespace FileManager.Core.Interpreter;

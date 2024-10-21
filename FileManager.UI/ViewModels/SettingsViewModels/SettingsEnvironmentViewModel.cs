@@ -4,10 +4,10 @@ using HBLibrary.Wpf.ViewModels;
 
 namespace FileManager.UI.ViewModels.SettingsViewModels {
     public class SettingsEnvironmentViewModel : ViewModelBase<SettingsEnvironmentModel> {
-        public bool EncryptJobs {
-            get => Model.EncryptJobs;
+        public bool ValidateOnNavigation {
+            get => Model.ValidateOnNavigation;
             set {
-                Model.EncryptJobs = value;
+                Model.ValidateOnNavigation = value;
                 NotifyPropertyChanged();
             }
         }

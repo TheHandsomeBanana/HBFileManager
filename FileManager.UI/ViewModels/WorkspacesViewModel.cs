@@ -7,11 +7,11 @@ using FileManager.UI.ViewModels.WorkspaceViewModels;
 using FileManager.UI.Views;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using FileManager.UI.Views.WorkspaceViews;
-using HBLibrary.Common;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Common.Exceptions;
-using HBLibrary.Common.Workspace;
+using HBLibrary.DataStructures;
+using HBLibrary.DI;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.Interface.Workspace;
+using HBLibrary.Workspace.Exceptions;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -146,7 +146,7 @@ public class WorkspacesViewModel : AsyncInitializerViewModelBase, IDisposable {
         }
     }
 
-    private async Task ExportWorkspace(WorkspaceItemViewModel workspace) {
+    private Task ExportWorkspace(WorkspaceItemViewModel workspace) {
         throw new NotImplementedException();
     }
 

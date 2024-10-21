@@ -1,18 +1,12 @@
 ﻿using HBLibrary.Common;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.Authentication;
-using HBLibrary.Common.Authentication.Microsoft;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Json;
 using HBLibrary.Common.Plugins;
-using HBLibrary.Common.Plugins.Builder;
-using HBLibrary.Common.Workspace;
-using HBLibrary.Services.IO.Storage;
-using HBLibrary.Services.IO.Storage.Builder;
-using HBLibrary.Services.IO.Storage.Entries;
-using HBLibrary.Services.IO.Storage.Settings;
-using HBLibrary.Services.Logging;
+using HBLibrary.Core;
+using HBLibrary.DI;
+using HBLibrary.Interface.IO.Storage;
+using HBLibrary.Interface.IO.Storage.Entries;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.Security.Authentication;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.Services.NavigationService.Builder;
@@ -74,7 +68,7 @@ namespace FileManager.UI {
 
                 IAccountService accountService = container.Resolve<IAccountService>();
 
-                AccountInfo? lastAccount = accountService.AccountStorage.GetLatestAccount(appSettings.ApplicationName!);
+                IAccountInfo? lastAccount = accountService.AccountStorage.GetLatestAccount(appSettings.ApplicationName!);
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
                     MSAuthCredentials? credentials = MSAuthCredentials

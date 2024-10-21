@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.DI\HBLibrary.DI.csproj" />
     <ProjectReference Include="..\FileManager.Core.Interpreter\FileManager.Core.Interpreter.csproj" />
   </ItemGroup>
 

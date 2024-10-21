@@ -1,4 +1,5 @@
-﻿using HBLibrary.Common.Plugins;
+﻿
+using HBLibrary.Interface.Plugins;
 
 namespace FileManager.Core.JobSteps.ViewModels;
 public class FallbackStepViewModel : JobStepViewModel<JobStep> {

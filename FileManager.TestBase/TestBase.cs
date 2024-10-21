@@ -1,7 +1,7 @@
 using FileManager.Core.Interpreter;
 using FileManager.Core.Interpreter.Syntax;
-using HBLibrary.Code.Interpreter.Lexer;
-using HBLibrary.Common.DI.Unity;
+using HBLibrary.DI;
+using HBLibrary.Interface.Interpreter.Lexer;
 using Unity;
 
 namespace FileManager.TestBase;

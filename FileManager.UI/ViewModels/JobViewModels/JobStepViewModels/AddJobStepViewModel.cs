@@ -1,6 +1,8 @@
 ﻿using FileManager.Core.JobSteps;
 using FileManager.Core.JobSteps.Models;
 using HBLibrary.Common.Plugins;
+using HBLibrary.Interface.Plugins;
+using HBLibrary.Plugins;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using System.Collections.Generic;

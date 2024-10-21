@@ -3,10 +3,11 @@ using FileManager.Core.JobSteps;
 using FileManager.Core.Workspace;
 using FileManager.UI.Models.SettingsModels;
 using HBLibrary.Common;
-using HBLibrary.Common.DI.Unity;
 using HBLibrary.Common.Plugins;
-using HBLibrary.Common.Plugins.Loader;
-using HBLibrary.Common.Workspace;
+using HBLibrary.DataStructures;
+using HBLibrary.DI;
+using HBLibrary.Interface.Plugins;
+using HBLibrary.Interface.Workspace;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -171,7 +172,7 @@ public class SettingsPluginsViewModel : ViewModelBase {
     }
 
     private void FindPlugins(string assemblyFileName) {
-        AssemblyContext? loadedContext = pluginManager.GetLoadedAssembly(assemblyFileName);
+        IAssemblyContext? loadedContext = pluginManager.GetLoadedAssembly(assemblyFileName);
         if (loadedContext is not null) {
             FoundPlugins = pluginManager.TypeProvider.GetCachedByAttribute<JobStep>([loadedContext]);
         }

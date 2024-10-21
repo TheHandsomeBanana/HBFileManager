@@ -1,8 +1,10 @@
-﻿using HBLibrary.Common;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.Authentication;
-using HBLibrary.Common.Authentication.Microsoft;
-using HBLibrary.Common.DI.Unity;
+﻿using HBLibrary.Core;
+using HBLibrary.Interface.DI;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.Interface.Security.Authentication;
+using HBLibrary.Security.Account;
+using HBLibrary.Security.Authentication;
+using HBLibrary.Security.Authentication.Microsoft;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;

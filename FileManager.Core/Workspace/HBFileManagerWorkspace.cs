@@ -1,9 +1,4 @@
-﻿using HBLibrary.Common.Account;
-using HBLibrary.Common.Extensions;
-using HBLibrary.Common.Workspace;
-using HBLibrary.Services.IO.Json;
-using HBLibrary.Services.IO.Storage;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,16 +6,23 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using HBLibrary.Common.Json;
 using FileManager.Core.JobSteps.Converters;
-using HBLibrary.Common.Plugins;
 using Unity;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Services.IO.Storage.Container;
 using FileManager.Core.Job;
 using System.Text.Json.Serialization;
-using HBLibrary.Services.IO.Storage.Settings;
-using HBLibrary.Common.Security.Keys;
-using HBLibrary.Common;
-using HBLibrary.Services.IO.Storage.Builder;
+using HBLibrary.Workspace;
+using HBLibrary.Interface.IO.Storage;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.DI;
+using HBLibrary.Interface.Plugins;
+using HBLibrary.Interface.IO.Storage.Builder;
+using HBLibrary.Interface.Security;
+using HBLibrary.Interface.IO.Storage.Settings;
+using HBLibrary.IO.Storage.Container;
+using HBLibrary.DataStructures;
+using HBLibrary.Interface.Security.Keys;
+using HBLibrary.IO.Storage.Builder;
+using HBLibrary.Interface.IO.Storage.Container;
+using HBLibrary.IO.Storage;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -44,7 +46,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         Directory.CreateDirectory(jobsDirectory);
     }
 
-    public override async Task OpenAsync(Account openedBy) {
+    public override async Task OpenAsync(IAccount openedBy) {
         await base.OpenAsync(openedBy);
 
         containerPath = Path.Combine(Path.GetDirectoryName(FullPath!)!, Path.GetFileNameWithoutExtension(FullPath!));
@@ -55,7 +57,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         IStorageEntryContainerBuilder jobContainerBuilder = StorageEntryContainer.CreateBuilder(containerPath!);
         if (UsesEncryption) {
             jobContainerBuilder.EnableCryptography(new StorageContainerCryptography {
-                CryptographyMode = HBLibrary.Common.Security.CryptographyMode.AES,
+                CryptographyMode = CryptographyMode.AES,
                 GetEntryKeyAsync = async () => {
                     Result<AesKey> keyResult = await GetKeyAsync();
                     return keyResult.Map<IKey>(e => e);

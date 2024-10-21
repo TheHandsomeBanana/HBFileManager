@@ -1,7 +1,7 @@
 ﻿using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.ViewModels.SettingsViewModels;
-using HBLibrary.Common.DI.Unity;
+using HBLibrary.DI;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
 using Unity;

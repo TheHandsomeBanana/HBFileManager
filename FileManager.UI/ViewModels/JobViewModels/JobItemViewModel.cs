@@ -5,12 +5,7 @@ using FileManager.Core.JobSteps.Views;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Common.Extensions;
 using HBLibrary.Common.Plugins;
-using HBLibrary.Services.IO;
-using HBLibrary.Services.Logging;
-using HBLibrary.Services.Logging.Loggers;
 using HBLibrary.Wpf;
 using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
@@ -27,8 +22,17 @@ using System.Windows.Documents;
 using System.Xml.Serialization;
 using Unity;
 using FileManager.Core.Job;
-using HBLibrary.Common.Workspace;
 using FileManager.Core.Workspace;
+using FileManager.UI.Services.SettingsService;
+using FileManager.UI.Models.SettingsModels;
+using HBLibrary.Interface.Plugins;
+using HBLibrary.Core.Extensions;
+using HBLibrary.DI;
+using HBLibrary.Interface.Workspace;
+using HBLibrary.DataStructures;
+using HBLibrary.Interface.Logging;
+using HBLibrary.Interface.IO;
+using HBLibrary.IO;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IDisposable {
@@ -167,6 +171,13 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     protected override async Task InitializeViewModelAsync() {
         LoadJobSteps();
         SelectedStep = Steps.FirstOrDefault();
+
+        ISettingsService settingsService = container.Resolve<ISettingsService>();
+        SettingsEnvironmentModel environmentSettings = settingsService.GetSetting<SettingsEnvironmentModel>()!;
+        
+        if(!environmentSettings.ValidateOnNavigation) {
+            return;
+        }
 
         bool canRun = true;
         List<Task<bool>> validationTasks = [];

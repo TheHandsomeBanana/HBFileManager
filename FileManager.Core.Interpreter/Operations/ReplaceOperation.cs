@@ -1,6 +1,6 @@
 ﻿using FileManager.Core.Interpreter.Exceptions;
-using HBLibrary.Code.Interpreter.Operation;
-using HBLibrary.Services.IO;
+using HBLibrary.Interface.Interpreter.Operation;
+using HBLibrary.Interface.IO;
 
 namespace FileManager.Core.Interpreter.Operations;
 public sealed class ReplaceOperation : IOOperation, IAsyncOperation {

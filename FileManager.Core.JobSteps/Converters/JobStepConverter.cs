@@ -1,7 +1,5 @@
 ﻿using FileManager.Core.JobSteps.Models;
-using HBLibrary.Common.Plugins;
-using HBLibrary.Common.Plugins.Provider.Registry;
-using HBLibrary.Common.Plugins.Provider.Resolver;
+using HBLibrary.Interface.Plugins;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;

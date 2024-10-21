@@ -1,7 +1,7 @@
 ﻿using FileManager.Core.Interpreter.Syntax;
 using FileManager.Core.Interpreter.Syntax.Commands;
-using HBLibrary.Code.Interpreter;
-using HBLibrary.Code.Interpreter.Evaluator;
+using HBLibrary.Interface.Interpreter;
+using HBLibrary.Interface.Interpreter.Evaluator;
 using System.Collections.Immutable;
 
 namespace FileManager.Core.Interpreter;

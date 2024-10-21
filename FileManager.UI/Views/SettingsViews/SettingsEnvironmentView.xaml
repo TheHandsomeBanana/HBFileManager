@@ -20,6 +20,7 @@
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/GroupBox/GroupBoxes.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converters:EnumToStringConverter x:Key="e2s" />
@@ -30,10 +31,21 @@
     <StackPanel Orientation="Vertical"
                 Margin="0 10 0 0">
 
-        <CheckBox Style="{StaticResource HBDark_CheckBox}"
-                  Content="Encrypt jobs"
-                  IsChecked="{Binding EncryptJobs}">
+        <GroupBox Style="{StaticResource HBDark_GroupBox}" Padding="10 20 10 20">
+            <GroupBox.Header>
+                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                           Background="{StaticResource HBDark_Background}"
+                           Padding="5 0 5 0"
+                           Text="Jobs"
+                           Grid.Row="0"
+                           Margin="0 0 0 3" />
+            </GroupBox.Header>
 
-        </CheckBox>
+            <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                      Content="Validate on Navigation"
+                      IsChecked="{Binding ValidateOnNavigation}">
+
+            </CheckBox>
+        </GroupBox>
     </StackPanel>
 </UserControl>

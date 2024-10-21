@@ -2,8 +2,9 @@
 using FileManager.Core.Interpreter.Syntax.Arguments;
 using FileManager.Core.Interpreter.Syntax.Commands;
 using FileManager.Core.Interpreter.Syntax.Expressions;
-using HBLibrary.Code.Interpreter;
-using HBLibrary.Code.Interpreter.Parser;
+using HBLibrary.Interface.Interpreter;
+using HBLibrary.Interface.Interpreter.Parser;
+using HBLibrary.Interpreter.Parser;
 using System.Collections.Immutable;
 
 namespace FileManager.Core.Interpreter;

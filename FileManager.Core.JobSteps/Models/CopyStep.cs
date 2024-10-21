@@ -2,9 +2,10 @@
 using FileManager.Core.JobSteps.ViewModels;
 using FileManager.Core.JobSteps.Views;
 using HBLibrary.Common;
-using HBLibrary.Common.Plugins.Attributes;
-using HBLibrary.Services.IO;
-using HBLibrary.Services.Logging;
+using HBLibrary.DataStructures;
+using HBLibrary.Interface.IO;
+using HBLibrary.Interface.Logging;
+using HBLibrary.Interface.Plugins.Attributes;
 using HBLibrary.Wpf.Models;
 using HBLibrary.Wpf.ViewModels;
 using System.IO;

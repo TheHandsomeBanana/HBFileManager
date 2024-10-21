@@ -3,9 +3,11 @@ using FileManager.Core.Workspace;
 using FileManager.UI.Views;
 using FileManager.UI.Views.WorkspaceViews;
 using HBLibrary.Common;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Common.Workspace;
+using HBLibrary.DataStructures;
+using HBLibrary.DI;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.Interface.Workspace;
+using HBLibrary.Security.Account;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
 using HBLibrary.Wpf.ViewModels;
@@ -55,7 +57,7 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
     }
 
 
-    public ObservableCollection<AccountInfo> AccessControlList;
+    public ObservableCollection<IAccountInfo> AccessControlList;
     private readonly ICollectionView accessControlView;
     public ICollectionView AccessControlView => accessControlView;
     public AsyncRelayCommand ShareAccessCommand { get; set; }
@@ -67,7 +69,7 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
 
         ShareAccessCommand = new AsyncRelayCommand(ShareAccessAsync, CanShareAccess, OnShareAccessException);
         RevokeAccessCommand = new AsyncRelayCommand<AccountInfo>(RevokeAccessAsync, CanRevokeAccess, OnRevokeAccessException);
-        AccessControlList = new ObservableCollection<AccountInfo>(Model.SharedAccess);
+        AccessControlList = new ObservableCollection<IAccountInfo>(Model.SharedAccess);
 
         accessControlView = CollectionViewSource.GetDefaultView(AccessControlList);
         accessControlView.Filter = FilterAccounts;
@@ -99,7 +101,6 @@ public class WorkspaceItemViewModel : ViewModelBase<HBFileManagerWorkspace>, IDi
         }
 
         try {
-
             Result revokeResult = workspaceManager.RevokeAccess(Model, obj);
             if (revokeResult.IsFaulted) {
                 HBDarkMessageBox.Show("Revoke access error",

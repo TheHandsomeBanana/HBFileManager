@@ -1,6 +1,7 @@
 ﻿using FileManager.Core;
-using HBLibrary.Common.Account;
-using HBLibrary.Common.DI.Unity;
+using HBLibrary.DI;
+using HBLibrary.Interface.Security.Account;
+using HBLibrary.Security.Account;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.Views;
@@ -20,10 +21,10 @@ namespace FileManager.UI.ViewModels.WorkspaceViewModels;
 
 public class ShareWorkspaceAccessViewModel : AsyncInitializerViewModelBase {
     private readonly IUnityContainer container;
-    private readonly AccountInfo owner;
+    private readonly IAccountInfo owner;
 
-    public ObservableCollection<AccountInfo> AvailableAccounts { get; set; }
-    public ObservableCollection<AccountInfo> SharedWithAccounts { get; set; }
+    public ObservableCollection<IAccountInfo> AvailableAccounts { get; set; }
+    public ObservableCollection<IAccountInfo> SharedWithAccounts { get; set; }
 
     public AccountInfo? availableAccountsSelectedItem;
     public AccountInfo? AvailableAccountsSelectedItem {
@@ -56,7 +57,7 @@ public class ShareWorkspaceAccessViewModel : AsyncInitializerViewModelBase {
     public RelayCommand<Window> CancelCommand { get; set; }
     public RelayCommand AddAccountToShareCommand { get; set; }
     public RelayCommand RemoveAccountFromShareCommand { get; set; }
-    public ShareWorkspaceAccessViewModel(AccountInfo owner, AccountInfo[] currentSharedAccounts) {
+    public ShareWorkspaceAccessViewModel(IAccountInfo owner, IAccountInfo[] currentSharedAccounts) {
         this.owner = owner;
 
         container = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
@@ -66,17 +67,17 @@ public class ShareWorkspaceAccessViewModel : AsyncInitializerViewModelBase {
         AddAccountToShareCommand = new RelayCommand(AddAccount, CanAddAccounts);
         RemoveAccountFromShareCommand = new RelayCommand(RemoveAccount, CanRemoveAccount);
 
-        AvailableAccounts = new ObservableCollection<AccountInfo>();
-        SharedWithAccounts = new ObservableCollection<AccountInfo>(currentSharedAccounts);
+        AvailableAccounts = new ObservableCollection<IAccountInfo>();
+        SharedWithAccounts = new ObservableCollection<IAccountInfo>(currentSharedAccounts);
     }
 
 
     protected override async Task InitializeViewModelAsync() {
         IAccountStorage storage = new AccountStorage();
-        AccountInfo[] accounts = await storage.LoadAccountsAsync();
+        IAccountInfo[] accounts = await storage.LoadAccountsAsync();
 
         foreach (AccountInfo account in accounts) {
-            if (SharedWithAccounts.All(e => e.AccountId != account.AccountId) && account != owner) {
+            if (SharedWithAccounts.All(e => e.AccountId != account.AccountId) && account != (AccountInfo)owner) {
                 AvailableAccounts.Add(account);
             }
         }

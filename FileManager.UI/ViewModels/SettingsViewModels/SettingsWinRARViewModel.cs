@@ -1,5 +1,5 @@
 ﻿using FileManager.UI.Models.SettingsModels;
-using HBLibrary.Services.IO.Archiving.WinRAR;
+using HBLibrary.IO.Archiving.WinRAR;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using Microsoft.Win32;

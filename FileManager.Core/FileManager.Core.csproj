@@ -7,8 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Common\HBLibrary.Common.csproj" />
-    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Services.IO\HBLibrary.Services.IO.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.DI\HBLibrary.DI.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.Plugins\HBLibrary.Interface.Plugins.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.IO\HBLibrary.IO.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Workspace\HBLibrary.Workspace.csproj" />
     <ProjectReference Include="..\FileManager.Core.JobSteps\FileManager.Core.JobSteps.csproj" />
   </ItemGroup>
 

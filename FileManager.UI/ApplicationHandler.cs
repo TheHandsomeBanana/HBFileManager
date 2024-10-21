@@ -1,10 +1,10 @@
 ﻿using FileManager.Core;
 using FileManager.Core.Workspace;
 using FileManager.UI.ViewModels;
-using HBLibrary.Common.DI.Unity;
-using HBLibrary.Common.Workspace;
-using HBLibrary.Services.IO.Storage;
-using HBLibrary.Services.IO.Storage.Entries;
+using HBLibrary.DI;
+using HBLibrary.Interface.IO.Storage;
+using HBLibrary.Interface.IO.Storage.Entries;
+using HBLibrary.Interface.Workspace;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
 using Microsoft.Graph.Models.TermStore;
