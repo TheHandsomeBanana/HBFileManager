@@ -23,6 +23,7 @@ using HBLibrary.Interface.Security.Keys;
 using HBLibrary.IO.Storage.Builder;
 using HBLibrary.Interface.IO.Storage.Container;
 using HBLibrary.IO.Storage;
+using HBLibrary.Core.ChangeTracker;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -69,6 +70,8 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
             });
         }
 
+        jobContainerBuilder.EnableChangeTracker(new ChangeTracker());
+
         jobContainerBuilder.SetContainerPath("jobs")
             .ConfigureFileServices(fs => fs.UseJsonFileService(jfs =>
                 jfs.SetGlobalOptions(new JsonSerializerOptions {
@@ -78,10 +81,10 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
                     },
                     WriteIndented = true
                 }))
-            ).Build();
+            );
 
         IStorageEntryContainer jobContainer = jobContainerBuilder.Build();
-            
+
         Storage = ApplicationStorage.CreateBuilder(Path.GetDirectoryName(FullPath)!)
            .AddContainer(typeof(JobManager), _ => jobContainer)
            .Build();
@@ -92,23 +95,23 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     }
 
     public override async Task SaveAsync() {
-        await base.SaveAsync();
 
         if (Storage is not null) {
             await Storage.SaveAllAsync();
         }
+
+        await base.SaveAsync();
     }
 
     public override void Save() {
+        Storage?.SaveAll();
         base.Save();
-
-        if (Storage is not null) {
-            Storage.SaveAll();
-        }
     }
 
     public override void Close() {
         Save();
+
+        Storage?.Dispose();
 
         containerPath = null;
 
@@ -117,6 +120,8 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
     public override async Task CloseAsync() {
         await SaveAsync();
+
+        Storage?.Dispose();
 
         containerPath = null;
 

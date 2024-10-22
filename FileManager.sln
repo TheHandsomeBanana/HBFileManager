@@ -64,6 +64,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.DI", "..\HBLibrar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.Plugins", "..\HBLibrary\HBLibrary.Plugins\HBLibrary.Plugins.csproj", "{FFD4B48A-CA6D-443A-B7CB-28E40446E8B2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HBLibrary.Interface.Core", "..\HBLibrary\HBLibrary.Interface.Core\HBLibrary.Interface.Core.csproj", "{5EECCF55-44AB-4123-996A-957A886FCCD8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -162,6 +164,10 @@ Global
 		{FFD4B48A-CA6D-443A-B7CB-28E40446E8B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFD4B48A-CA6D-443A-B7CB-28E40446E8B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFD4B48A-CA6D-443A-B7CB-28E40446E8B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EECCF55-44AB-4123-996A-957A886FCCD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EECCF55-44AB-4123-996A-957A886FCCD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EECCF55-44AB-4123-996A-957A886FCCD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EECCF55-44AB-4123-996A-957A886FCCD8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +196,7 @@ Global
 		{42AB8B3D-03CB-4613-B920-2F85457E00E0} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
 		{EE1C7282-9D4E-4A01-9540-A417DA33BE65} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
 		{FFD4B48A-CA6D-443A-B7CB-28E40446E8B2} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
+		{5EECCF55-44AB-4123-996A-957A886FCCD8} = {7B4DD5B4-406F-4D30-B287-7A74C5093B5B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE14C107-2CE1-4AA5-929A-C946862C90F8}
