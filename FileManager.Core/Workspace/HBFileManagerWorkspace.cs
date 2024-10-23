@@ -24,6 +24,7 @@ using HBLibrary.IO.Storage.Builder;
 using HBLibrary.Interface.IO.Storage.Container;
 using HBLibrary.IO.Storage;
 using HBLibrary.Core.ChangeTracker;
+using HBLibrary.Interface.Core.ChangeTracker;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -34,9 +35,12 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     public IApplicationStorage? Storage { get; private set; }
     [JsonIgnore]
     public JobManager? JobManager { get; set; }
+    [JsonIgnore]
+    public IChangeTracker ChangeTracker { get; set; }
 
 
     public HBFileManagerWorkspace() : base() {
+        ChangeTracker = new ChangeTracker();
     }
 
     public override void OnCreated() {
@@ -49,6 +53,10 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
     public override async Task OpenAsync(IAccount openedBy) {
         await base.OpenAsync(openedBy);
+
+        if (ChangeTracker is null) {
+            throw new InvalidOperationException("ChangeTracker is not set");
+        }
 
         containerPath = Path.Combine(Path.GetDirectoryName(FullPath!)!, Path.GetFileNameWithoutExtension(FullPath!));
 
@@ -70,7 +78,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
             });
         }
 
-        jobContainerBuilder.EnableChangeTracker(new ChangeTracker());
+        jobContainerBuilder.EnableChangeTracker(ChangeTracker);
 
         jobContainerBuilder.SetContainerPath("jobs")
             .ConfigureFileServices(fs => fs.UseJsonFileService(jfs =>
@@ -90,6 +98,10 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
            .Build();
 
         JobManager = new JobManager(jobContainer);
+
+        foreach (IStorageEntryContainer entryContainer in Storage.GetContainers()) {
+            entryContainer.ChangeTracker?.HookStateChanged();
+        }
 
         NotifyOpened();
     }

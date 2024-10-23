@@ -29,6 +29,7 @@ using HBLibrary.IO.Storage;
 using HBLibrary.IO.Storage.Builder;
 using HBLibrary.Interface.Plugins.Builder;
 using HBLibrary.Plugins;
+using HBLibrary.Core.ChangeTracker;
 
 namespace FileManager.UI;
 public class UnitySetup : IUnitySetup {
@@ -86,6 +87,8 @@ public class UnitySetup : IUnitySetup {
 
         appStorageBuilder.AddContainer(typeof(SettingsService), b => {
             b.SetContainerPath("settings");
+
+            b.EnableChangeTracker(new ChangeTracker());
 
             b.ConfigureFileServices(c => {
                 c.UseJsonFileService(jfs => {

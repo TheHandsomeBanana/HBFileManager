@@ -7,7 +7,9 @@ using HBLibrary.Core;
 using HBLibrary.Core.Extensions;
 using HBLibrary.DataStructures;
 using HBLibrary.DI;
+using HBLibrary.Interface.Core.ChangeTracker;
 using HBLibrary.Interface.IO.Storage;
+using HBLibrary.Interface.IO.Storage.Container;
 using HBLibrary.Interface.Plugins;
 using HBLibrary.Interface.Security.Account;
 using HBLibrary.Interface.Workspace;
@@ -30,7 +32,6 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
     private readonly IAccountService accountService;
-    private readonly IApplicationStorage applicationStorage;
     private readonly IPluginManager pluginManager;
     private readonly CommonAppSettings commonAppSettings;
     private readonly IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager;
@@ -62,25 +63,39 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     public RelayCommand<Window> OpenAccountOverviewCommand { get; set; }
     public RelayCommand OpenNotificationsCommand { get; set; }
 
-    public ObservableCollection<WorkspaceLocation> Workspaces { get; set; } = [];
+    public ObservableCollection<WorkspaceLocationViewModel> Workspaces { get; set; } = [];
 
-    private WorkspaceLocation? selectedWorkspace;
-    public WorkspaceLocation? SelectedWorkspace {
+    private WorkspaceLocationViewModel? selectedWorkspace;
+    public WorkspaceLocationViewModel? SelectedWorkspace {
         get {
             return selectedWorkspace;
         }
         set {
+            if(workspaceManager.CurrentWorkspace?.ChangeTracker.HasActiveChanges ?? false) {
+                MessageBoxResult result = HBDarkMessageBox.Show("Unsaved changes",
+                    "This workspace contains unsaved changes. Save them now?",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning);
+
+                // Workspace is saved on switch already..
+                if(result == MessageBoxResult.Cancel) {
+                    NotifyPropertyChanged();
+                    return;
+                }
+            }
+
 
             if (value is not null) {
                 selectedWorkspace = value;
-                SwitchWorkspaceAsync(selectedWorkspace)
+                SwitchWorkspaceAsync(selectedWorkspace.Model)
                     .ContinueWith(e => {
                         if (e.Result.IsSuccess) {
-                            workspaceLocationManager.SetLatestWorkspaceLocation(selectedWorkspace);
+                            workspaceManager.CurrentWorkspace!.ChangeTracker.ChangeTrackerStateChanged += OnWorkspaceChangeTrackerStateChanged;
+
+                            workspaceLocationManager.SetLatestWorkspaceLocation(selectedWorkspace.Model);
                             NotifyPropertyChanged(nameof(SelectedWorkspace));
 
                             Application.Current.Dispatcher.Invoke(() => {
-
                                 if (NavigationIndex is not null) {
                                     // Trigger page refresh
                                     NavigateCommand<WorkspacesViewModel> navigateCommand = GetNavigateWorkspacesCommand();
@@ -105,11 +120,19 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
         }
     }
 
+    private string title = "HB File Manager";
+
+    public string Title {
+        get { return title; }
+        set {
+            title = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     public MainViewModel() {
         container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
 
-        this.applicationStorage = container.Resolve<IApplicationStorage>();
         this.navigationStore = container.Resolve<INavigationStore>();
         this.accountService = container.Resolve<IAccountService>();
         this.commonAppSettings = container.Resolve<CommonAppSettings>();
@@ -142,6 +165,15 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     }
 
     protected override async Task InitializeViewModelAsync() {
+        IApplicationStorage mainStorage = container.Resolve<IApplicationStorage>();
+        foreach (IStorageEntryContainer container in mainStorage.GetContainers()) {
+            if (container.ChangeTracker is not null) {
+                container.ChangeTracker.ChangeTrackerStateChanged += OnChangeTrackerStateChanged;
+                container.ChangeTracker.HookStateChanged();
+            }
+        }
+
+
         WorkspaceLocationCache locationCache = workspaceLocationManager.LocationCache;
         bool updateRequired = false;
         foreach (WorkspaceLocation location in locationCache.WorkspaceLocations.ToArray()) {
@@ -165,12 +197,12 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
             Result<HBFileManagerWorkspace> workspaceGetResult = await workspaceManager.GetAsync(location.FullPath!, accountService.Account!);
 
             if (workspaceGetResult.IsSuccess) {
-                Workspaces.Add(location);
+                Workspaces.Add(new WorkspaceLocationViewModel(location));
             }
         }
 
-        if (locationCache.LastWorkspace is not null && Workspaces.Contains(locationCache.LastWorkspace)) {
-            SelectedWorkspace = locationCache.LastWorkspace;
+        if (locationCache.LastWorkspace is not null && Workspaces.Any(e => e.Model == locationCache.LastWorkspace)) {
+            SelectedWorkspace = Workspaces.First(e => e.Model == locationCache.LastWorkspace);
             NavigateToExplorerCommand.Execute(NavigateCommandParameter);
         }
         else {
@@ -190,6 +222,15 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
         });
     }
 
+    private void OnChangeTrackerStateChanged(bool state) {
+        if (state) {
+            Title = "HB File Manager *";
+        }
+        else {
+            Title = "HB File Manager";
+        }
+    }
+
     protected override void OnInitializeException(Exception exception) {
         HBDarkMessageBox.Show("Initialization error",
             exception.Message,
@@ -200,7 +241,7 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
     private void OpenAccountOverview(Window obj) {
 
         AccountViewModel accountViewModel = new AccountViewModel(obj,
-            accountService, commonAppSettings, 
+            accountService, commonAppSettings,
             ApplicationHandler.OnAccountSwitched,
             ApplicationHandler.OnAccountSwitching
         );
@@ -224,6 +265,24 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
         NotifyPropertyChanged(nameof(CurrentViewModel));
     }
 
+    private void OnWorkspaceChangeTrackerStateChanged(bool obj) {
+        Application.Current.Dispatcher.Invoke(() => {
+
+            if (obj) {
+                if (SelectedWorkspace is not null && !SelectedWorkspace.Name.EndsWith(" *")) {
+                    SelectedWorkspace.Name += " *";
+                    NotifyPropertyChanged(nameof(SelectedWorkspace));
+                }
+            }
+            else {
+                if (SelectedWorkspace is not null) {
+                    SelectedWorkspace.Name = SelectedWorkspace.Name.TrimEnd(' ', '*');
+                    NotifyPropertyChanged(nameof(SelectedWorkspace));
+                }
+            }
+        });
+    }
+
     private async Task<Result> SwitchWorkspaceAsync(WorkspaceLocation location) {
         HBFileManagerWorkspace? temp = workspaceManager.CurrentWorkspace;
 
@@ -231,9 +290,11 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
             return Result.Ok();
         }
 
+
         Result workspaceResult = await workspaceManager.OpenAsync(location!.FullPath, accountService.Account!);
 
         if (workspaceResult.IsSuccess && temp is not null) {
+            temp.ChangeTracker.ChangeTrackerStateChanged -= OnWorkspaceChangeTrackerStateChanged;
             await temp.CloseAsync();
         }
 
@@ -242,18 +303,18 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
 
     private void WorkspaceLocationManager_WorkspaceLocationsChanged(bool added, WorkspaceLocation[] locations) {
         if (!added) {
-            if (locations.Contains(SelectedWorkspace)) {
+            if (locations.Contains(SelectedWorkspace?.Model)) {
                 workspaceManager.CurrentWorkspace?.CloseAsync()
                 .FireAndForget();
             }
 
             foreach (WorkspaceLocation location in locations) {
-                Workspaces.Remove(location);
+                Workspaces.RemoveAt(Workspaces.IndexOf(Workspaces.First(e => e.Model == location)));
             }
         }
         else if (added) {
             foreach (WorkspaceLocation location in locations) {
-                Workspaces.Add(location);
+                Workspaces.Add(new WorkspaceLocationViewModel(location));
             }
         }
     }

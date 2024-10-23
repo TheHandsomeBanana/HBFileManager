@@ -174,8 +174,8 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
 
         ISettingsService settingsService = container.Resolve<ISettingsService>();
         SettingsEnvironmentModel environmentSettings = settingsService.GetSetting<SettingsEnvironmentModel>()!;
-        
-        if(!environmentSettings.ValidateOnNavigation) {
+
+        if (!environmentSettings.ValidateOnNavigation) {
             return;
         }
 
@@ -194,9 +194,9 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
 
     protected override void OnInitializeException(Exception exception) {
-        HBDarkMessageBox.Show("Initialization error", 
-            exception.Message, 
-            MessageBoxButton.OK, 
+        HBDarkMessageBox.Show("Initialization error",
+            exception.Message,
+            MessageBoxButton.OK,
             MessageBoxImage.Error);
     }
 
@@ -221,7 +221,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
-   
+
     public void DeleteStep(JobStepWrapperViewModel stepViewModel) {
         MessageBoxResult result = HBDarkMessageBox.Show("Delete step",
             "Are you sure you want to delete this step?",
@@ -311,11 +311,9 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             if (oldIndex != newIndex) {
                 Steps.Move(oldIndex, newIndex);
                 NotifyPropertyChanged(nameof(StepsView));
-                SelectedStep = sourceItem;
+                Model.Steps.Move(oldIndex, newIndex);
 
-                // Apply new indexed list
-                Model.Steps.Clear();
-                Model.Steps.AddRange(Steps.Select(e => e.Model));
+                SelectedStep = sourceItem;
 
                 if (targetItem.Model.ExecutionOrder != sourceItem.Model.ExecutionOrder) {
                     sourceItem.Model.ExecutionOrder = targetItem.Model.ExecutionOrder;

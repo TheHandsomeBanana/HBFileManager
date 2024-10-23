@@ -15,15 +15,22 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
                 return Model.UseWinRAR;
             }
             set {
-
                 if (!value) {
                     Location = "";
                     LicenseKeyLocation = "";
                     LocationErrorText = "";
+                    Model.UseWinRAR = value;
                 }
+                else {
+                    DetectWinRARInstallation(null);
 
-                Model.UseWinRAR = value;
-                NotifyPropertyChanged();
+                    if (CheckProvidedLocation(Location)) {
+                        Model.UseWinRAR = value;
+                        NotifyPropertyChanged();
+
+                        ValidateWinRARLicense();
+                    }
+                }
             }
         }
 
@@ -77,10 +84,6 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
         public SettingsWinRARViewModel(SettingsWinRARModel model) : base(model) {
             DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation, true);
             BrowseLocationCommand = new RelayCommand(BrowseLocation, true);
-
-            if (UseWinRAR && CheckProvidedLocation(model.Location)) {
-                ValidateWinRARLicense();
-            }
         }
 
         private void DetectWinRARInstallation(object? obj) {
@@ -97,7 +100,7 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
 
         private bool CheckProvidedLocation(string value) {
             if (!WinRARManager.CheckWinRARInstallationForPath(value)) {
-                LocationErrorText = "WinRAR not found in this directory";
+                LocationErrorText = "WinRAR not found";
                 return false;
             }
 
