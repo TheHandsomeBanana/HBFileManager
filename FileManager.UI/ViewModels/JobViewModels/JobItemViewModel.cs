@@ -329,7 +329,10 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             step.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
         }
 
+        
         stepsView.CollectionChanged -= StepsView_CollectionChanged;
+        IsInitialized = false;
+        this.Steps.Clear();
     }
 
     #region Validation Logic

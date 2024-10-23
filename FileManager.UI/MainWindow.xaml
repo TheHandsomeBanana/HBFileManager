@@ -231,7 +231,7 @@
                           Margin="0 0 10 0"
                           Width="Auto"
                           ItemsSource="{Binding Workspaces}"
-                          SelectedItem="{Binding SelectedWorkspace, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedItem="{Binding SelectedWorkspace, Delay=10, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           DisplayMemberPath="Name">
                 </ComboBox>
 

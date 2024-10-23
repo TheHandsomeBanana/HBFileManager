@@ -71,19 +71,30 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
             return selectedWorkspace;
         }
         set {
-            if(workspaceManager.CurrentWorkspace?.ChangeTracker.HasActiveChanges ?? false) {
+            if (workspaceManager.CurrentWorkspace?.ChangeTracker.HasActiveChanges ?? false) {
                 MessageBoxResult result = HBDarkMessageBox.Show("Unsaved changes",
                     "This workspace contains unsaved changes. Save them now?",
                     MessageBoxButton.OKCancel,
                     MessageBoxImage.Warning);
 
                 // Workspace is saved on switch already..
-                if(result == MessageBoxResult.Cancel) {
-                    NotifyPropertyChanged();
+                if (result == MessageBoxResult.Cancel) {
+                    Application.Current.Dispatcher.Invoke(() => {
+                        NotifyPropertyChanged(nameof(SelectedWorkspace));
+                    });
                     return;
                 }
-            }
 
+                if (result == MessageBoxResult.OK) {
+                    if (SelectedWorkspace is not null) {
+                        SelectedWorkspace.Name = SelectedWorkspace.Name.TrimEnd(' ', '*');
+                    }
+
+                    Application.Current.Dispatcher.Invoke(() => {
+                        NotifyPropertyChanged(nameof(SelectedWorkspace));
+                    });
+                }
+            }
 
             if (value is not null) {
                 selectedWorkspace = value;
@@ -267,7 +278,6 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
 
     private void OnWorkspaceChangeTrackerStateChanged(bool obj) {
         Application.Current.Dispatcher.Invoke(() => {
-
             if (obj) {
                 if (SelectedWorkspace is not null && !SelectedWorkspace.Name.EndsWith(" *")) {
                     SelectedWorkspace.Name += " *";
@@ -294,8 +304,8 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
         Result workspaceResult = await workspaceManager.OpenAsync(location!.FullPath, accountService.Account!);
 
         if (workspaceResult.IsSuccess && temp is not null) {
-            temp.ChangeTracker.ChangeTrackerStateChanged -= OnWorkspaceChangeTrackerStateChanged;
             await temp.CloseAsync();
+            temp.ChangeTracker.ChangeTrackerStateChanged -= OnWorkspaceChangeTrackerStateChanged;
         }
 
         return workspaceResult;
