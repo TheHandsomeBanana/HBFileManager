@@ -18,8 +18,8 @@ public partial class JobItemView : UserControl {
             this.Dispatcher.Invoke(jobItemViewModel.InitializeAsync);
         };
 
-        if(e.OldValue is IDisposable disposable) {
-            disposable.Dispose();
+        if(e.OldValue is JobItemViewModel oldJobItemViewModel) {
+            oldJobItemViewModel.Reset();
         }
     }
 }

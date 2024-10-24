@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.JobSteps;
+using HBLibrary.Interface.Core.ChangeTracker;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace FileManager.Core.Job;
 public interface IJobManager {
+    public IChangeTracker? ChangeTracker { get; }
     public void AddOrUpdate(Job jobItem);
     public void Delete(Job jobItem);
     public void Delete(Guid jobId);

@@ -33,9 +33,10 @@ using HBLibrary.DataStructures;
 using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.IO;
 using HBLibrary.IO;
+using HBLibrary.Interface.Core;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
-public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IDisposable {
+public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {
     private readonly IUnityContainer container;
     private readonly IDialogService dialogService;
     private readonly JobManager jobManager;
@@ -285,10 +286,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         if (newIndex != index) {
             Steps.Move(index, newIndex);
             SelectedStep = Steps[newIndex];
-
-            // Apply new indexed list
-            Model.Steps.Clear();
-            Model.Steps.AddRange(Steps.Select(e => e.Model));
+            Model.Steps.Move(index, newIndex);
         }
     }
 
@@ -322,17 +320,30 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
+    public void Reset() {
+        IsInitialized = false;
+
+        Unhook();
+        Clear();
+    }
+
     public void Dispose() {
+        Unhook();
+        Clear();
+    }
+
+    private void Unhook() {
         foreach (JobStepWrapperViewModel step in Steps) {
             step.StepContext!.ExecutionOrderChanged -= JobItemViewModel_ExecutionOrderChanged;
             step.StepContext!.ValidationRequired -= JobItemViewModel_ValidationRequired;
             step.StepContext!.AsyncValidationRequired -= JobItemViewModel_AsyncValidationRequired;
         }
 
-        
         stepsView.CollectionChanged -= StepsView_CollectionChanged;
-        IsInitialized = false;
+    }
+    private void Clear() {
         this.Steps.Clear();
+        ValidationLog.Clear();
     }
 
     #region Validation Logic

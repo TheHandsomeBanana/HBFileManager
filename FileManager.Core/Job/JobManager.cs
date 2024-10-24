@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.JobSteps;
+using HBLibrary.Interface.Core.ChangeTracker;
 using HBLibrary.Interface.IO.Storage.Container;
 using HBLibrary.Interface.IO.Storage.Entries;
 using System;
@@ -10,6 +11,9 @@ using System.Threading.Tasks;
 namespace FileManager.Core.Job;
 public class JobManager : IJobManager {
     private readonly IStorageEntryContainer container;
+
+    public IChangeTracker? ChangeTracker => container.ChangeTracker;
+
     public JobManager(IStorageEntryContainer container) {
         this.container = container;
     }

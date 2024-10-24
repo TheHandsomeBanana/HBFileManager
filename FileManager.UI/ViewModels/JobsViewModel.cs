@@ -83,7 +83,15 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     protected override void InitializeViewModel() {
+        bool? anyChanges = jobManager.ChangeTracker?.HasActiveChanges;
         LoadJobs();
+
+        // ChangeTracker cannot initialize values that wont trigger add or update logic
+        // -> Simulate initialize through saving changes
+        if (anyChanges.HasValue && !anyChanges.Value) {
+            jobManager.ChangeTracker?.SaveAllChanges();
+        }
+
         SelectedJob = jobs.FirstOrDefault();
     }
 
