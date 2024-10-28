@@ -110,25 +110,6 @@
                           Content="Scheduled"
                           Margin="0 0 0 10"></CheckBox>
 
-
-                <controls:TimePicker Visibility="{Binding Scheduled, Converter={StaticResource b2v}, FallbackValue=Visible}"
-                                     SelectedTime="{Binding ScheduledAt, Mode=TwoWay}"
-                                     SeperatorStyle="{StaticResource HBDark_TextBlock}"
-                                     MinuteStyle="{StaticResource HBDark_ComboBox}"
-                                     HourStyle="{StaticResource HBDark_ComboBox}"
-                                     HorizontalAlignment="Left"
-                                     Margin="0 0 0 10">
-
-                    <controls:TimePicker.Icon>
-                        <Path Data="M12 20C16.4 20 20 16.4 20 12S16.4 4 12 4 4 7.6 4 12 7.6 20 12 20M12 2C17.5 2 22 6.5 22 12S17.5 22 12 22C6.5 22 2 17.5 2 12C2 6.5 6.5 2 12 2M12.5 12.8L7.7 15.6L7 14.2L11 11.9V7H12.5V12.8Z"
-                              Fill="{StaticResource VSAccentViolet}"
-                              Stroke="{StaticResource VSViolet}"
-                              StrokeThickness="0.5"
-                              Stretch="Uniform"></Path>
-                    </controls:TimePicker.Icon>
-
-                </controls:TimePicker>
-
                 <TextBlock Style="{StaticResource HBDark_TextBlock}"
                            Text="Description"
                            Margin="0 0 0 3">

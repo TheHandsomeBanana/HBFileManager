@@ -12,15 +12,15 @@ public class SettingsService : ISettingsService {
         this.container = applicationStorage.GetContainer(typeof(SettingsService));
     }
 
-    public TSetting? GetSetting<TSetting>() where TSetting : class, INotifyTrackableChanged {
+    public TSetting? GetSetting<TSetting>() where TSetting : class, ITrackable {
         return GetSetting(typeof(TSetting)) as TSetting;
     }
 
-    public void SetSetting<TSetting>(TSetting setting) where TSetting : class, INotifyTrackableChanged {
+    public void SetSetting<TSetting>(TSetting setting) where TSetting : class, ITrackable {
         SetSetting(typeof(TSetting), setting);
     }
 
-    public TSetting GetOrSetNew<TSetting>(Func<TSetting> createSettingFunc) where TSetting : class, INotifyTrackableChanged {
+    public TSetting GetOrSetNew<TSetting>(Func<TSetting> createSettingFunc) where TSetting : class, ITrackable {
         if (container.TryGet(typeof(TSetting).GuidString(), out IStorageEntry? entry)) {
             TSetting? setting = entry!.Get(typeof(TSetting)) as TSetting;
 

@@ -107,4 +107,9 @@ public class JobManager : IJobManager {
 
         return [.. job.Steps];
     }
+
+    public Job[] GetExecutableJobs() {
+        return GetAll().Where(e => e.CanRun)
+            .ToArray();
+    }
 }

@@ -54,6 +54,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             NotifyPropertyChanged();
         }
     }
+
     public bool IsEnabled {
         get => Model.IsEnabled;
         set {
@@ -70,6 +71,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             }
         }
     }
+
     public bool CanRun {
         get => Model.CanRun;
         set {
@@ -77,13 +79,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             NotifyPropertyChanged();
         }
     }
-    public TimeOnly? ScheduledAt {
-        get => Model.ScheduledAt;
-        set {
-            Model.ScheduledAt = value;
-            NotifyPropertyChanged();
-        }
-    }
+
     public bool OnDemand {
         get => Model.OnDemand;
         set {
@@ -95,10 +91,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         get => Model.Scheduled;
         set {
             Model.Scheduled = value;
-            if (!value) {
-                ScheduledAt = null;
-            }
-
             NotifyPropertyChanged();
         }
     }

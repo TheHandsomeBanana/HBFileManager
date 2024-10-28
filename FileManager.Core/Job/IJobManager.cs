@@ -21,4 +21,7 @@ public interface IJobManager {
     public void DeleteStep(JobStep step);
     public JobStep? GetStepById(Guid jobId, Guid stepId);
     public JobStep[] GetSteps(Guid jobId);
+
+    public Job[] GetExecutableJobs();
+
 }

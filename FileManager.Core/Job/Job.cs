@@ -40,15 +40,6 @@ public sealed class Job : TrackableModel, IDisposable {
         }
     }
 
-    private TimeOnly? scheduledAt;
-    public TimeOnly? ScheduledAt {
-        get => scheduledAt;
-        set {
-            scheduledAt = value;
-            NotifyTrackableChanged(value);
-        }
-    }
-
     private bool onDemand;
     public bool OnDemand {
         get => onDemand;
