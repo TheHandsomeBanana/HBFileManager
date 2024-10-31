@@ -44,13 +44,14 @@
         </Grid.ColumnDefinitions>
 
         <ListBox Style="{StaticResource HBDark_ListBox}"
+                 ItemContainerStyle="{StaticResource HBDark_ListBoxItem}"
                  Grid.Column="0"
                  d:ItemsSource="{d:SampleData ItemCount=5}"
                  ItemsSource="{Binding RunningJobs}"
                  SelectedItem="{Binding SelectedJobRun}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Height="30">
+                    <Grid Height="50" Margin="0 0 10 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="30" />
                             <ColumnDefinition Width="*" />
@@ -84,11 +85,20 @@
                               Margin="0 0 5 0"
                               Visibility="{Binding IsError, Converter={StaticResource b2v}}" />
 
-                        <TextBlock Grid.Column="1"
-                                   Style="{StaticResource HBDark_TextBlock}"
-                                   Text="{Binding Name}">
+                        <StackPanel Orientation="Vertical"
+                                    Grid.Column="1"
+                                    VerticalAlignment="Center">
 
-                        </TextBlock>
+                            <TextBlock Style="{StaticResource HBDark_BigTextBlock}"
+                                       Text="{Binding Name}">
+                            </TextBlock>
+
+                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                       Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}">
+                            </TextBlock>
+
+
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

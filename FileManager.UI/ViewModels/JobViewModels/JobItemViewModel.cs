@@ -419,7 +419,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
-        ILogger tempLogger = loggerFactory.CreateLogger(jobStep.Name);
+        ILogger tempLogger = loggerFactory.CreateLogger(jobStep.Name, e => e.Build());
         tempContainer.RegisterInstance(tempLogger);
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 
@@ -433,7 +433,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
-        IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(jobStep.Name);
+        IAsyncLogger tempLogger = loggerFactory.CreateAsyncLogger(jobStep.Name, e => e.Build());
         tempContainer.RegisterInstance(tempLogger);
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 

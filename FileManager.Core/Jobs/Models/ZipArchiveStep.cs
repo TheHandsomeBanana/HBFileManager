@@ -13,11 +13,11 @@ namespace FileManager.Core.Jobs.Models;
 public class ZipArchiveStep : JobStep {
 
     public override void Execute(IUnityContainer container) {
-        throw new NotImplementedException();
+        Thread.Sleep(4000);
     }
 
-    public override Task ExecuteAsync(IUnityContainer container) {
-        throw new NotImplementedException();
+    public override async Task ExecuteAsync(IUnityContainer container) {
+        await Task.Delay(4000);
     }
 
     public override System.Windows.Controls.UserControl? GetJobStepView() {

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Unity;
 
 namespace FileManager.Core.Jobs;
@@ -21,13 +22,12 @@ public class JobRunner : IJobRunner {
     private readonly IPluginManager pluginManager;
     private readonly List<JobRun> runningJobs = [];
 
+    public event Action<JobRun>? OnJobStarting;
+    public event Action<JobRun>? OnJobFinished;
+
     public JobRunner(IStorageEntryContainer container, IPluginManager pluginManager) {
         this.container = container;
         this.pluginManager = pluginManager;
-    }
-
-    public JobRun[] GetCompletedJobs() {
-        throw new NotImplementedException();
     }
 
     public JobRun[] GetRunningJobs() {
@@ -36,16 +36,17 @@ public class JobRunner : IJobRunner {
 
     public async Task RunAsync(Job job, IUnityContainer mainContainer) {
         StepRun[] stepRuns = job.Steps.Select(e => new StepRun(e, pluginManager.GetStaticPluginMetadata(e.GetType()).TypeName))
-            .ToArray();
+                .ToArray();
 
         JobRun jobRun = new JobRun(job, stepRuns);
+
+        OnJobStarting?.Invoke(jobRun);
         jobRun.Start();
 
         List<Task> asyncJobs = [];
         List<IUnityContainer> asyncJobsContainers = [];
         foreach (StepRun stepRun in jobRun.StepRuns) {
             IUnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
-
             if (stepRun.IsAsync) {
                 asyncJobs.Add(RunStepAsync(stepRun, tempContainer));
                 asyncJobsContainers.Add(tempContainer);
@@ -58,6 +59,7 @@ public class JobRunner : IJobRunner {
 
         await Task.WhenAll(asyncJobs);
         jobRun.End();
+        OnJobFinished?.Invoke(jobRun);
 
         foreach (IUnityContainer container in asyncJobsContainers) {
             container.Dispose();
@@ -92,6 +94,7 @@ public class JobRunner : IJobRunner {
         IAsyncLogger tempAsyncLogger = loggerFactory.CreateAsyncLogger(stepRun.Name, e => e.AddTarget(stepRun.Logs).Build());
 
         tempContainer.RegisterInstance(tempLogger);
+        tempContainer.RegisterInstance(tempAsyncLogger);
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 
         return tempContainer;

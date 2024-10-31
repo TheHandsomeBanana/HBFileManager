@@ -1,6 +1,7 @@
 ﻿using FileManager.Core.Jobs;
 using FileManager.Core.Workspace;
 using FileManager.Domain;
+using HBLibrary.Core.Extensions;
 using HBLibrary.DI;
 using HBLibrary.Interface.Workspace;
 using HBLibrary.Wpf.Commands;
@@ -33,7 +34,7 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
         mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
 
-        RunJobCommand = new AsyncRelayCommand<ExecutableJobViewModel>(RunJob, e => e!.Model.OnDemand, e => OnException("Run error", e));
+        RunJobCommand = new AsyncRelayCommand<ExecutableJobViewModel>(RunJobAsync, e => e!.Model.OnDemand, e => OnException("Run error", e));
         ScheduleJobCommand = new AsyncRelayCommand<ExecutableJobViewModel>(ScheduleJob, e => e!.Model.Scheduled, e => OnException("Scheduling error", e));
 
     }
@@ -46,8 +47,8 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
         throw new NotImplementedException();
     }
 
-    private Task RunJob(ExecutableJobViewModel job) {
+    private async Task RunJobAsync(ExecutableJobViewModel job) {
         JobRunner jobRunner = workspaceManager.CurrentWorkspace!.JobRunner!;
-        return jobRunner.RunAsync(job.Model, mainContainer);
+        await Task.Run(() => jobRunner.RunAsync(job.Model, mainContainer));
     }
 }

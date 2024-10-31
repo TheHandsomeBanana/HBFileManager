@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels.ExecutionViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,13 @@ namespace FileManager.UI.Views.ExecutionViews
         public RunningJobsView()
         {
             InitializeComponent();
+            Loaded += RunningJobsView_Loaded;
+        }
+
+        private void RunningJobsView_Loaded(object sender, RoutedEventArgs e) {
+            if (DataContext is RunningJobsViewModel viewModel && !viewModel.IsInitialized) {
+                viewModel.Initialize();
+            }
         }
     }
 }

@@ -104,7 +104,15 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
         NavigateScheduledJobsCommand = new NavigateCommand<ScheduledJobsViewModel>(navigationService, () => new ScheduledJobsViewModel());
         NavigateJobsHistoryCommand = new NavigateCommand<JobsHistoryViewModel>(navigationService, () => new JobsHistoryViewModel());
 
-        navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += ExecutionViewModel_CurrentViewModelChanged;
+        navigationStore[NavigateCommandParameter].CurrentViewModelChanged += ExecutionViewModel_CurrentViewModelChanged;
+
+        workspaceManager.CurrentWorkspace!.JobRunner!.OnJobStarting += ExecutionViewModel_OnJobStarting;
+
+        NavigateRunningJobsCommand.Execute(NavigateCommandParameter);
+    }
+
+    private void ExecutionViewModel_OnJobStarting(Domain.JobRun _) {
+        NavigateRunningJobsCommand.Execute(NavigateCommandParameter);
     }
 
     private void ExecutionViewModel_CurrentViewModelChanged() {
@@ -120,5 +128,8 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
 
     public void Dispose() {
         navigationStore[NavigateCommandParameter].CurrentViewModelChanged -= ExecutionViewModel_CurrentViewModelChanged;
+        workspaceManager.CurrentWorkspace!.JobRunner!.OnJobStarting -= ExecutionViewModel_OnJobStarting;
+        
+        navigationStore.DisposeByParentTypename(NavigateCommandParameter);
     }
 }

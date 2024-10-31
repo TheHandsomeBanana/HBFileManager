@@ -190,7 +190,7 @@
                           Grid.Column="1"
                           Grid.Row="0"
                           VerticalAlignment="Bottom"
-                          Command="{Binding NavigateScheduledCommand}"
+                          Command="{Binding NavigateScheduledJobsCommand}"
                           CommandParameter="{Binding NavigateCommandParameter}"
                           IsChecked="{Binding ScheduledJobsChecked, Mode=TwoWay}"
                           Cursor="Hand">
@@ -204,7 +204,7 @@
                           Grid.Column="2"
                           Grid.Row="0"
                           VerticalAlignment="Bottom"
-                          Command="{Binding NavigateHistoryCommand}"
+                          Command="{Binding NavigateJobsHistoryCommand}"
                           CommandParameter="{Binding NavigateCommandParameter}"
                           IsChecked="{Binding JobsHistoryChecked, Mode=TwoWay}"
                           Cursor="Hand">

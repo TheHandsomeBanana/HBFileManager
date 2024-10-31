@@ -14,11 +14,11 @@ public class AddJobStepViewModel : ViewModelBase {
     private readonly static JobStepInfo[] fixedTypes = [
        new JobStepInfo {
             StepType = typeof(CopyStep),
-            Metadata = PluginManager.GetStaticPluginMetadata(typeof(CopyStep))
+            Metadata = PluginManager.GetPluginMetadata(typeof(CopyStep))
         },
         new JobStepInfo {
             StepType = typeof(ZipArchiveStep),
-            Metadata = PluginManager.GetStaticPluginMetadata(typeof(ZipArchiveStep))
+            Metadata = PluginManager.GetPluginMetadata(typeof(ZipArchiveStep))
         }
     ];
 

@@ -9,7 +9,8 @@ using Unity;
 namespace FileManager.Core.Jobs;
 
 public interface IJobRunner {
+    public event Action<JobRun>? OnJobStarting;
+    public event Action<JobRun>? OnJobFinished;
     public JobRun[] GetRunningJobs();
-    public JobRun[] GetCompletedJobs();
     public Task RunAsync(Job job, IUnityContainer container);
 }

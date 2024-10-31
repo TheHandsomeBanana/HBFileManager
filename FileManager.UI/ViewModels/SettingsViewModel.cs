@@ -27,9 +27,10 @@ public class SettingsViewModel : ViewModelBase, IDisposable {
 
         SettingsEnvironmentModel environmentModel = settingsService.GetOrSetNew(() => new SettingsEnvironmentModel());
         SettingsWinRARModel winRARModel = settingsService.GetOrSetNew(() => new SettingsWinRARModel());
+        SettingsExecutionModel executionModel = settingsService.GetOrSetNew(() => new SettingsExecutionModel());
 
         NavigateToEnvironmentCommand = new NavigateCommand<SettingsEnvironmentViewModel>(navigationService, () => new SettingsEnvironmentViewModel(environmentModel));
-        NavigateToExecutionCommand = new NavigateCommand<SettingsExecutionViewModel>(navigationService, () => new SettingsExecutionViewModel());
+        NavigateToExecutionCommand = new NavigateCommand<SettingsExecutionViewModel>(navigationService, () => new SettingsExecutionViewModel(executionModel));
         NavigateToWinRARCommand = new NavigateCommand<SettingsWinRARViewModel>(navigationService, () => new SettingsWinRARViewModel(winRARModel));
         NavigateToPluginsCommand = new NavigateCommand<SettingsPluginsViewModel>(navigationService, () => new SettingsPluginsViewModel());
 

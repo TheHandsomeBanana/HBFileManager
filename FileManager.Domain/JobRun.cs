@@ -1,6 +1,7 @@
 ﻿using FileManager.Domain.JobSteps;
 using HBLibrary.Logging.FlowDocumentTarget;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 using Unity;
 
@@ -16,6 +17,8 @@ public class JobRun {
     public TimeSpan? Duration => StartedAt - FinishedAt;
     public StepRun[] StepRuns { get; set; }
 
+    [JsonIgnore]
+    public Stopwatch Stopwatch { get; } = new Stopwatch();
 
     public JobRun(Job job, StepRun[] stepRuns) {
         State = RunState.Pending;
@@ -26,10 +29,12 @@ public class JobRun {
 
     public void Start() {
         StartedAt = DateTime.UtcNow;
+        Stopwatch.Start();
         State = RunState.Running;
     }
 
     public void End() {
+        Stopwatch.Stop();
         FinishedAt = DateTime.UtcNow;
 
         if (StepRuns.Any(e => e.State == RunState.Faulted)) {
