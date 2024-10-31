@@ -4,9 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views"
-             xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
-             xmlns:jobViewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels"
-             xmlns:jobViews="clr-namespace:FileManager.UI.Views.JobViews"
+             xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.ExecutionViewModels"
+             xmlns:views="clr-namespace:FileManager.UI.Views.ExecutionViews"
              xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
@@ -78,7 +77,8 @@
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
                               Grid.Row="2"
-                              scrollViewer:ScrollViewerAttachedProperties.VerticalScrollBarMargin="5 0 0 0">
+                              scrollViewer:ScrollViewerAttachedProperties.VerticalScrollBarMargin="5 0 0 0"
+                              MaxWidth="400">
                     <ItemsControl ItemsSource="{Binding ExecutableJobsView}"
                                   d:ItemsSource="{d:SampleData ItemCount=2}">
                         <ItemsControl.ItemTemplate>
@@ -90,15 +90,19 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                                               Text="{Binding Name}"
-                                               Grid.Column="0"
-                                               Margin="0 0 10 0" />
+                                    <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                                                  HorizontalScrollBarVisibility="Auto">
+
+                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                                   Text="{Binding Name}"
+                                                   Grid.Column="0"
+                                                   Margin="0 0 5 0" />
+                                    </ScrollViewer>
 
                                     <Button Style="{StaticResource HBDark_VSButton2_Green}"
                                             Width="50"
                                             Grid.Column="1"
-                                            Margin="0 0 10 0"
+                                            Margin="0 0 5 0"
                                             Command="{Binding RunJobCommand}"
                                             CommandParameter="{Binding}">
                                         <Button.Content>
@@ -142,5 +146,89 @@
                 </ScrollViewer>
             </Grid>
         </Border>
+
+        <Grid Grid.Column="1"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Stretch"
+              Margin="10 10 10 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="120" />
+                <ColumnDefinition Width="140" />
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Rectangle Grid.Row="0"
+                       Grid.Column="3"
+                       Height="1"
+                       VerticalAlignment="Bottom"
+                       Fill="{StaticResource HBDark_Button_BorderBrush}" />
+
+
+
+            <ToggleButton x:Name="tbRunning"
+                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Grid.Column="0"
+                          Grid.Row="0"
+                          Command="{Binding NavigateRunningJobsCommand}"
+                          CommandParameter="{Binding NavigateCommandParameter}"
+                          VerticalAlignment="Bottom"
+                          IsChecked="{Binding RunningJobsChecked, Mode=TwoWay}"
+                          Cursor="Hand">
+                <ToggleButton.Content>
+                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                               Text="Running Jobs" />
+                </ToggleButton.Content>
+            </ToggleButton>
+            <ToggleButton x:Name="tbScheduled"
+                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Grid.Column="1"
+                          Grid.Row="0"
+                          VerticalAlignment="Bottom"
+                          Command="{Binding NavigateScheduledCommand}"
+                          CommandParameter="{Binding NavigateCommandParameter}"
+                          IsChecked="{Binding ScheduledJobsChecked, Mode=TwoWay}"
+                          Cursor="Hand">
+                <ToggleButton.Content>
+                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                               Text="Scheduled Jobs" />
+                </ToggleButton.Content>
+            </ToggleButton>
+            <ToggleButton x:Name="tbHistory"
+                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Grid.Column="2"
+                          Grid.Row="0"
+                          VerticalAlignment="Bottom"
+                          Command="{Binding NavigateHistoryCommand}"
+                          CommandParameter="{Binding NavigateCommandParameter}"
+                          IsChecked="{Binding JobsHistoryChecked, Mode=TwoWay}"
+                          Cursor="Hand">
+                <ToggleButton.Content>
+                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                               Text="History" />
+                </ToggleButton.Content>
+            </ToggleButton>
+
+            <ContentControl Content="{Binding CurrentViewModel}"
+                            Grid.ColumnSpan="4"
+                            Grid.Row="1">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type viewModels:RunningJobsViewModel}">
+                        <views:RunningJobsView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:ScheduledJobsViewModel}">
+                        <views:ScheduledJobsView />
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:JobsHistoryViewModel}">
+                        <views:JobsHistoryView />
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
+        </Grid>
     </Grid>
 </UserControl>

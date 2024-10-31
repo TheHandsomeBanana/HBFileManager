@@ -8,14 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Unity" Version="5.11.10" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.IO\HBLibrary.Interface.IO.csproj" />
-    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.Logging\HBLibrary.Interface.Logging.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.Plugins\HBLibrary.Interface.Plugins.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Plugins\HBLibrary.Plugins.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Wpf\HBLibrary.Wpf.csproj" />
+    <ProjectReference Include="..\FileManager.Domain.JobSteps\FileManager.Domain.JobSteps.csproj" />
   </ItemGroup>
 
  

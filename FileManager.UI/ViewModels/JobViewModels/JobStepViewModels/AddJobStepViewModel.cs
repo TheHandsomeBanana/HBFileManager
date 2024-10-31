@@ -1,5 +1,6 @@
-﻿using FileManager.Core.JobSteps;
-using FileManager.Core.JobSteps.Models;
+﻿using FileManager.Core.Jobs.Models;
+using FileManager.Core.JobSteps;
+using FileManager.Domain.JobSteps;
 using HBLibrary.Common.Plugins;
 using HBLibrary.Interface.Plugins;
 using HBLibrary.Plugins;
@@ -13,11 +14,11 @@ public class AddJobStepViewModel : ViewModelBase {
     private readonly static JobStepInfo[] fixedTypes = [
        new JobStepInfo {
             StepType = typeof(CopyStep),
-            Metadata = PluginManager.GetPluginMetadata(typeof(CopyStep))
+            Metadata = PluginManager.GetStaticPluginMetadata(typeof(CopyStep))
         },
         new JobStepInfo {
             StepType = typeof(ZipArchiveStep),
-            Metadata = PluginManager.GetPluginMetadata(typeof(ZipArchiveStep))
+            Metadata = PluginManager.GetStaticPluginMetadata(typeof(ZipArchiveStep))
         }
     ];
 

@@ -54,6 +54,7 @@ public class UnitySetup : IUnitySetup {
     private static void AddNavigation(IUnityContainer container) {
         INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder()
             .AddParentTypename(nameof(MainViewModel))
+            .AddParentTypename(nameof(ExecutionViewModel))
             .DisposeOnLeave();
 
         container.RegisterInstance(storeBuilder.Build(), new ContainerControlledLifetimeManager());

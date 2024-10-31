@@ -1,6 +1,8 @@
-﻿using FileManager.Core.JobSteps;
-using FileManager.Core.JobSteps.ViewModels;
-using FileManager.Core.JobSteps.Views;
+﻿using FileManager.Core.Jobs.ViewModels;
+using FileManager.Core.Jobs.Views;
+using FileManager.Core.JobSteps;
+using FileManager.Domain.JobSteps;
+using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Wpf.ViewModels;
 using System.Windows.Controls;
 using Unity;

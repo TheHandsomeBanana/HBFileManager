@@ -39,6 +39,7 @@
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Core\HBLibrary.Core.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.DI\HBLibrary.DI.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.IO\HBLibrary.IO.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Logging.FlowDocumentTarget\HBLibrary.Logging.FlowDocumentTarget.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Logging\HBLibrary.Logging.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Plugins\HBLibrary.Plugins.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Security\HBLibrary.Security.csproj" />

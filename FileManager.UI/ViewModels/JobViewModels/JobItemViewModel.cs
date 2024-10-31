@@ -1,7 +1,4 @@
 ﻿using FileManager.Core.JobSteps;
-using FileManager.Core.JobSteps.Models;
-using FileManager.Core.JobSteps.ViewModels;
-using FileManager.Core.JobSteps.Views;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common;
@@ -21,7 +18,6 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Xml.Serialization;
 using Unity;
-using FileManager.Core.Job;
 using FileManager.Core.Workspace;
 using FileManager.UI.Services.SettingsService;
 using FileManager.UI.Models.SettingsModels;
@@ -34,6 +30,9 @@ using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.IO;
 using HBLibrary.IO;
 using HBLibrary.Interface.Core;
+using FileManager.Domain;
+using FileManager.Domain.JobSteps;
+using FileManager.Core.Jobs;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {

@@ -4,14 +4,26 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	  <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Jobs\Views\CopyStepView.xaml" />
+    <None Remove="Jobs\Views\FallbackStepView.xaml" />
+    <None Remove="Jobs\Views\StepView.xaml" />
+    <None Remove="Jobs\Views\ZipArchiveStepView.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.DI\HBLibrary.DI.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.Logging\HBLibrary.Interface.Logging.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Interface.Plugins\HBLibrary.Interface.Plugins.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.IO\HBLibrary.IO.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Plugins\HBLibrary.Plugins.csproj" />
     <ProjectReference Include="..\..\HBLibrary\HBLibrary.Workspace\HBLibrary.Workspace.csproj" />
+    <ProjectReference Include="..\..\HBLibrary\HBLibrary.Wpf\HBLibrary.Wpf.csproj" />
     <ProjectReference Include="..\FileManager.Core.JobSteps\FileManager.Core.JobSteps.csproj" />
+    <ProjectReference Include="..\FileManager.Domain\FileManager.Domain.csproj" />
   </ItemGroup>
 
 </Project>

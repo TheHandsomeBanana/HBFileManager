@@ -1,5 +1,4 @@
-﻿using FileManager.Core.JobSteps.Attributes;
-using FileManager.Core.JobSteps.ViewModels;
+﻿using FileManager.Domain.JobSteps;
 using HBLibrary.DataStructures;
 using HBLibrary.Interface.Plugins.Attributes;
 using HBLibrary.Wpf.ViewModels;

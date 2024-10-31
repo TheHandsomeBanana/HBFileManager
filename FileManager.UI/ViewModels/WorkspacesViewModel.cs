@@ -1,5 +1,4 @@
-﻿using FileManager.Core.Job;
-using FileManager.Core.JobSteps;
+﻿using FileManager.Core.JobSteps;
 using FileManager.Core.Workspace;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;

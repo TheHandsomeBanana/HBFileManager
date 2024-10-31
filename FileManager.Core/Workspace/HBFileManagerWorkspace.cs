@@ -5,9 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
 using HBLibrary.Common.Json;
-using FileManager.Core.JobSteps.Converters;
 using Unity;
-using FileManager.Core.Job;
 using System.Text.Json.Serialization;
 using HBLibrary.Workspace;
 using HBLibrary.Interface.IO.Storage;
@@ -25,6 +23,10 @@ using HBLibrary.Interface.IO.Storage.Container;
 using HBLibrary.IO.Storage;
 using HBLibrary.Core.ChangeTracker;
 using HBLibrary.Interface.Core.ChangeTracker;
+using FileManager.Core.Jobs;
+using FileManager.Core.Converters;
+using System.IO;
+using System.Security.Cryptography.Pkcs;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -34,9 +36,11 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     [JsonIgnore]
     public IApplicationStorage? Storage { get; private set; }
     [JsonIgnore]
+    public IChangeTracker ChangeTracker { get; set; }
+    [JsonIgnore]
     public JobManager? JobManager { get; set; }
     [JsonIgnore]
-    public IChangeTracker ChangeTracker { get; set; }
+    public JobRunner? JobRunner { get; set; }
 
 
     public HBFileManagerWorkspace() : base() {
@@ -93,11 +97,36 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
         IStorageEntryContainer jobContainer = jobContainerBuilder.Build();
 
+        IStorageEntryContainerBuilder jobRunnerContainerBuilder = StorageEntryContainer.CreateBuilder(containerPath!);
+        jobRunnerContainerBuilder.SetContainerPath("jobruns")
+            .ConfigureFileServices(fs => fs.UseJsonFileService());
+
+        if (UsesEncryption) {
+            jobRunnerContainerBuilder.EnableCryptography(new StorageContainerCryptography {
+                CryptographyMode = CryptographyMode.AES,
+                GetEntryKeyAsync = async () => {
+                    Result<AesKey> keyResult = await GetKeyAsync();
+                    return keyResult.Map<IKey>(e => e);
+                },
+                GetEntryKey = () => {
+                    Result<AesKey> keyResult = GetKey();
+                    return keyResult.Map<IKey>(e => e);
+                }
+            });
+        }
+
+        IStorageEntryContainer jobRunnerContainer = jobRunnerContainerBuilder.Build();
+
         Storage = ApplicationStorage.CreateBuilder(Path.GetDirectoryName(FullPath)!)
            .AddContainer(typeof(JobManager), _ => jobContainer)
+           .AddContainer(typeof(JobRunner), _ => jobRunnerContainer)
            .Build();
 
+
+        IUnityContainer mainContainer = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
+
         JobManager = new JobManager(jobContainer);
+        JobRunner = new JobRunner(jobRunnerContainer, pluginManager);
 
         foreach (IStorageEntryContainer entryContainer in Storage.GetContainers()) {
             entryContainer.ChangeTracker?.HookStateChanged();

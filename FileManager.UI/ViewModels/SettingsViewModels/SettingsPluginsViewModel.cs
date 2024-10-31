@@ -1,6 +1,8 @@
-﻿using FileManager.Core.Job;
+﻿using FileManager.Core.Jobs;
 using FileManager.Core.JobSteps;
 using FileManager.Core.Workspace;
+using FileManager.Domain;
+using FileManager.Domain.JobSteps;
 using FileManager.UI.Models.SettingsModels;
 using HBLibrary.Common;
 using HBLibrary.Common.Plugins;
