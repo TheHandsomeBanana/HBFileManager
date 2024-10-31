@@ -15,7 +15,6 @@ using System.Windows.Threading;
 namespace FileManager.UI.ViewModels.ExecutionViewModels.RunningJobsViewModels;
 public sealed class RunningJobViewModel : ViewModelBase<JobRun>, IDisposable {
     private readonly DispatcherTimer dispatcherTimer;
-    private readonly JobRunner jobRunner;
 
     public TimeSpan Elapsed => Model.Stopwatch.Elapsed;
 
@@ -36,21 +35,24 @@ public sealed class RunningJobViewModel : ViewModelBase<JobRun>, IDisposable {
     public bool IsSuccess => State == RunState.Success;
     public bool IsError => State == RunState.Faulted;
 
-    public RunningJobViewModel(JobRun model, JobRunner jobRunner) : base(model) {
-        this.jobRunner = jobRunner;
-
+    public RunningJobViewModel(JobRun model) : base(model) {
         dispatcherTimer = new DispatcherTimer {
             Interval = TimeSpan.FromMilliseconds(100)
         };
 
         dispatcherTimer.Tick += DispatcherTimer_Tick;
-        jobRunner.OnJobFinished += JobRunner_OnJobFinished;
+        model.OnJobFinished += JobRunner_OnJobFinished;
         dispatcherTimer.Start();
     }
 
-    private void JobRunner_OnJobFinished(JobRun obj) {
+    private void JobRunner_OnJobFinished() {
         dispatcherTimer.Stop();
-        State = obj.State;
+
+        Application.Current.Dispatcher.Invoke(() => {
+            NotifyPropertyChanged(nameof(IsRunning));
+            NotifyPropertyChanged(nameof(IsSuccess));
+            NotifyPropertyChanged(nameof(IsError));
+        });
     }
 
     private void DispatcherTimer_Tick(object? sender, EventArgs e) {
@@ -60,6 +62,6 @@ public sealed class RunningJobViewModel : ViewModelBase<JobRun>, IDisposable {
     public void Dispose() {
         dispatcherTimer.Stop();
         dispatcherTimer.Tick -= DispatcherTimer_Tick;
-        jobRunner.OnJobFinished -= JobRunner_OnJobFinished;
+        Model.OnJobFinished -= JobRunner_OnJobFinished;
     }
 }

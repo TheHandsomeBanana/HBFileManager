@@ -17,6 +17,9 @@ public class JobRun {
     public TimeSpan? Duration => StartedAt - FinishedAt;
     public StepRun[] StepRuns { get; set; }
 
+    public event Action? OnJobStarting;
+    public event Action? OnJobFinished;
+
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
@@ -28,6 +31,7 @@ public class JobRun {
 
 
     public void Start() {
+        OnJobStarting?.Invoke();
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
@@ -43,5 +47,7 @@ public class JobRun {
         else {
             State = RunState.Success;
         }
+
+        OnJobFinished?.Invoke();
     }
 }

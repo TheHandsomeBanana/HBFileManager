@@ -18,7 +18,7 @@ using Unity;
 namespace FileManager.UI.ViewModels.ExecutionViewModels;
 
 public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
-    private readonly JobRunner jobRunner;
+    private readonly JobExecutionManager jobRunner;
 
     public ObservableCollection<RunningJobViewModel> RunningJobs { get; set; }
 
@@ -41,7 +41,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
 
     protected override void InitializeViewModel() {
         foreach (JobRun jobRun in jobRunner.GetRunningJobs()) {
-            RunningJobs.Add(new RunningJobViewModel(jobRun, jobRunner));
+            RunningJobs.Add(new RunningJobViewModel(jobRun));
         }
 
         jobRunner.OnJobStarting += JobRunner_OnJobStarting;
@@ -49,7 +49,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
 
     private void JobRunner_OnJobStarting(JobRun obj) {
         Application.Current.Dispatcher.Invoke(() => {
-            RunningJobs.Add(new RunningJobViewModel(obj, jobRunner));
+            RunningJobs.Add(new RunningJobViewModel(obj));
         });
     }
 

@@ -13,7 +13,7 @@ namespace FileManager.Core.Jobs.Models;
 public class ZipArchiveStep : JobStep {
 
     public override void Execute(IUnityContainer container) {
-        Thread.Sleep(4000);
+        Thread.Sleep(10000);
     }
 
     public override async Task ExecuteAsync(IUnityContainer container) {

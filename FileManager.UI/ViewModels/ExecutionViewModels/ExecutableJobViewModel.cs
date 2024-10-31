@@ -43,12 +43,12 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
         HBDarkMessageBox.Show(title, exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 
-    private async Task ScheduleJob(ExecutableJobViewModel job) {
+    private Task ScheduleJob(ExecutableJobViewModel job) {
         throw new NotImplementedException();
     }
 
     private async Task RunJobAsync(ExecutableJobViewModel job) {
-        JobRunner jobRunner = workspaceManager.CurrentWorkspace!.JobRunner!;
+        JobExecutionManager jobRunner = workspaceManager.CurrentWorkspace!.JobRunner!;
         await Task.Run(() => jobRunner.RunAsync(job.Model, mainContainer));
     }
 }

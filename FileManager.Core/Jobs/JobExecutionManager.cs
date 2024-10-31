@@ -3,6 +3,7 @@ using FileManager.Domain.JobSteps;
 using HBLibrary.DataStructures;
 using HBLibrary.Interface.IO;
 using HBLibrary.Interface.IO.Storage.Container;
+using HBLibrary.Interface.IO.Storage.Entries;
 using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.Plugins;
 using HBLibrary.IO;
@@ -17,15 +18,14 @@ using System.Windows;
 using Unity;
 
 namespace FileManager.Core.Jobs;
-public class JobRunner : IJobRunner {
+public class JobExecutionManager : IJobExecutionManager {
     private readonly IStorageEntryContainer container;
     private readonly IPluginManager pluginManager;
     private readonly List<JobRun> runningJobs = [];
 
     public event Action<JobRun>? OnJobStarting;
-    public event Action<JobRun>? OnJobFinished;
 
-    public JobRunner(IStorageEntryContainer container, IPluginManager pluginManager) {
+    public JobExecutionManager(IStorageEntryContainer container, IPluginManager pluginManager) {
         this.container = container;
         this.pluginManager = pluginManager;
     }
@@ -39,6 +39,7 @@ public class JobRunner : IJobRunner {
                 .ToArray();
 
         JobRun jobRun = new JobRun(job, stepRuns);
+        runningJobs.Add(jobRun);
 
         OnJobStarting?.Invoke(jobRun);
         jobRun.Start();
@@ -59,7 +60,10 @@ public class JobRunner : IJobRunner {
 
         await Task.WhenAll(asyncJobs);
         jobRun.End();
-        OnJobFinished?.Invoke(jobRun);
+        runningJobs.Remove(jobRun);
+
+        container.AddOrUpdate(jobRun.Id.ToString(), jobRun, StorageEntryContentType.Json);
+
 
         foreach (IUnityContainer container in asyncJobsContainers) {
             container.Dispose();
@@ -98,5 +102,11 @@ public class JobRunner : IJobRunner {
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 
         return tempContainer;
+    }
+
+    public JobRun[] GetCompletedJobs() {
+        return container.GetAll().Select(e => e.Get<JobRun>())
+            .Where(e => e is not null)
+            .ToArray()!;
     }
 }
