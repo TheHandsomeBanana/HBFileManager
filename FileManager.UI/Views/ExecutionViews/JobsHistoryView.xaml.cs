@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels.ExecutionViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,13 @@ namespace FileManager.UI.Views.ExecutionViews
         public JobsHistoryView()
         {
             InitializeComponent();
+            Loaded += JobsHistoryView_Loaded;
+        }
+
+        private void JobsHistoryView_Loaded(object sender, RoutedEventArgs e) {
+            if (DataContext is JobsHistoryViewModel viewModel && !viewModel.IsInitialized) {
+                Dispatcher.Invoke(viewModel.InitializeAsync);
+            }
         }
     }
 }

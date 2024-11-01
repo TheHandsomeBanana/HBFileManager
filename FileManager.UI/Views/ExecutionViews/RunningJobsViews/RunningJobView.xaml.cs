@@ -1,4 +1,6 @@
-﻿using System;
+﻿using FileManager.UI.ViewModels.ExecutionViewModels.RunningJobsViewModels;
+using FileManager.UI.ViewModels.JobViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +21,13 @@ namespace FileManager.UI.Views.ExecutionViews.RunningJobsViews;
 /// </summary>
 public partial class RunningJobView : UserControl {
     public RunningJobView() {
+        DataContextChanged += RunningJobView_DataContextChanged;
         InitializeComponent();
+    }
+
+    private void RunningJobView_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
+        if (DataContext is RunningJobViewModel viewModel && !viewModel.IsInitialized) {
+            Dispatcher.Invoke(viewModel.Initialize);
+        }
     }
 }

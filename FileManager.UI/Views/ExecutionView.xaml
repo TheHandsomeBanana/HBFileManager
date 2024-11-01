@@ -216,10 +216,11 @@
 
             <ContentControl Content="{Binding CurrentViewModel}"
                             Grid.ColumnSpan="4"
-                            Grid.Row="1">
+                            Grid.Row="1"
+                            VerticalAlignment="Stretch">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type viewModels:RunningJobsViewModel}">
-                        <views:RunningJobsView />
+                        <views:RunningJobsView VerticalAlignment="Stretch" />
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type viewModels:ScheduledJobsViewModel}">
                         <views:ScheduledJobsView />

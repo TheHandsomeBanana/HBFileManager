@@ -18,7 +18,7 @@ public class StepRun {
     public RunState State { get; set; }
     public DateTime StartedAt { get; set; }
     public DateTime? FinishedAt { get; set; }
-    public TimeSpan? Duration => StartedAt - FinishedAt;
+    public TimeSpan? Duration => FinishedAt - StartedAt;
     public string StepType { get; set; }
     public bool IsAsync { get; set; }
     public string Name { get; set; }
@@ -26,6 +26,9 @@ public class StepRun {
 
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();
+
+    public event Action? OnStepStarting;
+    public event Action? OnStepFinished;
 
     public StepRun(JobStep step, string stepType) {
         this.step = step;
@@ -36,12 +39,22 @@ public class StepRun {
         StepType = stepType;
     }
 
+    // Json Constructor
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public StepRun()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    {
+        
+    }
+
     public void Start(UnityContainer container) {
+
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
+        OnStepStarting?.Invoke();
 
-        Logs.WriteLog(new LogStatement($"Step {Name} execution started.", Name, LogLevel.Info, DateTime.UtcNow));
+        Logs.WriteLog(new LogStatement($"{Name} execution started.", Name, LogLevel.Info, DateTime.UtcNow));
         step.Execute(container);
     }
     
@@ -54,17 +67,19 @@ public class StepRun {
     }
 
     public void EndSuccess() {
-        Logs.WriteSuccessLog(new LogStatement($"Step {Name} executed successfully", Name, LogLevel.Info, DateTime.UtcNow));
+        Logs.WriteSuccessLog(new LogStatement($"{Name} executed successfully", Name, LogLevel.Info, DateTime.UtcNow));
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Success;
+        OnStepFinished?.Invoke();
     }
 
     public void EndWithWarnings() {
-        Logs.WriteSuccessLog(new LogStatement($"Step {Name} executed successfully with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
+        Logs.WriteSuccessLog(new LogStatement($"{Name} executed successfully with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.CompletedWithWarnings;
+        OnStepFinished?.Invoke();
     }
 
     public void EndFailed(Exception e) {
@@ -72,5 +87,6 @@ public class StepRun {
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Faulted;
+        OnStepFinished?.Invoke();
     }
 }

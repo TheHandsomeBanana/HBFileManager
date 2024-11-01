@@ -17,15 +17,27 @@ using Unity;
 
 namespace FileManager.UI.ViewModels.ExecutionViewModels;
 
-public class JobsHistoryViewModel : AsyncInitializerViewModelBase {
+public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDisposable {
+    private JobRun[]? currentRunningJobs;
+
     private readonly JobExecutionManager jobExecutionManager;
     public ObservableCollection<JobHistoryViewModel> CompletedJobs { get; set; } = [];
+
+    private JobHistoryViewModel? selectedJobRun;
+    public JobHistoryViewModel? SelectedJobRun {
+        get { return selectedJobRun; }
+        set {
+            selectedJobRun = value;
+            NotifyPropertyChanged();
+        }
+    }
 
     public JobsHistoryViewModel() {
         IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
 
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
         jobExecutionManager = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
+
     }
 
     protected override async Task InitializeViewModelAsync() {
@@ -33,9 +45,30 @@ public class JobsHistoryViewModel : AsyncInitializerViewModelBase {
         foreach (JobRun run in jobRuns) {
             CompletedJobs.Add(new JobHistoryViewModel(run));
         }
+
+        currentRunningJobs = jobExecutionManager.GetRunningJobs();
+
+        foreach (JobRun activeRun in currentRunningJobs) {
+            activeRun.OnJobFinished += () => ActiveRun_OnJobFinished(activeRun);
+        }
+
+    }
+
+    private void ActiveRun_OnJobFinished(JobRun jobRun) {
+        Application.Current.Dispatcher.Invoke(() => {
+            CompletedJobs.Add(new JobHistoryViewModel(jobRun));
+        });
     }
 
     protected override void OnInitializeException(Exception exception) {
         HBDarkMessageBox.Show("Initialize error", exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    public void Dispose() {
+        if (currentRunningJobs is not null) {
+            foreach (JobRun activeRun in currentRunningJobs) {
+                activeRun.OnJobFinished -= () => ActiveRun_OnJobFinished(activeRun);
+            }
+        }
     }
 }

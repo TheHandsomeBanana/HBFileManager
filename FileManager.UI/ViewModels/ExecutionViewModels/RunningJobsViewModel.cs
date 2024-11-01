@@ -49,7 +49,9 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
 
     private void JobRunner_OnJobStarting(JobRun obj) {
         Application.Current.Dispatcher.Invoke(() => {
-            RunningJobs.Add(new RunningJobViewModel(obj));
+            RunningJobViewModel runningJobVM = new RunningJobViewModel(obj);
+            SelectedJobRun = runningJobVM;
+            RunningJobs.Add(runningJobVM);
         });
     }
 

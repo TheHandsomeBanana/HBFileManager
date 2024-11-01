@@ -10,7 +10,7 @@ namespace FileManager.UI.ViewModels;
 public class SettingsViewModel : ViewModelBase, IDisposable {
     private readonly INavigationStore navigationStore;
     private readonly ISettingsService settingsService;
-    public ViewModelBase? CurrentViewModel => navigationStore[nameof(SettingsViewModel)].ViewModel;
+    public ViewModelBase? CurrentViewModel => navigationStore[NavigateCommandParameter].ViewModel;
     public string NavigateCommandParameter => nameof(SettingsViewModel);
 
 
@@ -37,7 +37,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable {
         NavigateToEnvironmentCommand.Execute(NavigateCommandParameter);
 
         this.navigationStore = container.Resolve<INavigationStore>();
-        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
+        navigationStore[NavigateCommandParameter].CurrentViewModelChanged += SettingsViewModel_CurrentViewModelChanged;
     }
 
     private void SettingsViewModel_CurrentViewModelChanged() {
@@ -45,6 +45,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable {
     }
 
     public void Dispose() {
-        navigationStore[nameof(SettingsViewModel)].CurrentViewModelChanged -= SettingsViewModel_CurrentViewModelChanged;
+        navigationStore[NavigateCommandParameter].CurrentViewModelChanged -= SettingsViewModel_CurrentViewModelChanged;
+        navigationStore.DisposeByParentTypename(NavigateCommandParameter);
     }
 }

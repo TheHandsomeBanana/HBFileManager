@@ -28,7 +28,7 @@ public class JobExecutionManager : IJobExecutionManager {
     public event Action<JobRun>? OnJobStarting;
     public event Action<ScheduledJob>? OnJobScheduling;
 
-   
+
     public JobExecutionManager(IStorageEntryContainer container, IPluginManager pluginManager) {
         this.container = container;
         this.pluginManager = pluginManager;
@@ -42,7 +42,8 @@ public class JobExecutionManager : IJobExecutionManager {
         StepRun[] stepRuns = job.Steps.Select(e => new StepRun(e, pluginManager.GetStaticPluginMetadata(e.GetType()).TypeName))
                 .ToArray();
 
-        JobRun jobRun = new JobRun(job, stepRuns);
+        JobRun jobRun = new JobRun(job.Name, stepRuns);
+
         runningJobs.Add(jobRun);
 
         OnJobStarting?.Invoke(jobRun);
@@ -123,9 +124,10 @@ public class JobExecutionManager : IJobExecutionManager {
 
     public async Task<JobRun[]> GetCompletedJobsAsync() {
         List<Task<JobRun?>> entryGetTasks = [];
-        foreach(IStorageEntry entry in container.GetAll()) {
-            entryGetTasks.Add(entry.GetAsync<JobRun>());    
+        foreach (IStorageEntry entry in container.GetAll()) {
+            entryGetTasks.Add(entry.GetAsync<JobRun>());
         }
+
 
         JobRun?[] jobRuns = await Task.WhenAll(entryGetTasks);
         return jobRuns.Where(e => e is not null)

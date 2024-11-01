@@ -23,11 +23,18 @@ public class JobRun {
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public JobRun(Job job, StepRun[] stepRuns) {
+    public JobRun(string jobName, StepRun[] stepRuns) {
         State = RunState.Pending;
-        Name = job.Name;
+        Name = jobName;
         StepRuns = stepRuns;
     }
+
+    // Json Constructor
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+    public JobRun() {
+
+    }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 
     public void Start() {

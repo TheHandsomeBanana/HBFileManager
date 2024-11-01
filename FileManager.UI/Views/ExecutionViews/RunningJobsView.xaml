@@ -37,7 +37,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid VerticalAlignment="Stretch">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
@@ -48,7 +48,9 @@
                  Grid.Column="0"
                  d:ItemsSource="{d:SampleData ItemCount=5}"
                  ItemsSource="{Binding RunningJobs}"
-                 SelectedItem="{Binding SelectedJobRun}">
+                 SelectedItem="{Binding SelectedJobRun}"
+                 BorderThickness="0 0 2 0"
+                 VerticalAlignment="Stretch">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Height="50" MinWidth="100" Margin="0 0 10 0">
@@ -116,6 +118,7 @@
 
         <runningJobView:RunningJobView DataContext="{Binding SelectedJobRun}"
                                        Grid.Column="1"
+                                       VerticalAlignment="Stretch"
                                        Visibility="{Binding DataContext.SelectedJobRun, Converter={StaticResource n2v}, RelativeSource={RelativeSource AncestorType=UserControl}}" />
     </Grid>
 </UserControl>

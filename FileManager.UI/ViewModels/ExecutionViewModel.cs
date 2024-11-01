@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.Workspace;
+using FileManager.Domain;
 using FileManager.UI.ViewModels.ExecutionViewModels;
 using FileManager.UI.ViewModels.JobViewModels;
 using FileManager.UI.Views;
@@ -40,41 +41,59 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
     private bool runningJobsChecked = true;
     public bool RunningJobsChecked {
         get { return runningJobsChecked; }
-        set { 
-            runningJobsChecked = value;
-            NotifyPropertyChanged();
+        set {
+            if (value && !runningJobsChecked) {
 
-            if(value) {
-                ScheduledJobsChecked = false;
-                JobsHistoryChecked = false;
+                runningJobsChecked = value;
+                NotifyPropertyChanged();
+
+                if (value) {
+                    scheduledJobsChecked = false;
+                    jobsHistoryChecked = false;
+
+                    NotifyPropertyChanged(nameof(ScheduledJobsChecked));
+                    NotifyPropertyChanged(nameof(JobsHistoryChecked));
+                }
             }
         }
     }
-    
+
     private bool scheduledJobsChecked;
     public bool ScheduledJobsChecked {
         get { return scheduledJobsChecked; }
         set {
-            scheduledJobsChecked = value;
-            NotifyPropertyChanged();
+            if (value && !scheduledJobsChecked) {
 
-            if(value) {
-                RunningJobsChecked = false;
-                JobsHistoryChecked = false;
+                scheduledJobsChecked = value;
+                NotifyPropertyChanged();
+
+                if (value) {
+                    runningJobsChecked = false;
+                    jobsHistoryChecked = false;
+
+                    NotifyPropertyChanged(nameof(RunningJobsChecked));
+                    NotifyPropertyChanged(nameof(JobsHistoryChecked));
+                }
             }
         }
     }
-    
+
     private bool jobsHistoryChecked;
     public bool JobsHistoryChecked {
         get { return jobsHistoryChecked; }
         set {
-            jobsHistoryChecked = value;
-            NotifyPropertyChanged();
+            if (value && !jobsHistoryChecked) {
 
-            if (value) {
-                RunningJobsChecked = false;
-                ScheduledJobsChecked = false;
+                jobsHistoryChecked = value;
+                NotifyPropertyChanged();
+
+                if (value) {
+                    runningJobsChecked = false;
+                    scheduledJobsChecked = false;
+
+                    NotifyPropertyChanged(nameof(RunningJobsChecked));
+                    NotifyPropertyChanged(nameof(ScheduledJobsChecked));
+                }
             }
         }
     }
@@ -107,12 +126,26 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
         navigationStore[NavigateCommandParameter].CurrentViewModelChanged += ExecutionViewModel_CurrentViewModelChanged;
 
         workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobStarting += ExecutionViewModel_OnJobStarting;
+        workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobScheduling += ExecutionViewModel_OnJobScheduling;
 
         NavigateRunningJobsCommand.Execute(NavigateCommandParameter);
     }
 
+
+
     private void ExecutionViewModel_OnJobStarting(Domain.JobRun _) {
         NavigateRunningJobsCommand.Execute(NavigateCommandParameter);
+
+        RunningJobsChecked = true;
+        ScheduledJobsChecked = false;
+        JobsHistoryChecked = false;
+    }
+
+    private void ExecutionViewModel_OnJobScheduling(ScheduledJob _) {
+        NavigateScheduledJobsCommand.Execute(NavigateCommandParameter);
+        RunningJobsChecked = false;
+        ScheduledJobsChecked = true;
+        JobsHistoryChecked = false;
     }
 
     private void ExecutionViewModel_CurrentViewModelChanged() {
@@ -129,7 +162,8 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
     public void Dispose() {
         navigationStore[NavigateCommandParameter].CurrentViewModelChanged -= ExecutionViewModel_CurrentViewModelChanged;
         workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobStarting -= ExecutionViewModel_OnJobStarting;
-        
+        workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobScheduling -= ExecutionViewModel_OnJobScheduling;
+
         navigationStore.DisposeByParentTypename(NavigateCommandParameter);
     }
 }
