@@ -27,6 +27,7 @@ using FileManager.Core.Jobs;
 using FileManager.Core.Converters;
 using System.IO;
 using System.Security.Cryptography.Pkcs;
+using HBLibrary.Logging.FlowDocumentTarget;
 
 namespace FileManager.Core.Workspace;
 public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
@@ -40,7 +41,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     [JsonIgnore]
     public JobManager? JobManager { get; set; }
     [JsonIgnore]
-    public JobExecutionManager? JobRunner { get; set; }
+    public JobExecutionManager? JobExecutionManager { get; set; }
 
 
     public HBFileManagerWorkspace() : base() {
@@ -99,7 +100,14 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
 
         IStorageEntryContainerBuilder jobRunnerContainerBuilder = StorageEntryContainer.CreateBuilder(containerPath!);
         jobRunnerContainerBuilder.SetContainerPath("jobruns")
-            .ConfigureFileServices(fs => fs.UseJsonFileService());
+            .ConfigureFileServices(fs => fs.UseJsonFileService(jfs => {
+                jfs.SetGlobalOptions(new JsonSerializerOptions {
+                    Converters = {
+                        new FlowDocumentJsonConverter()
+                    },
+                    WriteIndented = true
+                });
+            }));
 
         if (UsesEncryption) {
             jobRunnerContainerBuilder.EnableCryptography(new StorageContainerCryptography {
@@ -126,7 +134,7 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         IUnityContainer mainContainer = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
 
         JobManager = new JobManager(jobContainer);
-        JobRunner = new JobExecutionManager(jobRunnerContainer, pluginManager);
+        JobExecutionManager = new JobExecutionManager(jobRunnerContainer, pluginManager);
 
         foreach (IStorageEntryContainer entryContainer in Storage.GetContainers()) {
             entryContainer.ChangeTracker?.HookStateChanged();

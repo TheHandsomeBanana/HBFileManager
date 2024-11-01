@@ -34,7 +34,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
     public RunningJobsViewModel() {
         IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
-        jobRunner = workspaceManager.CurrentWorkspace!.JobRunner!;
+        jobRunner = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
 
         RunningJobs = [];
     }

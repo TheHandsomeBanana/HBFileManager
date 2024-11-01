@@ -1,5 +1,6 @@
 ﻿using FileManager.Core.Jobs;
 using FileManager.Domain;
+using FileManager.Domain.JobSteps;
 using HBLibrary.Logging.FlowDocumentTarget;
 using HBLibrary.Wpf.ViewModels;
 using System;
@@ -19,21 +20,13 @@ public sealed class RunningJobViewModel : ViewModelBase<JobRun>, IDisposable {
     public TimeSpan Elapsed => Model.Stopwatch.Elapsed;
 
     public string Name => Model.Name;
-    public RunState State {
-        get => Model.State;
-        set {
-            Model.State = value;
-            NotifyPropertyChanged(nameof(IsRunning));
-            NotifyPropertyChanged(nameof(IsSuccess));
-            NotifyPropertyChanged(nameof(IsError));
-        }
-    }
 
     public ObservableCollection<RunningStepViewModel> RunningSteps { get; set; } = [];
 
-    public bool IsRunning => State == RunState.Running;
-    public bool IsSuccess => State == RunState.Success;
-    public bool IsError => State == RunState.Faulted;
+    public bool IsRunning => Model.State == RunState.Running;
+    public bool IsSuccess => Model.State == RunState.Success;
+    public bool IsError => Model.State == RunState.Faulted;
+    public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
 
     public RunningJobViewModel(JobRun model) : base(model) {
         dispatcherTimer = new DispatcherTimer {
@@ -52,6 +45,7 @@ public sealed class RunningJobViewModel : ViewModelBase<JobRun>, IDisposable {
             NotifyPropertyChanged(nameof(IsRunning));
             NotifyPropertyChanged(nameof(IsSuccess));
             NotifyPropertyChanged(nameof(IsError));
+            NotifyPropertyChanged(nameof(IsWarning));
         });
     }
 

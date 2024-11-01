@@ -36,7 +36,7 @@ public class StepRun {
         StepType = stepType;
     }
 
-    public void Start(IUnityContainer container) {
+    public void Start(UnityContainer container) {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
@@ -45,7 +45,7 @@ public class StepRun {
         step.Execute(container);
     }
     
-    public Task StartAsync(IUnityContainer container) {
+    public Task StartAsync(UnityContainer container) {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
@@ -54,10 +54,17 @@ public class StepRun {
     }
 
     public void EndSuccess() {
-        Logs.WriteSuccessLog(new LogStatement($"Step {Name} executed successfully", Name, LogLevel.Fatal, DateTime.UtcNow));
+        Logs.WriteSuccessLog(new LogStatement($"Step {Name} executed successfully", Name, LogLevel.Info, DateTime.UtcNow));
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Success;
+    }
+
+    public void EndWithWarnings() {
+        Logs.WriteSuccessLog(new LogStatement($"Step {Name} executed successfully with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
+        FinishedAt = DateTime.UtcNow;
+        Stopwatch.Stop();
+        State = RunState.CompletedWithWarnings;
     }
 
     public void EndFailed(Exception e) {

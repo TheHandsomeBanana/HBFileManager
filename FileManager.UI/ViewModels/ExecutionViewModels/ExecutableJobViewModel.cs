@@ -48,7 +48,7 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
     }
 
     private async Task RunJobAsync(ExecutableJobViewModel job) {
-        JobExecutionManager jobRunner = workspaceManager.CurrentWorkspace!.JobRunner!;
+        JobExecutionManager jobRunner = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
         await Task.Run(() => jobRunner.RunAsync(job.Model, mainContainer));
     }
 }

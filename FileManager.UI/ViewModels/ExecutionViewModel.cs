@@ -106,7 +106,7 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
 
         navigationStore[NavigateCommandParameter].CurrentViewModelChanged += ExecutionViewModel_CurrentViewModelChanged;
 
-        workspaceManager.CurrentWorkspace!.JobRunner!.OnJobStarting += ExecutionViewModel_OnJobStarting;
+        workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobStarting += ExecutionViewModel_OnJobStarting;
 
         NavigateRunningJobsCommand.Execute(NavigateCommandParameter);
     }
@@ -128,7 +128,7 @@ public class ExecutionViewModel : ViewModelBase, IDisposable {
 
     public void Dispose() {
         navigationStore[NavigateCommandParameter].CurrentViewModelChanged -= ExecutionViewModel_CurrentViewModelChanged;
-        workspaceManager.CurrentWorkspace!.JobRunner!.OnJobStarting -= ExecutionViewModel_OnJobStarting;
+        workspaceManager.CurrentWorkspace!.JobExecutionManager!.OnJobStarting -= ExecutionViewModel_OnJobStarting;
         
         navigationStore.DisposeByParentTypename(NavigateCommandParameter);
     }

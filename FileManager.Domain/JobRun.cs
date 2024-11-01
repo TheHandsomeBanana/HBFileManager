@@ -40,13 +40,21 @@ public class JobRun {
     public void End() {
         Stopwatch.Stop();
         FinishedAt = DateTime.UtcNow;
+        foreach (StepRun step in StepRuns) {
+            if (State != RunState.CompletedWithWarnings && step.State == RunState.CompletedWithWarnings) {
+                State = RunState.CompletedWithWarnings;
+            }
 
-        if (StepRuns.Any(e => e.State == RunState.Faulted)) {
-            State = RunState.Faulted;
+            if (step.State == RunState.Faulted) {
+                State = RunState.Faulted;
+                break;
+            }
         }
-        else {
+
+        if (State == RunState.Running) {
             State = RunState.Success;
         }
+
 
         OnJobFinished?.Invoke();
     }

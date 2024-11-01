@@ -1,4 +1,5 @@
-﻿using FileManager.Domain;
+﻿using FileManager.Core.JobSteps;
+using FileManager.Domain;
 using FileManager.Domain.JobSteps;
 using HBLibrary.DataStructures;
 using HBLibrary.Interface.IO;
@@ -16,6 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Unity;
+using Unity.Lifetime;
 
 namespace FileManager.Core.Jobs;
 public class JobExecutionManager : IJobExecutionManager {
@@ -24,7 +26,9 @@ public class JobExecutionManager : IJobExecutionManager {
     private readonly List<JobRun> runningJobs = [];
 
     public event Action<JobRun>? OnJobStarting;
+    public event Action<ScheduledJob>? OnJobScheduling;
 
+   
     public JobExecutionManager(IStorageEntryContainer container, IPluginManager pluginManager) {
         this.container = container;
         this.pluginManager = pluginManager;
@@ -47,7 +51,7 @@ public class JobExecutionManager : IJobExecutionManager {
         List<Task> asyncJobs = [];
         List<IUnityContainer> asyncJobsContainers = [];
         foreach (StepRun stepRun in jobRun.StepRuns) {
-            IUnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
+            UnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
             if (stepRun.IsAsync) {
                 asyncJobs.Add(RunStepAsync(stepRun, tempContainer));
                 asyncJobsContainers.Add(tempContainer);
@@ -70,17 +74,28 @@ public class JobExecutionManager : IJobExecutionManager {
         }
     }
 
-    private static void RunStep(StepRun stepRun, IUnityContainer container) {
+    private static void RunStep(StepRun stepRun, UnityContainer container) {
         try {
             stepRun.Start(container);
-            stepRun.EndSuccess();
+
+            IExecutionStateHandler stateHandler = container.Resolve<IExecutionStateHandler>();
+
+            switch (stateHandler.State) {
+                case RunState.CompletedWithWarnings:
+                    stepRun.EndWithWarnings();
+                    break;
+                default:
+                    stepRun.EndSuccess();
+                    break;
+            }
+
         }
         catch (Exception ex) {
             stepRun.EndFailed(ex);
         }
     }
 
-    private static async Task RunStepAsync(StepRun stepRun, IUnityContainer container) {
+    private static async Task RunStepAsync(StepRun stepRun, UnityContainer container) {
         try {
             await stepRun.StartAsync(container);
             stepRun.EndSuccess();
@@ -90,7 +105,7 @@ public class JobExecutionManager : IJobExecutionManager {
         }
     }
 
-    private IUnityContainer CreateTempContainer(StepRun stepRun, IUnityContainer mainContainer) {
+    private static UnityContainer CreateTempContainer(StepRun stepRun, IUnityContainer mainContainer) {
         ILoggerFactory loggerFactory = mainContainer.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
@@ -101,12 +116,33 @@ public class JobExecutionManager : IJobExecutionManager {
         tempContainer.RegisterInstance(tempAsyncLogger);
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 
+        tempContainer.RegisterType<IExecutionStateHandler, ExecutionStateHandler>(new ContainerControlledLifetimeManager());
+
         return tempContainer;
     }
 
-    public JobRun[] GetCompletedJobs() {
-        return container.GetAll().Select(e => e.Get<JobRun>())
-            .Where(e => e is not null)
+    public async Task<JobRun[]> GetCompletedJobsAsync() {
+        List<Task<JobRun?>> entryGetTasks = [];
+        foreach(IStorageEntry entry in container.GetAll()) {
+            entryGetTasks.Add(entry.GetAsync<JobRun>());    
+        }
+
+        JobRun?[] jobRuns = await Task.WhenAll(entryGetTasks);
+        return jobRuns.Where(e => e is not null)
             .ToArray()!;
     }
+
+    public Task<ScheduledJob[]> GetScheduledJobs() {
+        throw new NotImplementedException();
+    }
+
+    public async Task Schedule(Job job) {
+        ScheduledJob scheduledJob = new ScheduledJob();
+        OnJobScheduling?.Invoke(scheduledJob);
+    }
+
+    public Task Shelve(ScheduledJob job) {
+        throw new NotImplementedException();
+    }
+
 }

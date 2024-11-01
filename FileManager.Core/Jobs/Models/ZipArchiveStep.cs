@@ -1,4 +1,5 @@
-﻿using FileManager.Domain.JobSteps;
+﻿using FileManager.Core.JobSteps;
+using FileManager.Domain.JobSteps;
 using HBLibrary.Common;
 using HBLibrary.DataStructures;
 using HBLibrary.Interface.Plugins.Attributes;
@@ -13,7 +14,10 @@ namespace FileManager.Core.Jobs.Models;
 public class ZipArchiveStep : JobStep {
 
     public override void Execute(IUnityContainer container) {
-        Thread.Sleep(10000);
+        IExecutionStateHandler stateHandler = container.Resolve<IExecutionStateHandler>();
+        stateHandler.WillCompleteWithWarnings();
+
+        Thread.Sleep(5000);
     }
 
     public override async Task ExecuteAsync(IUnityContainer container) {

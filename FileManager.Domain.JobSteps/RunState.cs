@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileManager.Domain;
+namespace FileManager.Domain.JobSteps;
 public enum RunState {
     Pending,
     Running,
     Faulted,
-    Success
+    Success,
+    CompletedWithWarnings
 }
