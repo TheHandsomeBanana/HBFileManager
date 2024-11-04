@@ -31,6 +31,8 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
         }
     }
 
+    public bool AnyJobsRunning => RunningJobs.Count > 0;
+
     public RunningJobsViewModel() {
         IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
@@ -45,6 +47,8 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
         }
 
         jobRunner.OnJobStarting += JobRunner_OnJobStarting;
+
+        NotifyPropertyChanged(nameof(AnyJobsRunning));
     }
 
     private void JobRunner_OnJobStarting(JobRun obj) {
@@ -53,6 +57,8 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
             SelectedJobRun = runningJobVM;
             RunningJobs.Add(runningJobVM);
         });
+
+        NotifyPropertyChanged(nameof(AnyJobsRunning));
     }
 
     public void Dispose() {

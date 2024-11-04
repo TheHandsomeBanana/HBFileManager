@@ -54,7 +54,7 @@ public class StepRun {
         State = RunState.Running;
         OnStepStarting?.Invoke();
 
-        Logs.WriteLog(new LogStatement($"{Name} execution started.", Name, LogLevel.Info, DateTime.UtcNow));
+        Logs.WriteLog(new LogStatement($"{Name} started", Name, LogLevel.Info, DateTime.UtcNow));
         step.Execute(container);
     }
     
@@ -67,7 +67,7 @@ public class StepRun {
     }
 
     public void EndSuccess() {
-        Logs.WriteSuccessLog(new LogStatement($"{Name} executed successfully", Name, LogLevel.Info, DateTime.UtcNow));
+        Logs.WriteSuccessLog(new LogStatement($"{Name} completed", Name, LogLevel.Info, DateTime.UtcNow));
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Success;
@@ -75,7 +75,7 @@ public class StepRun {
     }
 
     public void EndWithWarnings() {
-        Logs.WriteSuccessLog(new LogStatement($"{Name} executed successfully with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
+        Logs.WriteSuccessLog(new LogStatement($"{Name} completed with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.CompletedWithWarnings;

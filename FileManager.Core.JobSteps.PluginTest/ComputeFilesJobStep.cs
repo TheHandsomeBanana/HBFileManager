@@ -12,11 +12,13 @@ namespace FileManager.Core.JobSteps.PluginTest;
 [PluginDescription("Used to compute numerous files.")]
 public class ComputeFilesJobStep : JobStep {
     public override void Execute(IUnityContainer container) {
-        
+        Thread.Sleep(2000);
+        throw new StepExecutionException("Step execution failed", false);
     }
 
-    public override Task ExecuteAsync(IUnityContainer container) {
-        return Task.CompletedTask;
+    public override async Task ExecuteAsync(IUnityContainer container) {
+        await Task.Delay(2000);
+        throw new StepExecutionException("Step execution failed", false);
     }
 
     public override UserControl? GetJobStepView() {

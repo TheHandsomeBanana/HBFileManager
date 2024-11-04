@@ -50,7 +50,10 @@
                  ItemsSource="{Binding RunningSteps}"
                  SelectedItem="{Binding SelectedStepRun}"
                  ItemContainerStyle="{StaticResource HBDark_SmallTemplateListBoxItem}"
-                 BorderThickness="0 0 2 0">
+                 BorderThickness="0 0 2 0"
+                 MinWidth="150"
+                 MaxWidth="350"
+                 Padding="0 10 0 0">
             <ListBox.Resources>
                 <Style x:Key="RunStateTextStyle"
                        TargetType="TextBlock">
@@ -156,6 +159,8 @@
                                     Value="#4da5e9" />
                             <Setter Property="BorderThickness"
                                     Value="1" />
+                            <Setter Property="Background"
+                                    Value="#39454f" />
                         </MultiDataTrigger>
 
                         <MultiDataTrigger>
@@ -169,6 +174,8 @@
                                     Value="#f1c23c" />
                             <Setter Property="BorderThickness"
                                     Value="1" />
+                            <Setter Property="Background"
+                                    Value="#766a47" />
                         </MultiDataTrigger>
 
                         <MultiDataTrigger>
@@ -182,6 +189,8 @@
                                     Value="#e25964" />
                             <Setter Property="BorderThickness"
                                     Value="1" />
+                            <Setter Property="Background"
+                                    Value="#563d3e" />
                         </MultiDataTrigger>
 
                         <MultiDataTrigger>
@@ -195,6 +204,8 @@
                                     Value="#8ae28a" />
                             <Setter Property="BorderThickness"
                                     Value="1" />
+                            <Setter Property="Background"
+                                    Value="#364336" />
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -203,7 +214,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border Style="{StaticResource RunStateBorderStyle}"
-                            Height="50"
+                            Height="60"
                             MinWidth="100"
                             Padding="5"
                             HorizontalAlignment="Stretch"
@@ -211,23 +222,41 @@
 
                         <Grid HorizontalAlignment="Stretch"
                               VerticalAlignment="Center">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
+                            <controls:LoadingSpinner Grid.Column="0"
+                                                     Grid.RowSpan="2"
+                                                     Thickness="2"
+                                                     Diameter="18"
+                                                     Color="{StaticResource VSBlue}"
+                                                     IsLoading="{Binding IsRunning}"
+                                                     Margin="0 0 10 0">
+
+                            </controls:LoadingSpinner>
+
 
                             <TextBlock Style="{StaticResource RunStateTextStyle}"
                                        FontSize="14"
                                        Text="{Binding Name}"
-                                       Grid.Row="0">
+                                       Grid.Row="0"
+                                       Grid.Column="1">
                             </TextBlock>
 
 
 
                             <TextBlock Style="{StaticResource HBDark_TextBlock}"
                                        Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}"
-                                       Grid.Row="1">
+                                       Grid.Row="1"
+                                       Grid.Column="1">
                             </TextBlock>
                         </Grid>
                     </Border>

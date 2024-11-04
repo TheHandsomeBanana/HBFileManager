@@ -24,6 +24,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
     public string Name => Model.Name;
     public string StepType => Model.StepType;
     public RunState State => Model.State;
+    public bool IsRunning => Model.State == RunState.Running;
 
     public RunningStepViewModel(StepRun model) : base(model) {
         model.OnStepStarting += Model_OnStepStarting;
@@ -40,10 +41,12 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
 
     private void Model_OnStepFinished() {
         NotifyPropertyChanged(nameof(State));
+        NotifyPropertyChanged(nameof(IsRunning));
     }
 
     private void Model_OnStepStarting() {
         NotifyPropertyChanged(nameof(State));
+        NotifyPropertyChanged(nameof(IsRunning));
     }
 
     private void DispatcherTimer_Tick(object? sender, EventArgs e) {

@@ -148,7 +148,7 @@
         </Border>
 
         <Grid Grid.Column="1"
-              VerticalAlignment="Top"
+              VerticalAlignment="Stretch"
               HorizontalAlignment="Stretch"
               Margin="10 10 10 0">
             <Grid.ColumnDefinitions>
