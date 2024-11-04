@@ -8,9 +8,8 @@
              xmlns:models="clr-namespace:FileManager.Core.Jobs.Models"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:customControls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
-             xmlns:listViews="clr-namespace:HBLibrary.Wpf.Styles.ListView;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              Background="Transparent"
@@ -97,12 +96,12 @@
                             <GridViewColumn Header="Type"
                                             DisplayMemberBinding="{Binding Type}"
                                             Width="80"
-                                            listViews:GridViewColumnAttachedProperties.MinWidth="80">
+                                            attachedProperties:GridViewColumnAttachedProperties.MinWidth="80">
                             </GridViewColumn>
 
                             <GridViewColumn Header="Path"
                                             DisplayMemberBinding="{Binding Path}"
-                                            listViews:GridViewColumnAttachedProperties.MinWidth="200">
+                                            attachedProperties:GridViewColumnAttachedProperties.MinWidth="200">
                                 <GridViewColumn.Width>
                                     <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
                                                   ConverterParameter="*">
@@ -211,7 +210,7 @@
 
             </customControls:TimeSpanPicker>
 
-            <buttons:IconButton IconData="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
+            <customControls:IconButton IconData="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"
                                 IconWidth="16"
                                 IconHeight="16"
                                 Width="20"
@@ -219,7 +218,7 @@
                                 IconStretch="Uniform"
                                 IconFill="#51b4ff"
                                 Command="{Binding ToggleInfoPopupCommand}">
-            </buttons:IconButton>
+            </customControls:IconButton>
 
             <Popup IsOpen="{Binding IsInfoPopupOpen}"
                    PlacementTarget="{Binding ElementName=InfoButton}"

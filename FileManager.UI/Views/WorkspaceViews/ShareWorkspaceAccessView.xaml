@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.WorkspaceViews"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
@@ -66,22 +65,22 @@
                     Grid.Row="1"
                     Margin="10">
 
-            <buttons:IconButton BorderThickness="1"
+            <controls:IconButton BorderThickness="1"
                                 BorderBrush="{StaticResource ControlBorder}"
                                 Margin="0 0 0 10"
                                 IconData="M14.58,16.59L19.17,12L14.58,7.41L16,6L22,12L16,18L14.58,16.59M8.58,16.59L13.17,12L8.58,7.41L10,6L16,12L10,18L8.58,16.59M2.58,16.59L7.17,12L2.58,7.41L4,6L10,12L4,18L2.58,16.59Z"
                                 IconFill="{StaticResource Foreground}"
                                 Command="{Binding AddAccountToShareCommand}">
 
-            </buttons:IconButton>
+            </controls:IconButton>
 
-            <buttons:IconButton BorderThickness="1"
+            <controls:IconButton BorderThickness="1"
                                 BorderBrush="{StaticResource ControlBorder}"
                                 IconData="M9.42,7.41L4.83,12L9.42,16.59L8,18L2,12L8,6L9.42,7.41M15.42,7.41L10.83,12L15.42,16.59L14,18L8,12L14,6L15.42,7.41M21.42,7.41L16.83,12L21.42,16.59L20,18L14,12L20,6L21.42,7.41Z"
                                 IconFill="{StaticResource Foreground}"
                                 Command="{Binding RemoveAccountFromShareCommand}">
 
-            </buttons:IconButton>
+            </controls:IconButton>
 
         </StackPanel>
 

@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:FileManager.UI.Views"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.ExecutionViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.ExecutionViews"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"

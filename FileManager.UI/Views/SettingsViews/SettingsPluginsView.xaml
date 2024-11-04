@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:customControls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:listViews="clr-namespace:HBLibrary.Wpf.Styles.ListView;assembly=HBLibrary.Wpf"
@@ -48,16 +47,16 @@
                     VerticalAlignment="Center"
                     Orientation="Horizontal">
 
-            <buttons:IconButton BorderThickness="1"
+            <customControls:IconButton BorderThickness="1"
                                 ToolTip="Add new assembly"
                                 Height="24"
                                 Width="24"
                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                 IconFill="{StaticResource VSGreen}"
                                 Command="{Binding AddAssemblyCommand}">
-            </buttons:IconButton>
+            </customControls:IconButton>
             
-            <buttons:IconButton BorderThickness="1"
+            <customControls:IconButton BorderThickness="1"
                                 Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}"
                                 ToolTip="Remove assembly"
                                 Height="24"
@@ -66,7 +65,7 @@
                                 IconFill="{StaticResource VSRed}"
                                 Command="{Binding DeleteAssemblyCommand}"
                                 CommandParameter="{Binding SelectedAssembly}">
-            </buttons:IconButton>
+            </customControls:IconButton>
         </StackPanel>
 
         <TextBox Style="{StaticResource HBDark_VSFilterBox}"

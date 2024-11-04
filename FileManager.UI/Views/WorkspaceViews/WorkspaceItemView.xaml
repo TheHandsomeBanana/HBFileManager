@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.WorkspaceViews"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
@@ -84,7 +83,7 @@
                             HorizontalAlignment="Left"
                             Orientation="Horizontal">
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         ToolTip="Share access"
                                         Height="24"
                                         Width="24"
@@ -92,9 +91,9 @@
                                         IconFill="{StaticResource VSGreen}"
                                         Command="{Binding ShareAccessCommand}">
 
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Visibility="{Binding SelectedAccessControl, Converter={StaticResource n2v}}"
                                         ToolTip="Revoke access"
                                         Height="24"
@@ -103,7 +102,7 @@
                                         IconFill="{StaticResource VSRed}"
                                         Command="{Binding RevokeAccessCommand}"
                                         CommandParameter="{Binding SelectedAccessControl}">
-                    </buttons:IconButton>
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBox Style="{StaticResource HBDark_VSFilterBox}"

@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
@@ -56,7 +55,7 @@
                             HorizontalAlignment="Left"
                             Orientation="Horizontal">
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         ToolTip="Add workspace"
                                         Height="24"
                                         Width="24"
@@ -64,9 +63,9 @@
                                         IconFill="{StaticResource VSGreen}"
                                         Command="{Binding CreateWorkspaceCommand}">
 
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Visibility="{Binding SelectedWorkspace, Converter={StaticResource n2v}}"
                                         ToolTip="Remove workspace"
                                         Height="24"
@@ -75,9 +74,9 @@
                                         IconFill="{StaticResource VSRed}"
                                         Command="{Binding RemoveWorkspaceCommand}"
                                         CommandParameter="{Binding SelectedWorkspace}">
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Visibility="{Binding SelectedWorkspace, Converter={StaticResource n2v}}"
                                         ToolTip="Export workspace"
                                         Height="24"
@@ -89,9 +88,9 @@
                                         Command="{Binding ExportWorkspaceCommand}"
                                         CommandParameter="{Binding SelectedWorkspace}">
 
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         ToolTip="Import workspace"
                                         Height="24"
                                         Width="24"
@@ -101,7 +100,7 @@
                                         IconFill="#51b4ff"
                                         Command="{Binding ImportWorkspaceCommand}">
 
-                    </buttons:IconButton>
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBox Style="{StaticResource HBDark_VSFilterBox}"

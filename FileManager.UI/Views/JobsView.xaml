@@ -7,7 +7,6 @@
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
              xmlns:jobViewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels"
              xmlns:jobViews="clr-namespace:FileManager.UI.Views.JobViews"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -69,16 +68,16 @@
                             HorizontalAlignment="Left"
                             Orientation="Horizontal">
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Height="24"
                                         Width="24"
                                         IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                         IconFill="{StaticResource VSGreen}"
                                         Command="{Binding AddJobCommand}">
 
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Visibility="{Binding SelectedJob, Converter={StaticResource n2v}}"
                                         ToolTip="Delete job"
                                         Height="24"
@@ -87,9 +86,9 @@
                                         IconFill="{StaticResource VSRed}"
                                         Command="{Binding DeleteJobCommand}"
                                         CommandParameter="{Binding SelectedJob}">
-                    </buttons:IconButton>
+                    </controls:IconButton>
 
-                    <buttons:IconButton BorderThickness="1"
+                    <controls:IconButton BorderThickness="1"
                                         Visibility="{Binding SelectedJob, Converter={StaticResource n2v}}"
                                         ToolTip="Validate job"
                                         Height="24"
@@ -101,7 +100,7 @@
                                         Command="{Binding ValidateJobCommand}"
                                         CommandParameter="{Binding SelectedJob}">
                         
-                    </buttons:IconButton>
+                    </controls:IconButton>
                 </StackPanel>
 
                 <TextBox Style="{StaticResource HBDark_VSFilterBox}"

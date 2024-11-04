@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
-             xmlns:buttons="clr-namespace:HBLibrary.Wpf.Styles.Button;assembly=HBLibrary.Wpf"
              xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels.JobStepViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.JobViews.JobStepViews"
@@ -158,16 +157,16 @@
                                     HorizontalAlignment="Left"
                                     Orientation="Horizontal">
 
-                            <buttons:IconButton BorderThickness="1"
+                            <controls:IconButton BorderThickness="1"
                                                 Height="24"
                                                 Width="24"
                                                 ToolTip="Add step"
                                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                                 IconFill="{StaticResource VSGreen}"
                                                 Command="{Binding AddStepCommand}">
-                            </buttons:IconButton>
+                            </controls:IconButton>
 
-                            <buttons:IconButton BorderThickness="1"
+                            <controls:IconButton BorderThickness="1"
                                                 Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
                                                 ToolTip="Delete step"
                                                 Height="24"
@@ -176,9 +175,9 @@
                                                 IconFill="{StaticResource VSRed}"
                                                 Command="{Binding DeleteStepCommand}"
                                                 CommandParameter="{Binding SelectedStep}">
-                            </buttons:IconButton>
+                            </controls:IconButton>
 
-                            <buttons:IconButton BorderThickness="1"
+                            <controls:IconButton BorderThickness="1"
                                                 Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
                                                 ToolTip="Validate step"
                                                 Height="24"
@@ -190,7 +189,7 @@
                                                 Command="{Binding ValidateStepCommand}"
                                                 CommandParameter="{Binding SelectedStep}">
 
-                            </buttons:IconButton>
+                            </controls:IconButton>
                         </StackPanel>
 
                         <TextBox Style="{StaticResource HBDark_VSFilterBox}"
@@ -365,7 +364,7 @@
 
                         <StackPanel Grid.Column="0"
                                     Visibility="{Binding IsExpanded, ElementName=ExpanderValidationLog, Converter={StaticResource b2v}}">
-                            <buttons:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
+                            <controls:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
                                                 IconFill="{StaticResource VSRed}"
                                                 BorderThickness="1"
                                                 Width="25"
@@ -376,7 +375,7 @@
                                                 HorizontalAlignment="Left"
                                                 Command="{Binding ClearValidationLogCommand}">
 
-                            </buttons:IconButton>
+                            </controls:IconButton>
                         </StackPanel>
 
                         <RichTextBox Style="{StaticResource HBDark_RichTextBox}"
