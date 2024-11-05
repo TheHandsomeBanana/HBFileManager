@@ -38,7 +38,7 @@
                    Grid.Column="0" />
 
         <ListBox Style="{StaticResource PrimaryListBox}"
-                 ItemContainerStyle="{StaticResource HBDark_ListBoxItem}"
+                 ItemContainerStyle="{StaticResource PrimaryListBoxItem}"
                  SelectedItem="{Binding AvailableAccountsSelectedItem}"
                  Grid.Column="0"
                  Grid.Row="1"

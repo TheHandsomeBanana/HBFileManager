@@ -24,7 +24,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource Normal}"
+        <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="Name"
                    Grid.ColumnSpan="3"
                    Height="16" />

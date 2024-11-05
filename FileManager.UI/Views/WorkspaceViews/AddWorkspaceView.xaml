@@ -25,7 +25,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource Normal}"
+        <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="Directory"
                    Grid.Row="0"
                    Grid.ColumnSpan="2"
@@ -54,7 +54,7 @@
 
         </Grid>
 
-        <TextBlock Style="{StaticResource Normal}"
+        <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="Name"
                    Grid.Row="2"
                    Grid.ColumnSpan="2"

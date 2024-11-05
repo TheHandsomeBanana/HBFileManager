@@ -23,7 +23,7 @@
                   IsChecked="{Binding UseWinRAR}"
                   Content="Enable WinRAR"
                   Margin="0 0 0 5"></CheckBox>
-        <TextBlock Style="{StaticResource Normal}"
+        <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="Location"
                    Margin="0 0 0 3"></TextBlock>
         <Grid Margin="0 0 0 5"
@@ -58,7 +58,7 @@
                    Visibility="{Binding LocationErrorText, Converter={StaticResource s2v}}">
         </TextBlock>
 
-        <TextBlock Style="{StaticResource Normal}"
+        <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="License Key"
                    Margin="0 0 0 3" />
         <TextBox Style="{StaticResource PrimaryTextBox}"

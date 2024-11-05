@@ -29,7 +29,7 @@
                   Margin="0 0 0 20">
 
             <GroupBox.Header>
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Background="{StaticResource BackgroundBrush}"
                            Padding="5 0 5 0"
                            Text="Source"
@@ -139,7 +139,7 @@
                   Margin="0 0 0 20">
 
             <GroupBox.Header>
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Background="{StaticResource BackgroundBrush}"
                            Padding="5 0 5 0"
                            Text="Destination"
@@ -214,7 +214,7 @@
                         BorderBrush="{StaticResource BorderBrush}"
                         BorderThickness="1"
                         Padding="10">
-                    <TextBlock Style="{StaticResource Normal}"
+                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                Text="Set this value if folders and files should take part in the copying step, when they are older than the provided timespan. Leave this blank to only include size-checking in the modified-only rule."
                                TextWrapping="Wrap"
                                Width="200" />

@@ -73,7 +73,7 @@
                     <StackPanel Orientation="Vertical"
                                 Grid.Column="1">
 
-                        <TextBlock Style="{StaticResource Normal}"
+                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                    Text="Name"
                                    Margin="0 0 0 3">
                         </TextBlock>
@@ -91,7 +91,7 @@
                           Content="Scheduled"
                           Margin="0 0 0 10"></CheckBox>
 
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Text="Description"
                            Margin="0 0 0 3">
                 </TextBlock>
@@ -195,7 +195,7 @@
                                 <GridView AllowsColumnReorder="False">
                                     <GridViewColumn Width="55">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource Normal}"
+                                            <TextBlock Style="{StaticResource NormalTextBlock}"
                                                        FontWeight="Bold" />
                                         </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
@@ -211,7 +211,7 @@
                                     </GridViewColumn>
                                     <GridViewColumn Width="25">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource Normal}"
+                                            <TextBlock Style="{StaticResource NormalTextBlock}"
                                                        FontWeight="Bold" />
                                         </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
@@ -236,7 +236,7 @@
 
                                     <GridViewColumn DisplayMemberBinding="{Binding StepContext.Name}">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource Normal}"
+                                            <TextBlock Style="{StaticResource NormalTextBlock}"
                                                        FontWeight="Bold"
                                                        Text="Name" />
                                         </GridViewColumn.Header>
@@ -333,7 +333,7 @@
                           Grid.Row="1"
                           Grid.ColumnSpan="2">
                     <Expander.Header>
-                        <TextBlock Style="{StaticResource Normal}"
+                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                    Text="Validation Log" />
                     </Expander.Header>
 

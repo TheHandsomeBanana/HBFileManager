@@ -65,7 +65,7 @@
                         BorderBrush="{StaticResource TextBoxBorderBrush}"
                         BorderThickness="1"
                         Padding="10">
-                    <TextBlock Style="{StaticResource Normal}"
+                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                Text="Set this value if folders and files should take part in the copying step, when they are older than the provided timespan. Leave this blank to only include size-checking in the modified-only rule."
                                TextWrapping="Wrap"
                                Width="200" />
@@ -82,7 +82,7 @@
                       Margin="0 0 10 0">
 
                 <GroupBox.Header>
-                    <TextBlock Style="{StaticResource Normal}"
+                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                Background="{StaticResource BackgroundBrush}"
                                Padding="5 0 5 0"
                                Text="Source"
@@ -132,7 +132,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Type}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    FontWeight="Bold"
                                                    Text="Type" />
                                     </GridViewColumn.Header>
@@ -141,7 +141,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Path}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    FontWeight="Bold"
                                                    Text="Path" />
                                     </GridViewColumn.Header>
@@ -189,7 +189,7 @@
                       Margin="10 0 0 0">
 
                 <GroupBox.Header>
-                    <TextBlock Style="{StaticResource Normal}"
+                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                Background="{StaticResource BackgroundBrush}"
                                Padding="5 0 5 0"
                                Text="Destination"
@@ -240,7 +240,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Type}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    FontWeight="Bold"
                                                    Text="Type" />
                                     </GridViewColumn.Header>
@@ -249,7 +249,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Path}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    FontWeight="Bold"
                                                    Text="Path" />
                                     </GridViewColumn.Header>

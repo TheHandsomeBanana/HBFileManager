@@ -29,7 +29,7 @@
 
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 5">
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Text="Name: " />
                 <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding Name}" />
@@ -37,7 +37,7 @@
 
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 5">
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Text="Path: " />
                 <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding FullPath}" />
@@ -45,7 +45,7 @@
 
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 10">
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                            Text="Owner: " />
                 <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding Owner}" />

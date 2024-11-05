@@ -257,7 +257,7 @@
 
 
 
-                            <TextBlock Style="{StaticResource Normal}"
+                            <TextBlock Style="{StaticResource NormalTextBlock}"
                                        Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}"
                                        Grid.Row="1"
                                        Grid.Column="1">

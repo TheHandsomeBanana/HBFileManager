@@ -41,7 +41,7 @@
             
             <StackPanel Grid.Column="1">
 
-                <TextBlock Style="{StaticResource Normal}"
+                <TextBlock Style="{StaticResource NormalTextBlock}"
                    Text="Name"
                    Grid.Row="0"
                    Margin="0 0 0 3" />
@@ -54,7 +54,7 @@
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
-            <TextBlock Style="{StaticResource Normal}"
+            <TextBlock Style="{StaticResource NormalTextBlock}"
                        Text="Step Type:"
                        Margin="0 0 5 0" />
             <TextBlock Style="{StaticResource TextBlock2}"
@@ -63,7 +63,7 @@
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
-            <TextBlock Style="{StaticResource Normal}"
+            <TextBlock Style="{StaticResource NormalTextBlock}"
                        Text="Step Description:"
                        Margin="0 0 5 0" />
             <TextBlock Style="{StaticResource TextBlock2}"
@@ -73,7 +73,7 @@
         <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
 
             <TextBlock Text="Execution order:" 
-                   Style="{StaticResource Normal}"
+                   Style="{StaticResource NormalTextBlock}"
                    Margin="0 0 5 0"/>
 
             <controls:NumberBox Minimum="0"

@@ -107,7 +107,7 @@
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Width="25">
                                 <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource Normal}"
+                                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                                FontWeight="Bold" />
                                 </GridViewColumn.Header>
                                 <GridViewColumn.CellTemplate>
@@ -132,7 +132,7 @@
 
                             <GridViewColumn DisplayMemberBinding="{Binding Name}">
                                 <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource Normal}"
+                                    <TextBlock Style="{StaticResource NormalTextBlock}"
                                                FontWeight="Bold"
                                                Text="Name" />
                                 </GridViewColumn.Header>

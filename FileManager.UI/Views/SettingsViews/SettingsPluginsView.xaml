@@ -153,7 +153,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding BaseType}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    Text="Plugin Type"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -162,7 +162,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding ConcreteType}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    Text="Concrete Type"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -171,7 +171,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Metadata.TypeName}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    Text="Typename"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -180,7 +180,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Metadata.Description}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource Normal}"
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    Text="Description"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
