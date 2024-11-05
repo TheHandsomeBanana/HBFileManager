@@ -5,13 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.JobViews"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.JobViewModels.JobStepViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.JobViews.JobStepViews"
-             xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
-             xmlns:textBox="clr-namespace:HBLibrary.Wpf.Styles.TextBox;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="500"
@@ -44,7 +42,7 @@
     </UserControl.Resources>
 
     <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
-                  scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
+                  attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
 
         <Grid Margin="10 10 10 0">
 
@@ -284,11 +282,11 @@
                                               Command="{Binding DeleteStepCommand}"
                                               CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
-                                        <menus:MenuItemAttachedProperties.IconPath>
+                                        <attachedProperties:MenuItemAttachedProperties.IconPath>
                                             <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                                                   Fill="{StaticResource VSRed}"
                                                   Stretch="Uniform" />
-                                        </menus:MenuItemAttachedProperties.IconPath>
+                                        </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
                                 </ContextMenu>
                             </ListView.Resources>
@@ -311,11 +309,11 @@
                                 <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
                                     <MenuItem Header="Add new step"
                                               Command="{Binding AddStepCommand}">
-                                        <menus:MenuItemAttachedProperties.IconPath>
+                                        <attachedProperties:MenuItemAttachedProperties.IconPath>
                                             <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                                   Fill="{StaticResource VSGreen}"
                                                   Stretch="Uniform" />
-                                        </menus:MenuItemAttachedProperties.IconPath>
+                                        </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
                                 </ContextMenu>
                             </ListView.ContextMenu>
@@ -326,8 +324,8 @@
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
                               IsEnabled="{Binding IsInitialized, FallbackValue=False}"
-                              scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
-                              scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
+                              attachedProperties:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                              attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Disabled"
                               Padding="0 0 20 10"
@@ -383,7 +381,7 @@
                                      IsReadOnly="True"
                                      IsReadOnlyCaretVisible="True"
                                      FlowDirection="LeftToRight"
-                                     textBox:RichTextBoxAttachedProperties.BindableDocument="{Binding ValidationLog.Document}">
+                                     attachedProperties:RichTextBoxAttachedProperties.BindableDocument="{Binding ValidationLog.Document}">
                         </RichTextBox>
                     </Grid>
                 </Expander>

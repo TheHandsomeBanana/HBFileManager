@@ -4,12 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.ExecutionViews.RunningJobsViews"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
-             xmlns:scrollViewer="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              xmlns:runningStepView="clr-namespace:FileManager.UI.Views.ExecutionViews.RunningJobsViews"
              xmlns:jobStepsDomain="clr-namespace:FileManager.Domain.JobSteps;assembly=FileManager.Domain.JobSteps"
              mc:Ignorable="d"
@@ -48,12 +46,33 @@
                  d:ItemsSource="{d:SampleData ItemCount=5}"
                  ItemsSource="{Binding RunningSteps}"
                  SelectedItem="{Binding SelectedStepRun}"
-                 ItemContainerStyle="{StaticResource HBDark_SmallTemplateListBoxItem}"
+                 VerticalContentAlignment="Center"
+                 HorizontalContentAlignment="Stretch"
                  BorderThickness="0 0 2 0"
                  MinWidth="150"
                  MaxWidth="350"
                  Padding="0 10 0 0">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                    <ContentPresenter HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Center"
+                                                      Margin="0">
+                                    </ContentPresenter>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
             <ListBox.Resources>
+               
+
                 <Style x:Key="RunStateTextStyle"
                        TargetType="TextBlock">
                     <Style.Triggers>

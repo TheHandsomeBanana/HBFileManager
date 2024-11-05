@@ -4,11 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              xmlns:customControls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
-             xmlns:listViews="clr-namespace:HBLibrary.Wpf.Styles.ListView;assembly=HBLibrary.Wpf"
-             xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="1000">
@@ -97,11 +95,11 @@
                                   Command="{Binding DeleteAssemblyCommand}"
                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
-                            <menus:MenuItemAttachedProperties.IconPath>
+                            <attachedProperties:MenuItemAttachedProperties.IconPath>
                                 <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                                       Fill="{StaticResource VSRed}"
                                       Stretch="Uniform" />
-                            </menus:MenuItemAttachedProperties.IconPath>
+                            </attachedProperties:MenuItemAttachedProperties.IconPath>
                         </MenuItem>
                     </ContextMenu>
                 </ListBox.Resources>
@@ -122,11 +120,11 @@
                     <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
                         <MenuItem Header="Add new Assembly"
                                   Command="{Binding AddAssemblyCommand}">
-                            <menus:MenuItemAttachedProperties.IconPath>
+                            <attachedProperties:MenuItemAttachedProperties.IconPath>
                                 <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
                                       Fill="{StaticResource VSGreen}"
                                       Stretch="Uniform" />
-                            </menus:MenuItemAttachedProperties.IconPath>
+                            </attachedProperties:MenuItemAttachedProperties.IconPath>
                         </MenuItem>
                     </ContextMenu>
                 </ListBox.ContextMenu>
@@ -148,9 +146,9 @@
                            Grid.Row="0" />
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
-                              scrollViewers:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
-                              scrollViewers:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
-                              scrollViewers:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
+                              attachedProperties:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
+                              attachedProperties:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
+                              attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Auto"
                               Padding="0 0 20 10"

@@ -6,11 +6,9 @@
              xmlns:local="clr-namespace:FileManager.Core.Jobs.Views"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:models="clr-namespace:FileManager.Core.Jobs.Models"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              xmlns:customControls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
-             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
-             xmlns:scrollViewers="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              Background="Transparent"
              d:DesignHeight="450"
@@ -123,11 +121,11 @@
                                       Command="{Binding DeleteSourceCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
-                                <menus:MenuItemAttachedProperties.IconPath>
+                                <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
                                           Fill="{StaticResource VSRed}"
                                           Stretch="Uniform" />
-                                </menus:MenuItemAttachedProperties.IconPath>
+                                </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
                     </ListView.Resources>

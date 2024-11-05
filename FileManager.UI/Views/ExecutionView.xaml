@@ -6,12 +6,11 @@
              xmlns:local="clr-namespace:FileManager.UI.Views"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.ExecutionViewModels"
              xmlns:views="clr-namespace:FileManager.UI.Views.ExecutionViews"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
-             xmlns:scrollViewer="clr-namespace:HBLibrary.Wpf.Styles.ScrollViewer;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
@@ -76,7 +75,7 @@
 
                 <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
                               Grid.Row="2"
-                              scrollViewer:ScrollViewerAttachedProperties.VerticalScrollBarMargin="5 0 0 0"
+                              attachedProperties:ScrollViewerAttachedProperties.VerticalScrollBarMargin="5 0 0 0"
                               MaxWidth="400">
                     <ItemsControl ItemsSource="{Binding ExecutableJobsView}"
                                   d:ItemsSource="{d:SampleData ItemCount=2}">

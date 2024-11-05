@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.WorkspaceViews"
-             xmlns:menus="clr-namespace:HBLibrary.Wpf.Styles.Menu;assembly=HBLibrary.Wpf"
+             xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels"
@@ -127,11 +127,11 @@
                                       Command="{Binding RevokeAccessCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
-                                <menus:MenuItemAttachedProperties.IconPath>
+                                <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
                                           Fill="{StaticResource VSRed}"
                                           Stretch="Uniform" />
-                                </menus:MenuItemAttachedProperties.IconPath>
+                                </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
                     </ListBox.Resources>
@@ -154,11 +154,11 @@
                         <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
                             <MenuItem Header="Share access"
                                       Command="{Binding ShareAccessCommand}">
-                                <menus:MenuItemAttachedProperties.IconPath>
+                                <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
                                           Fill="{StaticResource VSGreen}"
                                           Stretch="Uniform" />
-                                </menus:MenuItemAttachedProperties.IconPath>
+                                </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
                     </ListBox.ContextMenu>
