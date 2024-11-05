@@ -17,23 +17,7 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/RichTextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Expander/Expanders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/TimePicker.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+            
 
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
@@ -41,7 +25,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+    <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
                   attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
 
         <Grid Margin="10 10 10 0">
@@ -55,7 +39,7 @@
                         Grid.Row="0"
                         IsEnabled="{Binding IsInitialized, FallbackValue=False}">
 
-                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                <TextBlock Style="{StaticResource HeaderTextBlock}"
                            Text="Properties"
                            Margin="0 0 0 10">
                 </TextBlock>
@@ -89,30 +73,30 @@
                     <StackPanel Orientation="Vertical"
                                 Grid.Column="1">
 
-                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                        <TextBlock Style="{StaticResource Normal}"
                                    Text="Name"
                                    Margin="0 0 0 3">
                         </TextBlock>
-                        <TextBox Style="{StaticResource HBDark_TextBox}"
+                        <TextBox Style="{StaticResource PrimaryTextBox}"
                                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}">
                         </TextBox>
                     </StackPanel>
                 </Grid>
-                <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
                           IsChecked="{Binding OnDemand}"
                           Content="On Demand"
                           Margin="0 0 0 10"></CheckBox>
-                <CheckBox Style="{StaticResource HBDark_CheckBox}"
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
                           IsChecked="{Binding Scheduled}"
                           Content="Scheduled"
                           Margin="0 0 0 10"></CheckBox>
 
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                <TextBlock Style="{StaticResource Normal}"
                            Text="Description"
                            Margin="0 0 0 3">
                 </TextBlock>
 
-                <TextBox Style="{StaticResource HBDark_TextBox}"
+                <TextBox Style="{StaticResource PrimaryTextBox}"
                          Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
                          VerticalContentAlignment="Top"
                          Height="100"
@@ -133,7 +117,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource HBDark_ControlBorder}"
+                <Border Style="{StaticResource ControlBorder}"
                         Grid.Column="0"
                         Grid.Row="0"
                         IsEnabled="{Binding IsInitialized}">
@@ -146,7 +130,7 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                        <TextBlock Style="{StaticResource HeaderTextBlock}"
                                    Text="Steps"
                                    Grid.Row="0">
                         </TextBlock>
@@ -160,7 +144,7 @@
                                                 Width="24"
                                                 ToolTip="Add step"
                                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                                IconFill="{StaticResource VSGreen}"
+                                                IconFill="{StaticResource VSGreenBrush}"
                                                 Command="{Binding AddStepCommand}">
                             </controls:IconButton>
 
@@ -170,7 +154,7 @@
                                                 Height="24"
                                                 Width="24"
                                                 IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                                IconFill="{StaticResource VSRed}"
+                                                IconFill="{StaticResource VSRedBrush}"
                                                 Command="{Binding DeleteStepCommand}"
                                                 CommandParameter="{Binding SelectedStep}">
                             </controls:IconButton>
@@ -190,14 +174,14 @@
                             </controls:IconButton>
                         </StackPanel>
 
-                        <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                        <TextBox Style="{StaticResource FilterTextBox}"
                                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                  VerticalAlignment="Top"
                                  Tag="Search Job Steps"
                                  Grid.Row="2">
                         </TextBox>
 
-                        <ListView Style="{StaticResource HBDark_ListView}"
+                        <ListView Style="{StaticResource PrimaryListView}"
                                   ItemsSource="{Binding StepsView}"
                                   SelectedItem="{Binding SelectedStep}"
                                   Grid.Row="3"
@@ -211,7 +195,7 @@
                                 <GridView AllowsColumnReorder="False">
                                     <GridViewColumn Width="55">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                            <TextBlock Style="{StaticResource Normal}"
                                                        FontWeight="Bold" />
                                         </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
@@ -227,7 +211,7 @@
                                     </GridViewColumn>
                                     <GridViewColumn Width="25">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                            <TextBlock Style="{StaticResource Normal}"
                                                        FontWeight="Bold" />
                                         </GridViewColumn.Header>
                                         <GridViewColumn.CellTemplate>
@@ -252,7 +236,7 @@
 
                                     <GridViewColumn DisplayMemberBinding="{Binding StepContext.Name}">
                                         <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                            <TextBlock Style="{StaticResource Normal}"
                                                        FontWeight="Bold"
                                                        Text="Name" />
                                         </GridViewColumn.Header>
@@ -277,14 +261,14 @@
 
                                 <ContextMenu x:Key="contextMenu"
                                              DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                             Style="{StaticResource HBDark_ContextMenu}">
+                                             Style="{StaticResource PrimaryContextMenu}">
                                     <MenuItem Header="Delete step"
                                               Command="{Binding DeleteStepCommand}"
                                               CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                                         <attachedProperties:MenuItemAttachedProperties.IconPath>
                                             <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                                  Fill="{StaticResource VSRed}"
+                                                  Fill="{StaticResource VSRedBrush}"
                                                   Stretch="Uniform" />
                                         </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
@@ -299,19 +283,19 @@
 
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem"
-                                       BasedOn="{StaticResource HBDark_ListViewItem}">
+                                       BasedOn="{StaticResource PrimaryListViewItem}">
                                     <Setter Property="ContextMenu"
                                             Value="{StaticResource contextMenu}" />
                                 </Style>
                             </ListView.ItemContainerStyle>
 
                             <ListView.ContextMenu>
-                                <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                                <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                                     <MenuItem Header="Add new step"
                                               Command="{Binding AddStepCommand}">
                                         <attachedProperties:MenuItemAttachedProperties.IconPath>
                                             <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                                  Fill="{StaticResource VSGreen}"
+                                                  Fill="{StaticResource VSGreenBrush}"
                                                   Stretch="Uniform" />
                                         </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
@@ -322,7 +306,7 @@
                 </Border>
 
 
-                <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
                               IsEnabled="{Binding IsInitialized, FallbackValue=False}"
                               attachedProperties:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
                               attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
@@ -342,14 +326,14 @@
 
                 <Expander x:Name="ExpanderValidationLog"
                           Margin="0 5 0 0"
-                          Style="{StaticResource HBDark_Expander}"
+                          Style="{StaticResource PrimaryExpander}"
                           IsExpanded="{Binding ValidationLogVisible}"
                           ExpandDirection="Down"
-                          Foreground="{StaticResource Foreground}"
+                          Foreground="{StaticResource ForegroundBrush}"
                           Grid.Row="1"
                           Grid.ColumnSpan="2">
                     <Expander.Header>
-                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                        <TextBlock Style="{StaticResource Normal}"
                                    Text="Validation Log" />
                     </Expander.Header>
 
@@ -363,7 +347,7 @@
                         <StackPanel Grid.Column="0"
                                     Visibility="{Binding IsExpanded, ElementName=ExpanderValidationLog, Converter={StaticResource b2v}}">
                             <controls:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
-                                                IconFill="{StaticResource VSRed}"
+                                                IconFill="{StaticResource VSRedBrush}"
                                                 BorderThickness="1"
                                                 Width="25"
                                                 Height="25"
@@ -376,7 +360,7 @@
                             </controls:IconButton>
                         </StackPanel>
 
-                        <RichTextBox Style="{StaticResource HBDark_RichTextBox}"
+                        <RichTextBox Style="{StaticResource PrimaryRichTextBox}"
                                      Grid.Column="1"
                                      IsReadOnly="True"
                                      IsReadOnlyCaretVisible="True"

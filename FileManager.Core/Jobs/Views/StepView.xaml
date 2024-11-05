@@ -11,15 +11,6 @@
              d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/ToggleButtons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:ReversedBooleanToVisibilityConverter x:Key="b2iv" />
             <BooleanToVisibilityConverter x:Key="b2v" />
         </ResourceDictionary>
@@ -50,12 +41,12 @@
             
             <StackPanel Grid.Column="1">
 
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                <TextBlock Style="{StaticResource Normal}"
                    Text="Name"
                    Grid.Row="0"
                    Margin="0 0 0 3" />
 
-                <TextBox Style="{StaticResource HBDark_TextBox}"
+                <TextBox Style="{StaticResource PrimaryTextBox}"
                  Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                  Grid.Row="1"/>
             </StackPanel>
@@ -63,34 +54,34 @@
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
-            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+            <TextBlock Style="{StaticResource Normal}"
                        Text="Step Type:"
                        Margin="0 0 5 0" />
-            <TextBlock Style="{StaticResource HBDark_TextBlock2}"
+            <TextBlock Style="{StaticResource TextBlock2}"
                        Text="{Binding Metadata.TypeName}" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
-            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+            <TextBlock Style="{StaticResource Normal}"
                        Text="Step Description:"
                        Margin="0 0 5 0" />
-            <TextBlock Style="{StaticResource HBDark_TextBlock2}"
+            <TextBlock Style="{StaticResource TextBlock2}"
                        Text="{Binding Metadata.Description}" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
 
             <TextBlock Text="Execution order:" 
-                   Style="{StaticResource HBDark_TextBlock}"
+                   Style="{StaticResource Normal}"
                    Margin="0 0 5 0"/>
 
             <controls:NumberBox Minimum="0"
                                 Height="20"
                                 Background="Transparent"
-                                Foreground="{StaticResource Foreground}"
-                                UpArrowColor="{StaticResource Foreground}"
-                                DownArrowColor="{StaticResource Foreground}"
+                                Foreground="{StaticResource ForegroundBrush}"
+                                UpArrowColor="{StaticResource ForegroundBrush}"
+                                DownArrowColor="{StaticResource ForegroundBrush}"
                                 BorderThickness="0"
                                 HorizontalAlignment="Left"
                                 Value="{Binding ExecutionOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

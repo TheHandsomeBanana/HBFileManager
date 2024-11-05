@@ -17,15 +17,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -36,7 +27,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Style="{StaticResource HBDark_ControlBorder}"
+        <Border Style="{StaticResource ControlBorder}"
                 Grid.Column="0">
 
             <Grid Margin="5">
@@ -48,7 +39,7 @@
                 </Grid.RowDefinitions>
 
 
-                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                <TextBlock Style="{StaticResource HeaderTextBlock}"
                            Text="Workspaces" />
 
                 <StackPanel Grid.Row="1"
@@ -60,7 +51,7 @@
                                         Height="24"
                                         Width="24"
                                         IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                        IconFill="{StaticResource VSGreen}"
+                                        IconFill="{StaticResource VSGreenBrush}"
                                         Command="{Binding CreateWorkspaceCommand}">
 
                     </controls:IconButton>
@@ -71,7 +62,7 @@
                                         Height="24"
                                         Width="24"
                                         IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                        IconFill="{StaticResource VSRed}"
+                                        IconFill="{StaticResource VSRedBrush}"
                                         Command="{Binding RemoveWorkspaceCommand}"
                                         CommandParameter="{Binding SelectedWorkspace}">
                     </controls:IconButton>
@@ -103,14 +94,14 @@
                     </controls:IconButton>
                 </StackPanel>
 
-                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                <TextBox Style="{StaticResource FilterTextBox}"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Tag="Search Workspaces"
                          Grid.Row="2">
 
                 </TextBox>
 
-                <ListBox Style="{StaticResource HBDark_ListBox}"
+                <ListBox Style="{StaticResource PrimaryListBox}"
                          ItemsSource="{Binding WorkspacesView}"
                          SelectedItem="{Binding SelectedWorkspace}"
                          Grid.Row="3"
@@ -124,14 +115,14 @@
                     <ListBox.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     Style="{StaticResource HBDark_ContextMenu}">
+                                     Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Remove workspace"
                                       Command="{Binding RemoveWorkspaceCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                          Fill="{StaticResource VSRed}"
+                                          Fill="{StaticResource VSRedBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
@@ -146,19 +137,19 @@
 
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem"
-                               BasedOn="{StaticResource HBDark_ListBoxItem}">
+                               BasedOn="{StaticResource PrimaryListBoxItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
                     </ListBox.ItemContainerStyle>
 
                     <ListBox.ContextMenu>
-                        <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                        <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Add workspace"
                                       Command="{Binding CreateWorkspaceCommand}">
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                          Fill="{StaticResource VSGreen}"
+                                          Fill="{StaticResource VSGreenBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>

@@ -16,20 +16,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
@@ -41,7 +27,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ListBox Style="{StaticResource HBDark_ListBox}"
+        <ListBox Style="{StaticResource PrimaryListBox}"
                  Grid.Column="0"
                  d:ItemsSource="{d:SampleData ItemCount=5}"
                  ItemsSource="{Binding RunningSteps}"
@@ -79,31 +65,31 @@
                         <DataTrigger Binding="{Binding State}"
                                      Value="{x:Static jobStepsDomain:RunState.Pending}">
                             <Setter Property="Foreground"
-                                    Value="{StaticResource HBDark_Label_Foreground}" />
+                                    Value="{StaticResource ForegroundBrush}" />
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding State}"
                                      Value="{x:Static jobStepsDomain:RunState.Running}">
                             <Setter Property="Foreground"
-                                    Value="{StaticResource VSBlue}" />
+                                    Value="{StaticResource VSBlueBrush}" />
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding State}"
                                      Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}">
                             <Setter Property="Foreground"
-                                    Value="{StaticResource VSYellow}" />
+                                    Value="{StaticResource VSYellowBrush}" />
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding State}"
                                      Value="{x:Static jobStepsDomain:RunState.Faulted}">
                             <Setter Property="Foreground"
-                                    Value="{StaticResource VSRed}" />
+                                    Value="{StaticResource VSRedBrush}" />
                         </DataTrigger>
 
                         <DataTrigger Binding="{Binding State}"
                                      Value="{x:Static jobStepsDomain:RunState.Success}">
                             <Setter Property="Foreground"
-                                    Value="{StaticResource VSGreen}" />
+                                    Value="{StaticResource VSGreenBrush}" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -232,9 +218,9 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border Style="{StaticResource RunStateBorderStyle}"
-                            Height="60"
+                            Height="58"
                             MinWidth="100"
-                            Padding="5"
+                            Padding="5 5 15 5"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch">
 
@@ -255,7 +241,7 @@
                                                      Grid.RowSpan="2"
                                                      Thickness="2"
                                                      Diameter="18"
-                                                     Color="{StaticResource VSBlue}"
+                                                     Color="{StaticResource VSBlueBrush}"
                                                      IsLoading="{Binding IsRunning}"
                                                      Margin="0 0 10 0">
 
@@ -271,7 +257,7 @@
 
 
 
-                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                            <TextBlock Style="{StaticResource Normal}"
                                        Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}"
                                        Grid.Row="1"
                                        Grid.Column="1">

@@ -15,16 +15,6 @@
              MinWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -42,12 +32,12 @@
             <RowDefinition Height="35" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource HBDark_BigTextBlock}"
+        <TextBlock Style="{StaticResource BigTextBlock}"
                    Text="Available Accounts"
                    Grid.Row="0"
                    Grid.Column="0" />
 
-        <ListBox Style="{StaticResource HBDark_ListBox}"
+        <ListBox Style="{StaticResource PrimaryListBox}"
                  ItemContainerStyle="{StaticResource HBDark_ListBoxItem}"
                  SelectedItem="{Binding AvailableAccountsSelectedItem}"
                  Grid.Column="0"
@@ -65,31 +55,31 @@
                     Margin="10">
 
             <controls:IconButton BorderThickness="1"
-                                BorderBrush="{StaticResource ControlBorder}"
+                                BorderBrush="{StaticResource BorderBrush}"
                                 Margin="0 0 0 10"
                                 IconData="M14.58,16.59L19.17,12L14.58,7.41L16,6L22,12L16,18L14.58,16.59M8.58,16.59L13.17,12L8.58,7.41L10,6L16,12L10,18L8.58,16.59M2.58,16.59L7.17,12L2.58,7.41L4,6L10,12L4,18L2.58,16.59Z"
-                                IconFill="{StaticResource Foreground}"
+                                IconFill="{StaticResource ForegroundBrush}"
                                 Command="{Binding AddAccountToShareCommand}">
 
             </controls:IconButton>
 
             <controls:IconButton BorderThickness="1"
-                                BorderBrush="{StaticResource ControlBorder}"
+                                BorderBrush="{StaticResource BorderBrush}"
                                 IconData="M9.42,7.41L4.83,12L9.42,16.59L8,18L2,12L8,6L9.42,7.41M15.42,7.41L10.83,12L15.42,16.59L14,18L8,12L14,6L15.42,7.41M21.42,7.41L16.83,12L21.42,16.59L20,18L14,12L20,6L21.42,7.41Z"
-                                IconFill="{StaticResource Foreground}"
+                                IconFill="{StaticResource ForegroundBrush}"
                                 Command="{Binding RemoveAccountFromShareCommand}">
 
             </controls:IconButton>
 
         </StackPanel>
 
-        <TextBlock Style="{StaticResource HBDark_BigTextBlock}"
+        <TextBlock Style="{StaticResource BigTextBlock}"
                    Text="Shared Accounts"
                    Grid.Column="2"
                    Grid.Row="0" />
 
-        <ListBox Style="{StaticResource HBDark_ListBox}"
-                 ItemContainerStyle="{StaticResource HBDark_ListBoxItem}"
+        <ListBox Style="{StaticResource PrimaryListBox}"
+                 ItemContainerStyle="{StaticResource PrimaryListBoxItem}"
                  SelectedItem="{Binding SharedWithAccountsSelectedItem}"
                  Grid.Column="2"
                  Grid.Row="1"
@@ -104,13 +94,15 @@
                     Orientation="Horizontal"
                     VerticalAlignment="Bottom">
 
-            <Button Style="{StaticResource HBDark_VSButton1}"
+            <Button Style="{StaticResource PrimaryButton}"
+                    HorizontalContentAlignment="Center"
                     Content="Save"
                     Command="{Binding SaveCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
                     Margin="0 0 5 0"/>
 
-            <Button Style="{StaticResource HBDark_VSButton2}"
+            <Button Style="{StaticResource AccentButton}"
+                    HorizontalContentAlignment="Center"
                     Content="Cancel"
                     Command="{Binding CancelCommand}"
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}">

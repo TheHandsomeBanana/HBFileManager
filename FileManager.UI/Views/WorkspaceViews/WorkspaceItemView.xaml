@@ -16,56 +16,46 @@
              d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:NullToVisibilityConverter x:Key="n2v" />
-
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid Margin="10 10 10 0">
         <StackPanel>
-            <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+            <TextBlock Style="{StaticResource HeaderTextBlock}"
                        Text="Overview"
                        Margin="0 0 0 10">
             </TextBlock>
-            
+
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 5">
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                <TextBlock Style="{StaticResource Normal}"
                            Text="Name: " />
-                <TextBlock Style="{StaticResource HBDark_TextBlock2}"
+                <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding Name}" />
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 5">
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                <TextBlock Style="{StaticResource Normal}"
                            Text="Path: " />
-                <TextBlock Style="{StaticResource HBDark_TextBlock2}"
+                <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding FullPath}" />
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal"
                         Margin="0 0 0 10">
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                <TextBlock Style="{StaticResource Normal}"
                            Text="Owner: " />
-                <TextBlock Style="{StaticResource HBDark_TextBlock2}"
+                <TextBlock Style="{StaticResource TextBlock2}"
                            Text="{Binding Owner}" />
             </StackPanel>
 
-            <CheckBox Style="{StaticResource HBDark_CheckBox}"
+            <CheckBox Style="{StaticResource PrimaryCheckBox}"
                       IsChecked="{Binding UsesEncryption, Mode=OneWay}"
-                      Content="Encryption enabled" 
+                      Content="Encryption enabled"
                       IsEnabled="False"
-                      Margin="0 0 0 20"/>
+                      Margin="0 0 0 20" />
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -76,7 +66,7 @@
                 </Grid.RowDefinitions>
 
 
-                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                <TextBlock Style="{StaticResource HeaderTextBlock}"
                            Text="Access Control" />
 
                 <StackPanel Grid.Row="1"
@@ -84,35 +74,35 @@
                             Orientation="Horizontal">
 
                     <controls:IconButton BorderThickness="1"
-                                        ToolTip="Share access"
-                                        Height="24"
-                                        Width="24"
-                                        IconData="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
-                                        IconFill="{StaticResource VSGreen}"
-                                        Command="{Binding ShareAccessCommand}">
+                                         ToolTip="Share access"
+                                         Height="24"
+                                         Width="24"
+                                         IconData="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
+                                         IconFill="{StaticResource VSGreenBrush}"
+                                         Command="{Binding ShareAccessCommand}">
 
                     </controls:IconButton>
 
                     <controls:IconButton BorderThickness="1"
-                                        Visibility="{Binding SelectedAccessControl, Converter={StaticResource n2v}}"
-                                        ToolTip="Revoke access"
-                                        Height="24"
-                                        Width="24"
-                                        IconData="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
-                                        IconFill="{StaticResource VSRed}"
-                                        Command="{Binding RevokeAccessCommand}"
-                                        CommandParameter="{Binding SelectedAccessControl}">
+                                         Visibility="{Binding SelectedAccessControl, Converter={StaticResource n2v}}"
+                                         ToolTip="Revoke access"
+                                         Height="24"
+                                         Width="24"
+                                         IconData="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
+                                         IconFill="{StaticResource VSRedBrush}"
+                                         Command="{Binding RevokeAccessCommand}"
+                                         CommandParameter="{Binding SelectedAccessControl}">
                     </controls:IconButton>
                 </StackPanel>
 
-                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                <TextBox Style="{StaticResource FilterTextBox}"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Tag="Search accounts"
                          Grid.Row="2">
 
                 </TextBox>
 
-                <ListBox Style="{StaticResource HBDark_ListBox}"
+                <ListBox Style="{StaticResource PrimaryListBox}"
                          ItemsSource="{Binding AccessControlView}"
                          SelectedItem="{Binding SelectedAccessControl}"
                          Grid.Row="3"
@@ -122,14 +112,14 @@
                     <ListBox.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     Style="{StaticResource HBDark_ContextMenu}">
+                                     Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Revoke access"
                                       Command="{Binding RevokeAccessCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M20 13.5C20 17.09 17.09 20 13.5 20H6V18H13.5C16 18 18 16 18 13.5S16 9 13.5 9H7.83L10.91 12.09L9.5 13.5L4 8L9.5 2.5L10.92 3.91L7.83 7H13.5C17.09 7 20 9.91 20 13.5Z"
-                                          Fill="{StaticResource VSRed}"
+                                          Fill="{StaticResource VSRedBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
@@ -144,19 +134,19 @@
 
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem"
-                               BasedOn="{StaticResource HBDark_ListBoxItem}">
+                               BasedOn="{StaticResource PrimaryListBoxItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
                     </ListBox.ItemContainerStyle>
 
                     <ListBox.ContextMenu>
-                        <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                        <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Share access"
                                       Command="{Binding ShareAccessCommand}">
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M21,12L14,5V9C7,10 4,15 3,20C5.5,16.5 9,14.9 14,14.9V19L21,12Z"
-                                          Fill="{StaticResource VSGreen}"
+                                          Fill="{StaticResource VSGreenBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
@@ -164,9 +154,6 @@
                     </ListBox.ContextMenu>
                 </ListBox>
             </Grid>
-
-
-
         </StackPanel>
     </Grid>
 </UserControl>

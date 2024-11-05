@@ -1,66 +1,74 @@
 ﻿<UserControl x:Class="FileManager.UI.Views.SettingsViews.SettingsWinRARView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
              xmlns:viewModels="clr-namespace:FileManager.UI.ViewModels.SettingsViewModels"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
-            <converters:StringToVisibilityConverter x:Key="s2v"/>
+            <converters:StringToVisibilityConverter x:Key="s2v" />
         </ResourceDictionary>
     </UserControl.Resources>
 
-  
 
-    <StackPanel Orientation="Vertical" Margin="0 10 0 0">
-        <CheckBox Style="{StaticResource HBDark_CheckBox}" IsChecked="{Binding UseWinRAR}" Content="Enable WinRAR" Margin="0 0 0 5"></CheckBox>
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="Location" Margin="0 0 0 3"></TextBlock>
-        <Grid Margin="0 0 0 5" IsEnabled="{Binding UseWinRAR}">
+
+    <StackPanel Orientation="Vertical"
+                Margin="0 10 0 0">
+        <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                  IsChecked="{Binding UseWinRAR}"
+                  Content="Enable WinRAR"
+                  Margin="0 0 0 5"></CheckBox>
+        <TextBlock Style="{StaticResource Normal}"
+                   Text="Location"
+                   Margin="0 0 0 3"></TextBlock>
+        <Grid Margin="0 0 0 5"
+              IsEnabled="{Binding UseWinRAR}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBox Grid.Column="0" Style="{StaticResource HBDark_TextBox}"
-                 Text="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                 Margin="0 0 5 0">
+            <TextBox Grid.Column="0"
+                     Style="{StaticResource PrimaryTextBox}"
+                     Text="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0 0 5 0">
             </TextBox>
-            <Button Grid.Column="1" Style="{StaticResource HBDark_VSBrowseButton}"
-                Command="{Binding BrowseLocationCommand}"></Button>
-            <Button Grid.Column="2" Style="{StaticResource HBDark_VSButton1}" 
-                Command="{Binding DetectWinRARCommand}"
-                Margin="5 0 0 0"
-                Content="Autodetect"
-                Padding="5 0 5 0"></Button>
+            <Button Grid.Column="1"
+                    Style="{StaticResource BrowseButton}"
+                    Command="{Binding BrowseLocationCommand}" 
+                    HorizontalContentAlignment="Center"/>
+
+            <Button Grid.Column="2"
+                    Style="{StaticResource PrimaryButton}"
+                    Command="{Binding DetectWinRARCommand}"
+                    Margin="5 0 0 0"
+                    Content="Autodetect"
+                    Padding="5 0 5 0" 
+                    HorizontalContentAlignment="Center"/>
         </Grid>
 
-        <TextBlock Style="{StaticResource HBDark_ErrorTextBlock}" 
-                   Text="{Binding LocationErrorText}" 
+        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                   Text="{Binding LocationErrorText}"
                    Visibility="{Binding LocationErrorText, Converter={StaticResource s2v}}">
         </TextBlock>
 
-        <TextBlock Style="{StaticResource HBDark_TextBlock}" Text="License Key" Margin="0 0 0 3"></TextBlock>
-        <TextBox Style="{StaticResource HBDark_TextBox}"
+        <TextBlock Style="{StaticResource Normal}"
+                   Text="License Key"
+                   Margin="0 0 0 3" />
+        <TextBox Style="{StaticResource PrimaryTextBox}"
                  Text="{Binding LicenseKeyLocation, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                 IsEnabled="False"
+                 IsReadOnly="True"
                  Margin="0 0 0 5">
         </TextBox>
 
-        <TextBlock Style="{StaticResource HBDark_ErrorTextBlock}" 
-                   Text="{Binding LicenseKeyLocationErrorText}" 
+        <TextBlock Style="{StaticResource ErrorTextBlock}"
+                   Text="{Binding LicenseKeyLocationErrorText}"
                    Visibility="{Binding LicenseKeyLocationErrorText, Converter={StaticResource s2v}}">
         </TextBlock>
 

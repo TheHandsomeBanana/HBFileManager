@@ -15,26 +15,9 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <!--<UserControl.DataContext>
-        <viewModels:JobsViewModel/>
-    </UserControl.DataContext>-->
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:NullToVisibilityConverter x:Key="n2v" />
             <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
         </ResourceDictionary>
@@ -47,7 +30,7 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Border Style="{StaticResource HBDark_ControlBorder}"
+        <Border Style="{StaticResource ControlBorder}"
                 Grid.Column="0"
                 IsEnabled="{Binding SelectedJob.IsInitialized}">
 
@@ -61,7 +44,7 @@
                 </Grid.RowDefinitions>
 
 
-                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                <TextBlock Style="{StaticResource HeaderTextBlock}"
                            Text="Jobs" />
 
                 <StackPanel Grid.Row="1"
@@ -72,7 +55,7 @@
                                         Height="24"
                                         Width="24"
                                         IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                        IconFill="{StaticResource VSGreen}"
+                                        IconFill="{StaticResource VSGreenBrush}"
                                         Command="{Binding AddJobCommand}">
 
                     </controls:IconButton>
@@ -83,7 +66,7 @@
                                         Height="24"
                                         Width="24"
                                         IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                        IconFill="{StaticResource VSRed}"
+                                        IconFill="{StaticResource VSRedBrush}"
                                         Command="{Binding DeleteJobCommand}"
                                         CommandParameter="{Binding SelectedJob}">
                     </controls:IconButton>
@@ -103,14 +86,14 @@
                     </controls:IconButton>
                 </StackPanel>
 
-                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                <TextBox Style="{StaticResource FilterTextBox}"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Tag="Search Jobs"
                          Grid.Row="2">
 
                 </TextBox>
 
-                <ListView Style="{StaticResource HBDark_ListView}"
+                <ListView Style="{StaticResource PrimaryListView}"
                           ItemsSource="{Binding JobsView}"
                           SelectedItem="{Binding SelectedJob}"
                           Grid.Row="3"
@@ -124,7 +107,7 @@
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Width="25">
                                 <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                    <TextBlock Style="{StaticResource Normal}"
                                                FontWeight="Bold" />
                                 </GridViewColumn.Header>
                                 <GridViewColumn.CellTemplate>
@@ -149,7 +132,7 @@
 
                             <GridViewColumn DisplayMemberBinding="{Binding Name}">
                                 <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                    <TextBlock Style="{StaticResource Normal}"
                                                FontWeight="Bold"
                                                Text="Name" />
                                 </GridViewColumn.Header>
@@ -169,14 +152,14 @@
                     <ListView.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     Style="{StaticResource HBDark_ContextMenu}">
+                                     Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Delete job"
                                       Command="{Binding DeleteJobCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                          Fill="{StaticResource VSRed}"
+                                          Fill="{StaticResource VSRedBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
@@ -191,19 +174,19 @@
 
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem"
-                               BasedOn="{StaticResource HBDark_ListViewItem}">
+                               BasedOn="{StaticResource PrimaryListViewItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
                     </ListView.ItemContainerStyle>
 
                     <ListView.ContextMenu>
-                        <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                        <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Add new job"
                                       Command="{Binding AddJobCommand}">
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                          Fill="{StaticResource VSGreen}"
+                                          Fill="{StaticResource VSGreenBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>

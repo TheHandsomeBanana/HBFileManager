@@ -17,20 +17,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:NullToVisibilityConverter x:Key="n2v" />
             <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
         </ResourceDictionary>
@@ -44,7 +30,7 @@
 
 
 
-        <Border Style="{StaticResource HBDark_ControlBorder}"
+        <Border Style="{StaticResource ControlBorder}"
                 Grid.Column="0">
             <Grid Margin="5">
                 <Grid.RowDefinitions>
@@ -53,7 +39,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                <TextBlock Style="{StaticResource HeaderTextBlock}"
                            Text="Executable Jobs" />
 
                 <StackPanel Grid.Row="0"
@@ -65,7 +51,7 @@
 
                 </StackPanel>
 
-                <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+                <TextBox Style="{StaticResource FilterTextBox}"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Tag="Search"
                          Grid.Row="1">
@@ -73,7 +59,7 @@
                 </TextBox>
 
 
-                <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
                               Grid.Row="2"
                               attachedProperties:ScrollViewerAttachedProperties.VerticalScrollBarMargin="5 0 0 0"
                               MaxWidth="400">
@@ -88,16 +74,17 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                                    <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
                                                   HorizontalScrollBarVisibility="Auto">
 
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                        <TextBlock Style="{StaticResource Normal}"
                                                    Text="{Binding Name}"
                                                    Grid.Column="0"
                                                    Margin="0 0 5 0" />
                                     </ScrollViewer>
 
-                                    <Button Style="{StaticResource HBDark_VSButton2_Green}"
+                                    <Button Style="{StaticResource AccentButtonGreen}"
+                                            HorizontalContentAlignment="Center"
                                             Width="50"
                                             Grid.Column="1"
                                             Margin="0 0 5 0"
@@ -106,33 +93,34 @@
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
                                                 <Path Data="M8,5.14V19.14L19,12.14L8,5.14Z"
-                                                      Fill="{StaticResource VSGreen}"
+                                                      Fill="{StaticResource VSGreenBrush}"
                                                       Stretch="Uniform"
                                                       Height="10"
                                                       Margin="0 0 5 0">
 
                                                 </Path>
                                                 <TextBlock Text="Run"
-                                                           Style="{StaticResource HBDark_TextBlock}" />
+                                                           Style="{StaticResource Normal}" />
                                             </StackPanel>
                                         </Button.Content>
                                     </Button>
 
-                                    <Button Style="{StaticResource HBDark_VSButton2_Blue}"
+                                    <Button Style="{StaticResource AccentButtonBlue}"
+                                            HorizontalContentAlignment="Center"
                                             Grid.Column="2"
                                             Command="{Binding ScheduleJobCommand}"
                                             CommandParameter="{Binding}">
                                         <Button.Content>
                                             <StackPanel Orientation="Horizontal">
                                                 <Path Data="M12,1C8.14,1 5,4.14 5,8A7,7 0 0,0 12,15C15.86,15 19,11.87 19,8C19,4.14 15.86,1 12,1M12,3.15C14.67,3.15 16.85,5.32 16.85,8C16.85,10.68 14.67,12.85 12,12.85A4.85,4.85 0 0,1 7.15,8A4.85,4.85 0 0,1 12,3.15M11,5V8.69L14.19,10.53L14.94,9.23L12.5,7.82V5M4,16V24H6V21H18V24L22,20L18,16V19H6V16"
-                                                      Fill="{StaticResource VSBlue}"
+                                                      Fill="{StaticResource VSBlueBrush}"
                                                       Stretch="Uniform"
                                                       Height="15"
                                                       Margin="0 0 5 0">
 
                                                 </Path>
                                                 <TextBlock Text="Schedule"
-                                                           Style="{StaticResource HBDark_TextBlock}" />
+                                                           Style="{StaticResource Normal}" />
                                             </StackPanel>
                                         </Button.Content>
                                     </Button>
@@ -165,12 +153,12 @@
                        Grid.Column="3"
                        Height="1"
                        VerticalAlignment="Bottom"
-                       Fill="{StaticResource HBDark_Button_BorderBrush}" />
+                       Fill="{StaticResource BorderBrush}" />
 
 
 
             <ToggleButton x:Name="tbRunning"
-                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Style="{StaticResource NavigationBarButton}"
                           Grid.Column="0"
                           Grid.Row="0"
                           Command="{Binding NavigateRunningJobsCommand}"
@@ -179,12 +167,12 @@
                           IsChecked="{Binding RunningJobsChecked, Mode=TwoWay}"
                           Cursor="Hand">
                 <ToggleButton.Content>
-                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                    <TextBlock Style="{StaticResource HeaderTextBlock}"
                                Text="Running Jobs" />
                 </ToggleButton.Content>
             </ToggleButton>
             <ToggleButton x:Name="tbScheduled"
-                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Style="{StaticResource NavigationBarButton}"
                           Grid.Column="1"
                           Grid.Row="0"
                           VerticalAlignment="Bottom"
@@ -193,12 +181,12 @@
                           IsChecked="{Binding ScheduledJobsChecked, Mode=TwoWay}"
                           Cursor="Hand">
                 <ToggleButton.Content>
-                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                    <TextBlock Style="{StaticResource HeaderTextBlock}"
                                Text="Scheduled Jobs" />
                 </ToggleButton.Content>
             </ToggleButton>
             <ToggleButton x:Name="tbHistory"
-                          Style="{StaticResource HBDark_NavigationBarButton}"
+                          Style="{StaticResource NavigationBarButton}"
                           Grid.Column="2"
                           Grid.Row="0"
                           VerticalAlignment="Bottom"
@@ -207,7 +195,7 @@
                           IsChecked="{Binding JobsHistoryChecked, Mode=TwoWay}"
                           Cursor="Hand">
                 <ToggleButton.Content>
-                    <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+                    <TextBlock Style="{StaticResource HeaderTextBlock}"
                                Text="History" />
                 </ToggleButton.Content>
             </ToggleButton>

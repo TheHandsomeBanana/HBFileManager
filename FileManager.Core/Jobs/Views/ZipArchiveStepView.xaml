@@ -15,22 +15,7 @@
              d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/GroupBox/GroupBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/TimeSpanPicker.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
+           
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
         </ResourceDictionary>
@@ -40,12 +25,12 @@
     <StackPanel>
         <local:StepView Margin="0 0 0 15" />
 
-        <GroupBox Style="{StaticResource HBDark_GroupBox}"
+        <GroupBox Style="{StaticResource PrimaryGroupBox}"
                   Margin="0 0 0 20">
 
             <GroupBox.Header>
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                           Background="{StaticResource HBDark_Background}"
+                <TextBlock Style="{StaticResource Normal}"
+                           Background="{StaticResource BackgroundBrush}"
                            Padding="5 0 5 0"
                            Text="Source"
                            Grid.Row="0"
@@ -63,29 +48,31 @@
                     </Grid.ColumnDefinitions>
 
                     <ComboBox Grid.Column="0"
-                              Style="{StaticResource HBDark_ComboBox}"
+                              Style="{StaticResource PrimaryComboBox}"
                               Width="Auto"
                               SelectedItem="{Binding SourceType}"
                               ItemsSource="{Binding AvailableSourceTypes}">
                     </ComboBox>
-                    <TextBox Style="{StaticResource HBDark_TextBox}"
+                    <TextBox Style="{StaticResource PrimaryTextBox}"
                              Text="{Binding Source, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{Binding Source, Mode=OneWay}"
                              Grid.Column="1"
                              Margin="5 0 5 0" />
 
-                    <Button Style="{StaticResource HBDark_VSBrowseButton}"
+                    <Button Style="{StaticResource BrowseButton}"
+                            HorizontalContentAlignment="Center"
                             Grid.Column="2"
                             Command="{Binding BrowseSourceCommand}" />
 
-                    <Button Style="{StaticResource HBDark_VSButton1}"
+                    <Button Style="{StaticResource PrimaryButton}"
+                            HorizontalContentAlignment="Center"
                             Grid.Column="3"
                             Margin="5 0 0 0"
                             Content="Add"
                             Command="{Binding AddSourceCommand}" />
                 </Grid>
 
-                <ListView Style="{StaticResource HBDark_ListView}"
+                <ListView Style="{StaticResource PrimaryListView}"
                           ItemsSource="{Binding SourceItems}"
                           SelectedItem="{Binding SelectedSource}"
                           BorderThickness="1">
@@ -116,14 +103,14 @@
                     <ListView.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                     Style="{StaticResource HBDark_ContextMenu}">
+                                     Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Delete item"
                                       Command="{Binding DeleteSourceCommand}"
                                       CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                                 <attachedProperties:MenuItemAttachedProperties.IconPath>
                                     <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                          Fill="{StaticResource VSRed}"
+                                          Fill="{StaticResource VSRedBrush}"
                                           Stretch="Uniform" />
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
@@ -132,7 +119,7 @@
 
                     <ListView.ItemContainerStyle>
                         <Style TargetType="ListViewItem"
-                               BasedOn="{StaticResource HBDark_ListViewItem}">
+                               BasedOn="{StaticResource PrimaryListViewItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
@@ -148,12 +135,12 @@
         </GroupBox>
 
 
-        <GroupBox Style="{StaticResource HBDark_GroupBox}"
+        <GroupBox Style="{StaticResource PrimaryGroupBox}"
                   Margin="0 0 0 20">
 
             <GroupBox.Header>
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                           Background="{StaticResource HBDark_Background}"
+                <TextBlock Style="{StaticResource Normal}"
+                           Background="{StaticResource BackgroundBrush}"
                            Padding="5 0 5 0"
                            Text="Destination"
                            Grid.Row="0"
@@ -170,19 +157,20 @@
                     </Grid.ColumnDefinitions>
 
                     <ComboBox Grid.Column="0"
-                              Style="{StaticResource HBDark_ComboBox}"
+                              Style="{StaticResource PrimaryComboBox}"
                               Width="Auto"
                               SelectedItem="{Binding DestinationType}"
                               ItemsSource="{Binding AvailableDestinationTypes}">
                     </ComboBox>
 
-                    <TextBox Style="{StaticResource HBDark_TextBox}"
+                    <TextBox Style="{StaticResource PrimaryTextBox}"
                              Text="{Binding Destination, UpdateSourceTrigger=PropertyChanged}"
                              ToolTip="{Binding Destination, Mode=OneWay}"
                              Grid.Column="1"
                              Margin="5 0 5 0" />
 
-                    <Button Style="{StaticResource HBDark_VSBrowseButton}"
+                    <Button Style="{StaticResource BrowseButton}"
+                            HorizontalContentAlignment="Center"
                             Grid.Column="2"
                             Command="{Binding BrowseDestinationCommand}" />
 
@@ -194,7 +182,7 @@
         </GroupBox>
 
 
-        <CheckBox Style="{StaticResource HBDark_CheckBox}"
+        <CheckBox Style="{StaticResource PrimaryCheckBox}"
                   Content="Include only modified"
                   Margin="0 0 0 10"
                   IsChecked="{Binding ModifiedOnly}" />
@@ -222,11 +210,11 @@
                    PlacementTarget="{Binding ElementName=InfoButton}"
                    StaysOpen="False"
                    Placement="Top">
-                <Border Background="{StaticResource HBDark_TextBox_Background}"
-                        BorderBrush="{StaticResource HBDark_TextBox_BorderBrush}"
+                <Border Background="{StaticResource BackgroundBrush}"
+                        BorderBrush="{StaticResource BorderBrush}"
                         BorderThickness="1"
                         Padding="10">
-                    <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                    <TextBlock Style="{StaticResource Normal}"
                                Text="Set this value if folders and files should take part in the copying step, when they are older than the provided timespan. Leave this blank to only include size-checking in the modified-only rule."
                                TextWrapping="Wrap"
                                Width="200" />

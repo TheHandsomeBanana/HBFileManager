@@ -34,15 +34,6 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/ListBoxButton.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/ListBoxButtonV2.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Controls/IconButton.xaml" />
                 <ResourceDictionary Source="/Resources/Images/Drawings.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
@@ -72,10 +63,10 @@
     </Window.CommandBindings>
 
     <Border x:Name="MainBorder"
-            Style="{StaticResource VSCopy}"
+            Style="{StaticResource ApplicationBorder}"
             BorderThickness="1"
             CornerRadius="5"
-            Background="{StaticResource HBDark_Background}">
+            Background="{StaticResource BackgroundBrush}">
 
 
         <Grid>
@@ -90,10 +81,10 @@
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <Border BorderBrush="{StaticResource HBDark_Border}"
+            <Border BorderBrush="{StaticResource BorderBrush}"
                     BorderThickness="0 0 0 1"
                     CornerRadius="5 5 0 0"
-                    Background="{StaticResource HBDark_Background}"
+                    Background="{StaticResource BackgroundBrush}"
                     Grid.ColumnSpan="2"
                     Grid.RowSpan="2">
             </Border>
@@ -113,7 +104,7 @@
                 <TextBlock Text="{Binding Title}"
                            FontFamily="Bahnschrift SemiBold"
                            Margin="10,0,0,0"
-                           Foreground="{StaticResource Foreground}"
+                           Foreground="{StaticResource ForegroundBrush}"
                            FontSize="16" />
             </StackPanel>
 
@@ -194,7 +185,7 @@
                 <controls:IconButton ToolTip="Notifications"
                                      WindowChrome.IsHitTestVisibleInChrome="True"
                                      IconData="M21,19V20H3V19L5,17V11C5,7.9 7.03,5.17 10,4.29C10,4.19 10,4.1 10,4A2,2 0 0,1 12,2A2,2 0 0,1 14,4C14,4.1 14,4.19 14,4.29C16.97,5.17 19,7.9 19,11V17L21,19M14,21A2,2 0 0,1 12,23A2,2 0 0,1 10,21"
-                                     IconFill="{StaticResource HBDark_Background}"
+                                     IconFill="{StaticResource BackgroundBrush}"
                                      IconStroke="#f1c23c"
                                      IconStrokeThickness="1"
                                      IconStretch="Uniform"
@@ -227,7 +218,7 @@
                                      Margin="0 0 5 0">
                 </controls:IconButton>
 
-                <ComboBox Style="{StaticResource HBDark_ComboBox}"
+                <ComboBox Style="{StaticResource PrimaryComboBox}"
                           Margin="0 0 10 0"
                           Width="Auto"
                           ItemsSource="{Binding Workspaces}"
@@ -237,7 +228,7 @@
 
             </StackPanel>
 
-            <Border BorderBrush="{StaticResource HBDark_Border}"
+            <Border BorderBrush="{StaticResource BorderBrush}"
                     Grid.Column="0"
                     Grid.Row="2"
                     VerticalAlignment="Stretch"
@@ -245,7 +236,7 @@
                     BorderThickness="0 0 1 0">
 
                 <ListBox x:Name="sidebar"
-                         Style="{StaticResource HBDark_ListBox}"
+                         Style="{StaticResource PrimaryListBox}"
                          Background="Transparent"
                          BorderThickness="0"
                          SelectedItem="{Binding NavigationIndex, Mode=TwoWay}"
@@ -257,7 +248,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#f1c23c"
@@ -269,7 +260,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#cdd5e0"
@@ -282,7 +273,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#5DADE2"
@@ -295,11 +286,11 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             BorderThickness="0"
-                                            IconFill="{StaticResource VSGreen}"
+                                            IconFill="{StaticResource VSGreenBrush}"
                                             Command="{Binding NavigateToExecutionCommand}"
                                             CommandParameter="{Binding NavigateCommandParameter}">
                     </controls:ListBoxButton>
@@ -308,7 +299,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#cdd5e0"
@@ -321,7 +312,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#cdd5e0"
@@ -334,7 +325,7 @@
                                             IconWidth="25"
                                             IconHeight="25"
                                             Height="80"
-                                            Foreground="{StaticResource Foreground}"
+                                            Foreground="{StaticResource ForegroundBrush}"
                                             Background="Transparent"
                                             HorizontalAlignment="Stretch"
                                             IconFill="#1d7ccc"

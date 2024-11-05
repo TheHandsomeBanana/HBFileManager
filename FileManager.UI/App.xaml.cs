@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.Identity.Client.Desktop;
 using Microsoft.IdentityModel.Abstractions;
+using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.Json;
@@ -43,7 +44,7 @@ namespace FileManager.UI {
         }
 
         private void AppOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e) {
-            HBDarkMessageBox.Show("Unexpected error", 
+            HBDarkMessageBox.Show("Unexpected error",
                 e.Exception.Message,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -51,12 +52,15 @@ namespace FileManager.UI {
             e.Handled = true;
         }
 
-        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e) {            
+        private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e) {
             ApplicationHandler.SaveAppState();
         }
 
 
         protected override async void OnStartup(StartupEventArgs e) {
+            base.OnStartup(e);
+
+
             try {
                 IUnityContainer container = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
                 CommonAppSettings appSettings = container.Resolve<CommonAppSettings>();
@@ -66,8 +70,21 @@ namespace FileManager.UI {
                     return;
                 }
 
-                IAccountService accountService = container.Resolve<IAccountService>();
+                // Try get last saved theme -> apply this theme or start theme with darkmode
+                IApplicationStorage applicationStorage = container.Resolve<IApplicationStorage>();
+                if (applicationStorage.DefaultContainer.TryGet("apptheme", out IStorageEntry? entry)) {
+                    StaticThemes currentTheme = entry.Get<StaticThemes>();
+                    StaticThemeManager.ApplyTheme(currentTheme);
+                }
+                else {
+                    applicationStorage.DefaultContainer.AddOrUpdate("apptheme", StaticThemes.Dark, StorageEntryContentType.Json);
+                    StaticThemeManager.ApplyTheme(StaticThemes.Dark);
+                }
 
+
+
+
+                IAccountService accountService = container.Resolve<IAccountService>();
                 IAccountInfo? lastAccount = accountService.AccountStorage.GetLatestAccount(appSettings.ApplicationName!);
 
                 if (lastAccount is not null && lastAccount.AccountType == AccountType.Microsoft) {
@@ -106,8 +123,6 @@ namespace FileManager.UI {
                 };
 
                 loginWindow.ShowDialog();
-
-                base.OnStartup(e);
             }
             catch {
                 ApplicationHandler.SaveAppStateOnExit();

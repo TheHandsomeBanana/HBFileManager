@@ -13,16 +13,7 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/CheckBox/CheckBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ComboBox/ComboBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/GroupBox/GroupBoxes.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
+         
             <converters:EnumToStringConverter x:Key="e2s" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -31,17 +22,17 @@
     <StackPanel Orientation="Vertical"
                 Margin="0 10 0 0">
 
-        <GroupBox Style="{StaticResource HBDark_GroupBox}" Padding="10 20 10 20">
+        <GroupBox Style="{StaticResource PrimaryGroupBox}" Padding="10 20 10 20">
             <GroupBox.Header>
-                <TextBlock Style="{StaticResource HBDark_TextBlock}"
-                           Background="{StaticResource HBDark_Background}"
+                <TextBlock Style="{StaticResource Normal}"
+                           Background="{StaticResource BackgroundBrush}"
                            Padding="5 0 5 0"
                            Text="Jobs"
                            Grid.Row="0"
                            Margin="0 0 0 3" />
             </GroupBox.Header>
 
-            <CheckBox Style="{StaticResource HBDark_CheckBox}"
+            <CheckBox Style="{StaticResource PrimaryCheckBox}"
                       Content="Validate on Navigation"
                       IsChecked="{Binding ValidateOnNavigation}">
 

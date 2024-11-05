@@ -12,17 +12,6 @@
              d:DesignWidth="1000">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <converters:GridViewColumnWidthConverter x:Key="GridViewColumnWidthConverter" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
@@ -37,7 +26,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock Style="{StaticResource HBDark_HeaderTextBlock}"
+        <TextBlock Style="{StaticResource HeaderTextBlock}"
                    Text="Assemblies" />
 
         <StackPanel Grid.Row="1"
@@ -50,7 +39,7 @@
                                 Height="24"
                                 Width="24"
                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                IconFill="{StaticResource VSGreen}"
+                                IconFill="{StaticResource VSGreenBrush}"
                                 Command="{Binding AddAssemblyCommand}">
             </customControls:IconButton>
             
@@ -60,13 +49,13 @@
                                 Height="24"
                                 Width="24"
                                 IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                IconFill="{StaticResource VSRed}"
+                                IconFill="{StaticResource VSRedBrush}"
                                 Command="{Binding DeleteAssemblyCommand}"
                                 CommandParameter="{Binding SelectedAssembly}">
             </customControls:IconButton>
         </StackPanel>
 
-        <TextBox Style="{StaticResource HBDark_VSFilterBox}"
+        <TextBox Style="{StaticResource FilterTextBox}"
                  Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                  Tag="Search Assemblies"
                  Grid.Row="2">
@@ -81,7 +70,7 @@
                 <ColumnDefinition Width="1.5*" />
             </Grid.ColumnDefinitions>
 
-            <ListBox Style="{StaticResource HBDark_ListBox}"
+            <ListBox Style="{StaticResource PrimaryListBox}"
                      ItemsSource="{Binding AssembliesView}"
                      SelectedItem="{Binding SelectedAssembly}"
                      DisplayMemberPath="FullName"
@@ -90,14 +79,14 @@
                 <ListBox.Resources>
                     <ContextMenu x:Key="contextMenu"
                                  DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                 Style="{StaticResource HBDark_ContextMenu}">
+                                 Style="{StaticResource PrimaryContextMenu}">
                         <MenuItem Header="Remove Assembly"
                                   Command="{Binding DeleteAssemblyCommand}"
                                   CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
 
                             <attachedProperties:MenuItemAttachedProperties.IconPath>
                                 <Path Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                      Fill="{StaticResource VSRed}"
+                                      Fill="{StaticResource VSRedBrush}"
                                       Stretch="Uniform" />
                             </attachedProperties:MenuItemAttachedProperties.IconPath>
                         </MenuItem>
@@ -111,18 +100,18 @@
                 </ListBox.InputBindings>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem"
-                           BasedOn="{StaticResource HBDark_ListBoxItem}">
+                           BasedOn="{StaticResource PrimaryListBoxItem}">
                         <Setter Property="ContextMenu"
                                 Value="{StaticResource contextMenu}" />
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ContextMenu>
-                    <ContextMenu Style="{StaticResource HBDark_ContextMenu}">
+                    <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                         <MenuItem Header="Add new Assembly"
                                   Command="{Binding AddAssemblyCommand}">
                             <attachedProperties:MenuItemAttachedProperties.IconPath>
                                 <Path Data="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                      Fill="{StaticResource VSGreen}"
+                                      Fill="{StaticResource VSGreenBrush}"
                                       Stretch="Uniform" />
                             </attachedProperties:MenuItemAttachedProperties.IconPath>
                         </MenuItem>
@@ -132,7 +121,7 @@
 
             <Rectangle Grid.Column="1"
                        Width="1"
-                       Fill="{StaticResource ControlBorder}" />
+                       Fill="{StaticResource BorderBrush}" />
 
             <Grid Grid.Column="2"
                   Margin="5 0 0 0">
@@ -142,10 +131,10 @@
                 </Grid.RowDefinitions>
 
                 <TextBlock Text="Found Plugins"
-                           Style="{StaticResource HBDark_HeaderTextBlock}"
+                           Style="{StaticResource HeaderTextBlock}"
                            Grid.Row="0" />
 
-                <ScrollViewer Style="{StaticResource HBDark_VSScrollViewer}"
+                <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
                               attachedProperties:ScrollViewerAttachedProperties.VerticalScrollBarMargin="10 0 0 0"
                               attachedProperties:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
                               attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
@@ -155,16 +144,16 @@
                               Grid.Column="1"
                               Grid.Row="1">
 
-                    <ListView Style="{StaticResource HBDark_ListView}"
+                    <ListView Style="{StaticResource PrimaryListView}"
                               ItemsSource="{Binding FoundPlugins}"
                               Visibility="{Binding SelectedAssembly, Converter={StaticResource n2v}}"
-                              ItemContainerStyle="{StaticResource HBDark_ListViewItem}">
+                              ItemContainerStyle="{StaticResource PrimaryListViewItem}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn DisplayMemberBinding="{Binding BaseType}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                        <TextBlock Style="{StaticResource Normal}"
                                                    Text="Plugin Type"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -173,7 +162,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding ConcreteType}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                        <TextBlock Style="{StaticResource Normal}"
                                                    Text="Concrete Type"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -182,7 +171,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Metadata.TypeName}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                        <TextBlock Style="{StaticResource Normal}"
                                                    Text="Typename"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>
@@ -191,7 +180,7 @@
                                 <GridViewColumn DisplayMemberBinding="{Binding Metadata.Description}"
                                                 Width="Auto">
                                     <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                                        <TextBlock Style="{StaticResource Normal}"
                                                    Text="Description"
                                                    FontWeight="Bold" />
                                     </GridViewColumn.Header>

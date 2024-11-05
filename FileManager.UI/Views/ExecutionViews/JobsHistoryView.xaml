@@ -14,20 +14,6 @@
              d:DesignWidth="800">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/DefaultDark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBlock/TextBlocks.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Button/Buttons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Border/Borders.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListBox/ListBoxItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViews.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/ListView/ListViewItems.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/TextBox/TextBoxes.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/ContextMenus.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/HBLibrary.Wpf;component/Styles/Menu/MenuItems.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
         </ResourceDictionary>
@@ -39,8 +25,8 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ListBox Style="{StaticResource HBDark_ListBox}"
-                 ItemContainerStyle="{StaticResource HBDark_ListBoxItem}"
+        <ListBox Style="{StaticResource PrimaryListBox}"
+                 ItemContainerStyle="{StaticResource PrimaryListBoxItem}"
                  Grid.Column="0"
                  d:ItemsSource="{d:SampleData ItemCount=5}"
                  ItemsSource="{Binding CompletedJobs}"
@@ -58,7 +44,7 @@
                         <!-- Success -->
                         <Path Grid.Column="0"
                               Data="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z"
-                              Fill="{StaticResource VSGreen}"
+                              Fill="{StaticResource VSGreenBrush}"
                               Stretch="Uniform"
                               Height="20"
                               Margin="0 0 5 0"
@@ -68,7 +54,7 @@
                         <!-- Warning -->
                         <Path Grid.Column="0"
                               Data="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z"
-                              Fill="{StaticResource VSYellow}"
+                              Fill="{StaticResource VSYellowBrush}"
                               Stretch="Uniform"
                               Height="20"
                               Margin="0 0 5 0"
@@ -78,7 +64,7 @@
                         <!-- Error -->
                         <Path Grid.Column="0"
                               Data="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
-                              Fill="{StaticResource VSRed}"
+                              Fill="{StaticResource VSRedBrush}"
                               Stretch="Uniform"
                               Height="20"
                               Margin="0 0 5 0"
@@ -88,11 +74,11 @@
                                     Grid.Column="1"
                                     VerticalAlignment="Center">
 
-                            <TextBlock Style="{StaticResource HBDark_BigTextBlock}"
+                            <TextBlock Style="{StaticResource BigTextBlock}"
                                        Text="{Binding Name}">
                             </TextBlock>
 
-                            <TextBlock Style="{StaticResource HBDark_TextBlock}"
+                            <TextBlock Style="{StaticResource Normal}"
                                        Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}">
                             </TextBlock>
 
