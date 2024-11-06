@@ -17,7 +17,7 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            
+
 
             <BooleanToVisibilityConverter x:Key="b2v" />
             <converters:NullToVisibilityConverter x:Key="n2v" />
@@ -120,6 +120,7 @@
                 <Border Style="{StaticResource ControlBorder}"
                         Grid.Column="0"
                         Grid.Row="0"
+                        
                         IsEnabled="{Binding IsInitialized}">
 
                     <Grid Margin="5">
@@ -140,36 +141,36 @@
                                     Orientation="Horizontal">
 
                             <controls:IconButton BorderThickness="1"
-                                                Height="24"
-                                                Width="24"
-                                                ToolTip="Add step"
-                                                IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
-                                                IconFill="{StaticResource VSGreenBrush}"
-                                                Command="{Binding AddStepCommand}">
+                                                 Height="24"
+                                                 Width="24"
+                                                 ToolTip="Add step"
+                                                 IconData="M20 14H14V20H10V14H4V10H10V4H14V10H20V14Z"
+                                                 IconFill="{StaticResource VSGreenBrush}"
+                                                 Command="{Binding AddStepCommand}">
                             </controls:IconButton>
 
                             <controls:IconButton BorderThickness="1"
-                                                Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
-                                                ToolTip="Delete step"
-                                                Height="24"
-                                                Width="24"
-                                                IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
-                                                IconFill="{StaticResource VSRedBrush}"
-                                                Command="{Binding DeleteStepCommand}"
-                                                CommandParameter="{Binding SelectedStep}">
+                                                 Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
+                                                 ToolTip="Delete step"
+                                                 Height="24"
+                                                 Width="24"
+                                                 IconData="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                                                 IconFill="{StaticResource VSRedBrush}"
+                                                 Command="{Binding DeleteStepCommand}"
+                                                 CommandParameter="{Binding SelectedStep}">
                             </controls:IconButton>
 
                             <controls:IconButton BorderThickness="1"
-                                                Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
-                                                ToolTip="Validate step"
-                                                Height="24"
-                                                Width="24"
-                                                IconHeight="18"
-                                                IconStretch="Uniform"
-                                                IconData="M11 15H6L13 1V9H18L11 23V15Z"
-                                                IconFill="#ffac14"
-                                                Command="{Binding ValidateStepCommand}"
-                                                CommandParameter="{Binding SelectedStep}">
+                                                 Visibility="{Binding SelectedStep, Converter={StaticResource n2v}}"
+                                                 ToolTip="Validate step"
+                                                 Height="24"
+                                                 Width="24"
+                                                 IconHeight="18"
+                                                 IconStretch="Uniform"
+                                                 IconData="M11 15H6L13 1V9H18L11 23V15Z"
+                                                 IconFill="#ffac14"
+                                                 Command="{Binding ValidateStepCommand}"
+                                                 CommandParameter="{Binding SelectedStep}">
 
                             </controls:IconButton>
                         </StackPanel>
@@ -181,79 +182,71 @@
                                  Grid.Row="2">
                         </TextBox>
 
-                        <ListView Style="{StaticResource PrimaryListView}"
-                                  ItemsSource="{Binding StepsView}"
-                                  SelectedItem="{Binding SelectedStep}"
-                                  Grid.Row="3"
-                                  AllowDrop="True">
-
+                        <ListBox Style="{StaticResource PrimaryListBox}"
+                                 ItemsSource="{Binding StepsView}"
+                                 SelectedItem="{Binding SelectedStep}"
+                                 Grid.Row="3"
+                                 AllowDrop="True"
+                                 d:ItemsSource="{d:SampleData ItemCount=5}">
                             <i:Interaction.Behaviors>
-                                <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type viewModels:JobStepWrapperViewModel}" />
+                                <behaviors:ListBoxDragDropBehavior DragDropDataType="{x:Type viewModels:JobStepWrapperViewModel}" />
                             </i:Interaction.Behaviors>
 
-                            <ListView.View>
-                                <GridView AllowsColumnReorder="False">
-                                    <GridViewColumn Width="55">
-                                        <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource NormalTextBlock}"
-                                                       FontWeight="Bold" />
-                                        </GridViewColumn.Header>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <controls:SlideToggleButton IsChecked="{Binding StepContext.IsEnabled}"
-                                                                            CornerRadius="6"
-                                                                            SliderCornerRadius="6"
-                                                                            HorizontalAlignment="Left">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                                </controls:SlideToggleButton>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                    <GridViewColumn Width="25">
-                                        <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource NormalTextBlock}"
-                                                       FontWeight="Bold" />
-                                        </GridViewColumn.Header>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
-                                                                       FromFill="#ffac14"
-                                                                       ToFill="#888484"
-                                                                       FromShadowEffect="#ffdf14"
-                                                                       ToShadowEffect="Transparent"
-                                                                       FromShadowBlurRadius="3"
-                                                                       ToShadowBlurRadius="0"
-                                                                       Height="20"
-                                                                       State="{Binding StepContext.IsValid}">
-                                                    <controls:AnimatedPath.ShadowEffect>
-                                                        <DropShadowEffect ShadowDepth="0"
-                                                                          Direction="0" />
-                                                    </controls:AnimatedPath.ShadowEffect>
-                                                </controls:AnimatedPath>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
+                                        <controls:LoadingSpinner Grid.Column="0"
+                                                                 Thickness="2"
+                                                                 Diameter="20"
+                                                                 Color="{StaticResource VSBlueBrush}"
+                                                                 IsLoading="{Binding IsValidationRunning}"
+                                                                 Margin="5 0 5 0">
 
-                                    <GridViewColumn DisplayMemberBinding="{Binding StepContext.Name}">
-                                        <GridViewColumn.Header>
-                                            <TextBlock Style="{StaticResource NormalTextBlock}"
-                                                       FontWeight="Bold"
-                                                       Text="Name" />
-                                        </GridViewColumn.Header>
-                                        <GridViewColumn.Width>
-                                            <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                          ConverterParameter="*">
-                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                         Path="ActualWidth" />
-                                                <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                                <Binding RelativeSource="{RelativeSource Self}" />
-                                            </MultiBinding>
-                                        </GridViewColumn.Width>
-                                    </GridViewColumn>
-                                </GridView>
-                            </ListView.View>
+                                        </controls:LoadingSpinner>
+                                        
+                                        <!-- Error -->
+                                        <Path Grid.Column="0"
+                                              Data="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
+                                              Fill="{StaticResource VSRedBrush}"
+                                              Stretch="Uniform"
+                                              Height="20"
+                                              Visibility="{Binding IsValidationError, Converter={StaticResource b2v}}" 
+                                              Margin="5 0 5 0"/>
 
-                            <ListView.Resources>
+                                        <!-- Success -->
+                                        <Path Grid.Column="0"
+                                              Data="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z"
+                                              Fill="{StaticResource VSGreenBrush}"
+                                              Stretch="Uniform"
+                                              Height="20"
+                                              Visibility="{Binding IsValidationSuccess, Converter={StaticResource b2v}}"
+                                              Margin="5 0 5 0">
+                                        </Path>
+
+                                        <TextBlock Style="{StaticResource NormalTextBlock}"
+                                                   Grid.Column="2"
+                                                   Text="{Binding StepContext.Name}" 
+                                                   Margin="5 0 5 0"/>
+
+                                        <controls:SlideToggleButton IsChecked="{Binding StepContext.IsEnabled}"
+                                                                    CornerRadius="6"
+                                                                    SliderCornerRadius="6"
+                                                                    HorizontalAlignment="Left"
+                                                                    Grid.Column="1"
+                                                                    Margin="5 0 5 0">
+
+                                        </controls:SlideToggleButton>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                            <ListBox.Resources>
                                 <Style TargetType="GridViewHeaderRowPresenter">
                                     <Setter Property="Visibility"
                                             Value="Collapsed" />
@@ -273,23 +266,23 @@
                                         </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
                                 </ContextMenu>
-                            </ListView.Resources>
+                            </ListBox.Resources>
 
-                            <ListView.InputBindings>
+                            <ListBox.InputBindings>
                                 <KeyBinding Key="Delete"
                                             Command="{Binding DeleteStepCommand}"
                                             CommandParameter="{Binding SelectedStep}" />
-                            </ListView.InputBindings>
+                            </ListBox.InputBindings>
 
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem"
-                                       BasedOn="{StaticResource PrimaryListViewItem}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem"
+                                       BasedOn="{StaticResource PrimaryListBoxItem}">
                                     <Setter Property="ContextMenu"
                                             Value="{StaticResource contextMenu}" />
                                 </Style>
-                            </ListView.ItemContainerStyle>
+                            </ListBox.ItemContainerStyle>
 
-                            <ListView.ContextMenu>
+                            <ListBox.ContextMenu>
                                 <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                                     <MenuItem Header="Add new step"
                                               Command="{Binding AddStepCommand}">
@@ -300,8 +293,8 @@
                                         </attachedProperties:MenuItemAttachedProperties.IconPath>
                                     </MenuItem>
                                 </ContextMenu>
-                            </ListView.ContextMenu>
-                        </ListView>
+                            </ListBox.ContextMenu>
+                        </ListBox>
                     </Grid>
                 </Border>
 
@@ -347,15 +340,15 @@
                         <StackPanel Grid.Column="0"
                                     Visibility="{Binding IsExpanded, ElementName=ExpanderValidationLog, Converter={StaticResource b2v}}">
                             <controls:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
-                                                IconFill="{StaticResource VSRedBrush}"
-                                                BorderThickness="1"
-                                                Width="25"
-                                                Height="25"
-                                                ToolTip="Clear log"
-                                                IconWidth="20"
-                                                IconStretch="Uniform"
-                                                HorizontalAlignment="Left"
-                                                Command="{Binding ClearValidationLogCommand}">
+                                                 IconFill="{StaticResource VSRedBrush}"
+                                                 BorderThickness="1"
+                                                 Width="25"
+                                                 Height="25"
+                                                 ToolTip="Clear log"
+                                                 IconWidth="20"
+                                                 IconStretch="Uniform"
+                                                 HorizontalAlignment="Left"
+                                                 Command="{Binding ClearValidationLogCommand}">
 
                             </controls:IconButton>
                         </StackPanel>

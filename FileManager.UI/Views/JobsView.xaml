@@ -93,63 +93,64 @@
 
                 </TextBox>
 
-                <ListView Style="{StaticResource PrimaryListView}"
-                          ItemsSource="{Binding JobsView}"
-                          SelectedItem="{Binding SelectedJob}"
-                          Grid.Row="3"
-                          AllowDrop="True">
+                <ListBox Style="{StaticResource PrimaryListBox}"
+                         ItemsSource="{Binding JobsView}"
+                         SelectedItem="{Binding SelectedJob}"
+                         d:ItemsSource="{d:SampleData ItemCount=5}"
+                         Grid.Row="3"
+                         AllowDrop="True">
+
 
                     <i:Interaction.Behaviors>
-                        <behaviors:ListViewDragDropBehavior DragDropDataType="{x:Type jobViewModels:JobItemViewModel}" />
+                        <behaviors:ListBoxDragDropBehavior DragDropDataType="{x:Type jobViewModels:JobItemViewModel}" />
                     </i:Interaction.Behaviors>
 
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="False">
-                            <GridViewColumn Width="25">
-                                <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource NormalTextBlock}"
-                                               FontWeight="Bold" />
-                                </GridViewColumn.Header>
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
-                                                               FromFill="#ffac14"
-                                                               ToFill="#888484"
-                                                               FromShadowEffect="#ffdf14"
-                                                               ToShadowEffect="Transparent"
-                                                               FromShadowBlurRadius="3"
-                                                               ToShadowBlurRadius="0"
-                                                               Height="20"
-                                                               State="{Binding CanRun}">
-                                            <controls:AnimatedPath.ShadowEffect>
-                                                <DropShadowEffect ShadowDepth="0"
-                                                                  Direction="0" />
-                                            </controls:AnimatedPath.ShadowEffect>
-                                        </controls:AnimatedPath>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
 
-                            <GridViewColumn DisplayMemberBinding="{Binding Name}">
-                                <GridViewColumn.Header>
-                                    <TextBlock Style="{StaticResource NormalTextBlock}"
-                                               FontWeight="Bold"
-                                               Text="Name" />
-                                </GridViewColumn.Header>
-                                <GridViewColumn.Width>
-                                    <MultiBinding Converter="{StaticResource GridViewColumnWidthConverter}"
-                                                  ConverterParameter="*">
-                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type ListView}}"
-                                                 Path="ActualWidth" />
-                                        <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType={x:Type GridView}}" />
-                                        <Binding RelativeSource="{RelativeSource Self}" />
-                                    </MultiBinding>
-                                </GridViewColumn.Width>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
+                                <controls:LoadingSpinner Grid.Column="0"
+                                                         Thickness="2"
+                                                         Diameter="20"
+                                                         Color="{StaticResource VSBlueBrush}"
+                                                         IsLoading="{Binding IsValidationRunning}"
+                                                         Margin="5 0 5 0">
 
-                    <ListView.Resources>
+                                </controls:LoadingSpinner>
+
+                                <!-- Error -->
+                                <Path Grid.Column="0"
+                                      Data="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"
+                                      Fill="{StaticResource VSRedBrush}"
+                                      Stretch="Uniform"
+                                      Height="20"
+                                      Visibility="{Binding IsValidationError, Converter={StaticResource b2v}}"
+                                      Margin="5 0 5 0" />
+
+                                <!-- Success -->
+                                <Path Grid.Column="0"
+                                      Data="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z"
+                                      Fill="{StaticResource VSGreenBrush}"
+                                      Stretch="Uniform"
+                                      Height="20"
+                                      Visibility="{Binding IsValidationSuccess, Converter={StaticResource b2v}}"
+                                      Margin="5 0 5 0">
+                                </Path>
+
+                                <TextBlock Style="{StaticResource NormalTextBlock}"
+                                           Grid.Column="2"
+                                           Text="{Binding Name}"
+                                           Margin="5 0 5 0" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <ListBox.Resources>
                         <ContextMenu x:Key="contextMenu"
                                      DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                      Style="{StaticResource PrimaryContextMenu}">
@@ -164,23 +165,23 @@
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
-                    </ListView.Resources>
+                    </ListBox.Resources>
 
-                    <ListView.InputBindings>
+                    <ListBox.InputBindings>
                         <KeyBinding Key="Delete"
                                     Command="{Binding DeleteJobCommand}"
                                     CommandParameter="{Binding SelectedJob}" />
-                    </ListView.InputBindings>
+                    </ListBox.InputBindings>
 
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem"
-                               BasedOn="{StaticResource PrimaryListViewItem}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem"
+                               BasedOn="{StaticResource PrimaryListBoxItem}">
                             <Setter Property="ContextMenu"
                                     Value="{StaticResource contextMenu}" />
                         </Style>
-                    </ListView.ItemContainerStyle>
+                    </ListBox.ItemContainerStyle>
 
-                    <ListView.ContextMenu>
+                    <ListBox.ContextMenu>
                         <ContextMenu Style="{StaticResource PrimaryContextMenu}">
                             <MenuItem Header="Add new job"
                                       Command="{Binding AddJobCommand}">
@@ -191,8 +192,8 @@
                                 </attachedProperties:MenuItemAttachedProperties.IconPath>
                             </MenuItem>
                         </ContextMenu>
-                    </ListView.ContextMenu>
-                </ListView>
+                    </ListBox.ContextMenu>
+                </ListBox>
             </Grid>
         </Border>
 

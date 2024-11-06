@@ -15,7 +15,11 @@ public interface IJobStepContext {
     public event Action<int, JobStep>? ExecutionOrderChanged;
     public event Func<JobStep, bool>? ValidationRequired;
     public event Func<JobStep, Task<bool>>? AsyncValidationRequired;
+    public event Action? ValidationStarted;
+    public event Action? ValidationFinished;
     public bool ValidationRunning { get; }
     public bool AsyncValidationRunning { get; }
 
+    public bool NotifyValidationRequired();
+    public Task<bool> NotifyAsyncValidationRequired();
 }

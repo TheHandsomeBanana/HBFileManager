@@ -60,6 +60,8 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
 
     public event Func<JobStep, bool>? ValidationRequired;
     public event Func<JobStep, Task<bool>>? AsyncValidationRequired;
+    public event Action? ValidationStarted;
+    public event Action? ValidationFinished;
 
     public bool ValidationRunning { get; private set; }
     public bool AsyncValidationRunning { get; private set; }
@@ -68,27 +70,33 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
     public JobStepViewModel(TModel model) : base(model) {
     }
 
-    public void NotifyValidationRequired() {
+    public bool NotifyValidationRequired() {
         try {
             ValidationRunning = true;
+            ValidationStarted?.Invoke();
             IsValid = ValidationRequired?.Invoke(Model) ?? false;
+            return IsValid;
         }
         finally {
             ValidationRunning = false;
+            ValidationFinished?.Invoke();
         }
     }
 
-    public async Task NotifyAsyncValidationRequired() {
+    public async Task<bool> NotifyAsyncValidationRequired() {
         IsValid = await InvokeAsyncValidation();
+        return IsValid;
     }
 
     private async Task<bool> InvokeAsyncValidation() {
         try {
             AsyncValidationRunning = true;
+            ValidationStarted?.Invoke();
             return await (AsyncValidationRequired?.Invoke(Model) ?? Task.FromResult(false));
         }
         finally {
             AsyncValidationRunning = false;
+            ValidationFinished?.Invoke();
         }
     }
 }

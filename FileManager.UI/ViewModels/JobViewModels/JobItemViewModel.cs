@@ -33,6 +33,7 @@ using HBLibrary.Interface.Core;
 using FileManager.Domain;
 using FileManager.Domain.JobSteps;
 using FileManager.Core.Jobs;
+using System.Windows.Controls;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {
@@ -135,6 +136,18 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
+    private bool isValidationRunning;
+    public bool IsValidationRunning {
+        get { return isValidationRunning; }
+        set {
+            isValidationRunning = value;
+            NotifyPropertyChanged();
+        }
+    }
+
+    public bool IsValidationError => !CanRun && !IsValidationRunning;
+    public bool IsValidationSuccess => CanRun && !IsValidationRunning;
+
 
     public ObservableCollection<JobStepWrapperViewModel> Steps { get; } = [];
     private readonly ICollectionView stepsView;
@@ -174,8 +187,12 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         bool canRun = true;
         List<Task<bool>> validationTasks = [];
         foreach (JobStepWrapperViewModel step in Steps) {
-            validationTasks.Add(ValidateJobStepAsync(step.Model));
+            validationTasks.Add(step.StepContext.NotifyAsyncValidationRequired());
         }
+
+        AddStepCommand.NotifyCanExecuteChanged();
+        DeleteStepCommand.NotifyCanExecuteChanged();
+        ValidateStepCommand.NotifyCanExecuteChanged();
 
         bool[] res = await Task.WhenAll(validationTasks);
         for (int i = 0; i < res.Length; i++) {
@@ -183,6 +200,9 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
 
         CanRun = IsEnabled && canRun;
+        AddStepCommand.NotifyCanExecuteChanged();
+        DeleteStepCommand.NotifyCanExecuteChanged();
+        ValidateStepCommand.NotifyCanExecuteChanged();
     }
 
     protected override void OnInitializeException(Exception exception) {
@@ -235,9 +255,8 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
-    private bool jobValidationRunning;
     private bool CanEditStepsList(object? obj) {
-        return !jobValidationRunning;
+        return !IsValidationRunning;
     }
 
 
@@ -320,6 +339,11 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
 
     public void Dispose() {
         Unhook();
+
+        foreach (JobStepWrapperViewModel step in Steps) {
+            step.Dispose();
+        }
+
         Clear();
     }
 
@@ -343,11 +367,11 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
 
     private Task ValidateStep(JobStepWrapperViewModel model) {
-        return ValidateJobStepAsync(model.Model);
+        return model.StepContext.NotifyAsyncValidationRequired();
     }
 
     private bool CanExecuteValidation(JobStepWrapperViewModel obj) {
-        return !(obj.StepContext?.ValidationRunning ?? true) && !(obj.StepContext?.AsyncValidationRunning ?? true);
+        return !IsValidationRunning && !(obj.StepContext?.ValidationRunning ?? true) && !(obj.StepContext?.AsyncValidationRunning ?? true);
     }
 
     private void OnValidationException(Exception exception) {
@@ -357,65 +381,42 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
                     MessageBoxImage.Error);
     }
 
-    public bool ValidateJobStep(JobStep jobStep) {
-        ValidationLogVisible = true;
-        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
 
-        ImmutableResultCollection res = Validate(jobStep);
-        HandleLogs(res, jobStep);
-
-        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
-
-        AddStepCommand.NotifyCanExecuteChanged();
-        return res.IsSuccess;
-    }
-
-    public async Task<bool> ValidateJobStepAsync(JobStep jobStep) {
-        Application.Current.Dispatcher.Invoke(() => ValidationLogVisible = true);
-
-        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
-
-        ImmutableResultCollection res = await ValidateAsync(jobStep);
-
-        HandleLogs(res, jobStep);
-
-        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
-
-        AddStepCommand.NotifyCanExecuteChanged();
-        return res.IsSuccess;
-    }
 
     public async Task ValidateAllJobStepsAsync(IEnumerable<JobStepWrapperViewModel> jobSteps) {
-        jobValidationRunning = true;
+        IsValidationRunning = true;
+        NotifyPropertyChanged(nameof(IsValidationError));
+        NotifyPropertyChanged(nameof(IsValidationSuccess));
+
         AddStepCommand.NotifyCanExecuteChanged();
         DeleteStepCommand.NotifyCanExecuteChanged();
+        ValidateStepCommand.NotifyCanExecuteChanged();
 
         Application.Current.Dispatcher.Invoke(() => ValidationLogVisible = true);
         bool canRun = true;
         foreach (JobStepWrapperViewModel jobStep in jobSteps) {
-            ValidationLog.AddInfoParagraph($"Validating {jobStep.Model.Name}");
-
-            ImmutableResultCollection res = await ValidateAsync(jobStep.Model);
-            HandleLogs(res, jobStep.Model);
-            canRun &= res.IsSuccess;
+            canRun &= await jobStep.StepContext.NotifyAsyncValidationRequired();
         }
 
         CanRun = canRun && IsEnabled;
+        IsValidationRunning = false;
 
-        jobValidationRunning = false;
+        NotifyPropertyChanged(nameof(IsValidationError));
+        NotifyPropertyChanged(nameof(IsValidationSuccess));
+
         AddStepCommand.NotifyCanExecuteChanged();
         DeleteStepCommand.NotifyCanExecuteChanged();
+        ValidateStepCommand.NotifyCanExecuteChanged();
     }
 
-    private Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {
-        return ValidateJobStepAsync(arg);
-    }
+    private bool ValidateJobStep(JobStep jobStep) {
+        ValidationLogVisible = true;
+        IsValidationRunning = true;
+        NotifyPropertyChanged(nameof(IsValidationError));
+        NotifyPropertyChanged(nameof(IsValidationSuccess));
 
-    private bool JobItemViewModel_ValidationRequired(JobStep jobStep) {
-        return ValidateJobStep(jobStep);
-    }
+        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
 
-    private ImmutableResultCollection Validate(JobStep jobStep) {
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
@@ -424,12 +425,29 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
 
         ImmutableResultCollection res = jobStep.Validate(tempContainer);
-
         tempContainer.Dispose();
-        return res;
+
+        HandleLogs(res, jobStep);
+
+        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
+
+        IsValidationRunning = false;
+        NotifyPropertyChanged(nameof(IsValidationError));
+        NotifyPropertyChanged(nameof(IsValidationSuccess));
+
+        return res.IsSuccess;
     }
 
-    private async Task<ImmutableResultCollection> ValidateAsync(JobStep jobStep) {
+    private async Task<bool> ValidateJobStepAsync(JobStep jobStep) {
+        Application.Current.Dispatcher.Invoke(() => {
+            ValidationLogVisible = true;
+            IsValidationRunning = true;
+            NotifyPropertyChanged(nameof(IsValidationError));
+            NotifyPropertyChanged(nameof(IsValidationSuccess));
+        });
+
+        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
 
@@ -440,7 +458,26 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         ImmutableResultCollection res = await jobStep.ValidateAsync(tempContainer);
 
         tempContainer.Dispose();
-        return res;
+
+        HandleLogs(res, jobStep);
+
+        CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
+
+        Application.Current.Dispatcher.Invoke(() => {
+            IsValidationRunning = false;
+            NotifyPropertyChanged(nameof(IsValidationError));
+            NotifyPropertyChanged(nameof(IsValidationSuccess));
+        });
+
+        return res.IsSuccess;
+    }
+
+    private bool JobItemViewModel_ValidationRequired(JobStep jobStep) {
+        return ValidateJobStep(jobStep);
+    }
+
+    private Task<bool> JobItemViewModel_AsyncValidationRequired(JobStep arg) {
+        return ValidateJobStepAsync(arg);
     }
 
     private async Task<bool> CheckAllIsValid() {

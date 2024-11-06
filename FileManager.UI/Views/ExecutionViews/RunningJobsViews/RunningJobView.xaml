@@ -218,7 +218,7 @@
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Border Style="{StaticResource RunStateBorderStyle}"
-                            Height="58"
+                            Height="60"
                             MinWidth="100"
                             Padding="5 5 15 5"
                             HorizontalAlignment="Stretch"

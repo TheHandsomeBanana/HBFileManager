@@ -17,40 +17,17 @@
     </UserControl.Resources>
 
     <StackPanel>
+        <StackPanel Margin="0 0 0 5">
 
-        <Grid Margin="0 0 0 10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="25"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <TextBlock Style="{StaticResource NormalTextBlock}"
+                       Text="Name"
+                       Grid.Row="0"
+                       Margin="0 0 0 3" />
 
-            <controls:AnimatedPath Data="M11 15H6L13 1V9H18L11 23V15Z"
-                                   FromFill="#ffac14"
-                                   ToFill="#888484"
-                                   FromShadowEffect="#ffdf14"
-                                   ToShadowEffect="Transparent"
-                                   FromShadowBlurRadius="3"
-                                   ToShadowBlurRadius="0"
-                                   Height="30"
-                                   State="{Binding IsValid}"
-                                   HorizontalAlignment="Left">
-                <controls:AnimatedPath.ShadowEffect>
-                    <DropShadowEffect ShadowDepth="0" Direction="0"/>
-                </controls:AnimatedPath.ShadowEffect>
-            </controls:AnimatedPath>
-            
-            <StackPanel Grid.Column="1">
-
-                <TextBlock Style="{StaticResource NormalTextBlock}"
-                   Text="Name"
-                   Grid.Row="0"
-                   Margin="0 0 0 3" />
-
-                <TextBox Style="{StaticResource PrimaryTextBox}"
-                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
-                 Grid.Row="1"/>
-            </StackPanel>
-        </Grid>
+            <TextBox Style="{StaticResource PrimaryTextBox}"
+                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                     Grid.Row="1" />
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal"
                     Margin="0 0 0 10">
@@ -70,11 +47,12 @@
                        Text="{Binding Metadata.Description}" />
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" Margin="0 0 0 5">
+        <StackPanel Orientation="Horizontal"
+                    Margin="0 0 0 5">
 
-            <TextBlock Text="Execution order:" 
-                   Style="{StaticResource NormalTextBlock}"
-                   Margin="0 0 5 0"/>
+            <TextBlock Text="Execution order:"
+                       Style="{StaticResource NormalTextBlock}"
+                       Margin="0 0 5 0" />
 
             <controls:NumberBox Minimum="0"
                                 Height="20"
@@ -84,7 +62,7 @@
                                 DownArrowColor="{StaticResource ForegroundBrush}"
                                 BorderThickness="0"
                                 HorizontalAlignment="Left"
-                                Value="{Binding ExecutionOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                Value="{Binding ExecutionOrder, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         </StackPanel>
     </StackPanel>
 </UserControl>
