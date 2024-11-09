@@ -160,11 +160,11 @@ public class MainViewModel : AsyncInitializerViewModelBase, IDisposable {
         NavigateToSettingsCommand = new NavigateCommand<SettingsViewModel>(navigationService, () => new SettingsViewModel());
         NavigateToApplicationLogCommand = new NavigateCommand<ApplicationLogViewModel>(navigationService, () => new ApplicationLogViewModel());
         NavigateToAboutCommand = new NavigateCommand<AboutViewModel>(navigationService, () => new AboutViewModel());
-        NavigateToWorkspacesCommand = new RelayCommand(NavigateToWorkspaces, true);
+        NavigateToWorkspacesCommand = new RelayCommand(NavigateToWorkspaces);
 
-        SaveApplicationStateCommand = new RelayCommand(SaveApplicationState, true);
-        OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview, true);
-        OpenNotificationsCommand = new RelayCommand(OpenNotifications, true);
+        SaveApplicationStateCommand = new RelayCommand(SaveApplicationState);
+        OpenAccountOverviewCommand = new RelayCommand<Window>(OpenAccountOverview);
+        OpenNotificationsCommand = new RelayCommand(OpenNotifications);
 
         navigationStore[nameof(MainViewModel)].CurrentViewModelChanged += MainWindowViewModel_CurrentViewModelChanged;
 

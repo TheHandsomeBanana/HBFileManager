@@ -30,6 +30,7 @@ using HBLibrary.IO.Storage.Builder;
 using HBLibrary.Interface.Plugins.Builder;
 using HBLibrary.Plugins;
 using HBLibrary.Core.ChangeTracker;
+using FileManager.UI.Models.SettingsModels;
 
 namespace FileManager.UI;
 public class UnitySetup : IUnitySetup {
@@ -44,13 +45,24 @@ public class UnitySetup : IUnitySetup {
         container.RegisterType<IDialogService, DialogService>();
 
         AddWorkspace(container);
-        container.RegisterType<ISettingsService, SettingsService>();
-
+        
         AddPluginManager(container);
         AddApplicationStorage(container);
+
+        AddSettings(container);
     }
 
-    
+    private static void AddSettings(IUnityContainer container) {
+        container.RegisterType<ISettingsService, SettingsService>();
+
+        ISettingsService settingsService = container.Resolve<ISettingsService>();
+
+        // Ensure default settings are applied on first startup
+        settingsService.SetIfNullOrNotExists(new SettingsEnvironmentModel());
+        settingsService.SetIfNullOrNotExists(new SettingsWinRARModel());
+        settingsService.SetIfNullOrNotExists(new SettingsExecutionModel());
+    }
+
     private static void AddNavigation(IUnityContainer container) {
         INavigationStoreBuilder storeBuilder = NavigationStore.CreateBuilder()
             .AddParentTypename(nameof(MainViewModel))

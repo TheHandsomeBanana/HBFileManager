@@ -82,8 +82,8 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
 
 
         public SettingsWinRARViewModel(SettingsWinRARModel model) : base(model) {
-            DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation, true);
-            BrowseLocationCommand = new RelayCommand(BrowseLocation, true);
+            DetectWinRARCommand = new RelayCommand(DetectWinRARInstallation);
+            BrowseLocationCommand = new RelayCommand(BrowseLocation);
         }
 
         private void DetectWinRARInstallation(object? obj) {

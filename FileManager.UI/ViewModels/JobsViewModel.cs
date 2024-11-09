@@ -22,6 +22,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     private readonly IJobManager jobManager;
     private readonly IDialogService dialogService;
     private readonly ObservableCollection<JobItemViewModel> jobs = [];
+    private readonly CancellationTokenSource initializeCTS = new CancellationTokenSource();
 
     public RelayCommand AddJobCommand { get; set; }
     public RelayCommand<JobItemViewModel> DeleteJobCommand { get; set; }
@@ -58,9 +59,9 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
 
         this.jobManager = workspaceManager.CurrentWorkspace!.JobManager!;
 
-        AddJobCommand = new RelayCommand(AddJob, true);
-        DeleteJobCommand = new RelayCommand<JobItemViewModel>(DeleteJob, true);
-        ValidateJobCommand = new AsyncRelayCommand<JobItemViewModel>(ValidateJob, ValidationCanRun, OnValidationException);
+        AddJobCommand = new RelayCommand(AddJob);
+        DeleteJobCommand = new RelayCommand<JobItemViewModel>(DeleteJob);
+        ValidateJobCommand = new AsyncRelayCommand<JobItemViewModel>(ValidateJobAsync, ValidationCanRun, OnValidationException);
 
         jobsView = CollectionViewSource.GetDefaultView(jobs);
         jobsView.Filter = FilterJobs;
@@ -74,8 +75,8 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
             MessageBoxImage.Error);
     }
 
-    private Task ValidateJob(JobItemViewModel model) {
-        return model.ValidateAllJobStepsAsync(model.Steps);
+    private Task ValidateJobAsync(JobItemViewModel model) {
+        return model.ValidateAllJobStepsAsync(model.Steps, initializeCTS.Token);
     }
 
     private bool ValidationCanRun(JobItemViewModel obj) {
@@ -93,6 +94,7 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
         }
 
         SelectedJob = jobs.FirstOrDefault();
+        ValidateJobCommand.NotifyCanExecuteChanged();
     }
 
     private void JobsView_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
@@ -144,6 +146,13 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
     }
 
     public void Dispose() {
+        // Initialization is running -> Cancel
+        if (IsLoading) {
+            initializeCTS.Cancel();
+        }
+
+        initializeCTS.Dispose();
+
         foreach (JobItemViewModel job in jobs) {
             job.Dispose();
         }

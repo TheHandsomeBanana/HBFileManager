@@ -59,7 +59,7 @@ public class AddJobStepViewModel : ViewModelBase {
 
     public AddJobStepViewModel(IPluginManager pluginManager) {
         AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name) && selectedStepType is not null);
-        CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
+        CancelCommand = new RelayCommand<Window>(CancelAndFinish);
 
 
         AvailableStepTypes =

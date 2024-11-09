@@ -20,7 +20,7 @@ public class AddJobViewModel : ViewModelBase {
 
     public AddJobViewModel() {
         AddJobCommand = new RelayCommand<Window>(AddAndFinish, _ => !string.IsNullOrWhiteSpace(Name));
-        CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
+        CancelCommand = new RelayCommand<Window>(CancelAndFinish);
     }
 
     private void AddAndFinish(Window? obj) {

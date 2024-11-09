@@ -62,8 +62,8 @@ public class ShareWorkspaceAccessViewModel : AsyncInitializerViewModelBase {
 
         container = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
 
-        SaveCommand = new RelayCommand<Window>(Save, true);
-        CancelCommand = new RelayCommand<Window>(Cancel, true);
+        SaveCommand = new RelayCommand<Window>(Save);
+        CancelCommand = new RelayCommand<Window>(Cancel);
         AddAccountToShareCommand = new RelayCommand(AddAccount, CanAddAccounts);
         RemoveAccountFromShareCommand = new RelayCommand(RemoveAccount, CanRemoveAccount);
 

@@ -16,8 +16,8 @@ public partial class JobsView : UserControl {
             this.Dispatcher.InvokeAsync(newJobsViewModel.Initialize);
         }
 
-        if(e.OldValue is IDisposable disposable) {
-            disposable.Dispose();
-        }
+        //if(e.OldValue is IDisposable disposable) {
+        //    disposable.Dispose();
+        //}
     }
 }

@@ -87,8 +87,8 @@ public class SettingsPluginsViewModel : ViewModelBase {
         assemblyView = CollectionViewSource.GetDefaultView(assemblies);
         assemblyView.Filter = FilterPlugins;
 
-        AddAssemblyCommand = new RelayCommand(AddAssembly, true);
-        DeleteAssemblyCommand = new RelayCommand<AssemblyName>(DeleteAssembly, true);
+        AddAssemblyCommand = new RelayCommand(AddAssembly);
+        DeleteAssemblyCommand = new RelayCommand<AssemblyName>(DeleteAssembly);
 
         SelectedAssembly = assemblies.FirstOrDefault();
     }

@@ -49,8 +49,8 @@ public class AddWorkspaceViewModel : ViewModelBase {
 
     public AddWorkspaceViewModel() {
         AddWorkspaceCommand = new RelayCommand<Window>(AddAndFinish, _ => CanAddWorkspace());
-        CancelCommand = new RelayCommand<Window>(CancelAndFinish, true);
-        BrowseDirectoryCommand = new RelayCommand(BrowseDirectory, true);
+        CancelCommand = new RelayCommand<Window>(CancelAndFinish);
+        BrowseDirectoryCommand = new RelayCommand(BrowseDirectory);
     }
 
     private void BrowseDirectory(object? obj) {

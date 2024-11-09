@@ -152,13 +152,13 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
 
         BrowseSourceCommand = new RelayCommand(BrowseSource, _ => SourceType is not null);
         BrowseDestinationCommand = new RelayCommand(BrowseDestination, _ => DestinationType is not null);
-        ToggleInfoPopupCommand = new RelayCommand(ToggleInfoPopup, true);
+        ToggleInfoPopupCommand = new RelayCommand(ToggleInfoPopup);
 
         AddSourceCommand = new RelayCommand(AddSource, _ => SourceType is not null && Source is not null);
         AddDestinationCommand = new RelayCommand(AddDestination, _ => DestinationType is not null && Destination is not null);
 
-        DeleteSourceCommand = new RelayCommand<Entry>(DeleteSource, true);
-        DeleteDestinationCommand = new RelayCommand<Entry>(DeleteDestination, true);
+        DeleteSourceCommand = new RelayCommand<Entry>(DeleteSource);
+        DeleteDestinationCommand = new RelayCommand<Entry>(DeleteDestination);
 
         TimeDifference = model.TimeDifference;
         TimeDifferenceUnit = model.TimeDifferenceUnit;
