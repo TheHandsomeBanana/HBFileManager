@@ -3,7 +3,6 @@ using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using FileManager.UI.Views.JobViews.JobStepViews;
 using HBLibrary.Common;
 using HBLibrary.Common.Plugins;
-using HBLibrary.Wpf;
 using HBLibrary.Wpf.Behaviors;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Services;
@@ -34,6 +33,7 @@ using FileManager.Domain;
 using FileManager.Domain.JobSteps;
 using FileManager.Core.Jobs;
 using System.Windows.Controls;
+using HBLibrary.Wpf.Logging;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {
