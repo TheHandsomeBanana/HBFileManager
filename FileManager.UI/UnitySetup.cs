@@ -58,9 +58,9 @@ public class UnitySetup : IUnitySetup {
         ISettingsService settingsService = container.Resolve<ISettingsService>();
 
         // Ensure default settings are applied on first startup
-        settingsService.SetIfNullOrNotExists(new SettingsEnvironmentModel());
-        settingsService.SetIfNullOrNotExists(new SettingsWinRARModel());
-        settingsService.SetIfNullOrNotExists(new SettingsExecutionModel());
+        settingsService.SetIfNotExists(new SettingsEnvironmentModel());
+        settingsService.SetIfNotExists(new SettingsWinRARModel());
+        settingsService.SetIfNotExists(new SettingsExecutionModel());
     }
 
     private static void AddNavigation(IUnityContainer container) {

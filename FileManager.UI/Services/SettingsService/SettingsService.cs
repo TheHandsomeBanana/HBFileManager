@@ -49,16 +49,10 @@ public class SettingsService : ISettingsService {
         container.AddOrUpdate(type.GuidString(), setting, StorageEntryContentType.Json);
     }
 
-    public void SetIfNullOrNotExists<TSetting>(TSetting setting) where TSetting : class, ITrackable {
-        if (container.TryGet(typeof(TSetting).GuidString(), out IStorageEntry? entry)) {
-            TSetting? foundSetting = entry!.Get(typeof(TSetting)) as TSetting;
-
-            if (foundSetting is null) {
-                SetSetting(setting);
-                return;
-            }
+    public void SetIfNotExists<TSetting>(TSetting setting) where TSetting : class, ITrackable {
+        if (!container.Contains(typeof(TSetting).GuidString())) {
+            SetSetting(setting);
         }
 
-        SetSetting(setting);
     }
 }

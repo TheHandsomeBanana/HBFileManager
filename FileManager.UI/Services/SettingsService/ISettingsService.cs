@@ -5,5 +5,5 @@ public interface ISettingsService {
     public TSetting? GetSetting<TSetting>() where TSetting : class, ITrackable;
     public void SetSetting<TSetting>(TSetting setting) where TSetting : class, ITrackable;
     public TSetting GetOrSetNew<TSetting>(Func<TSetting> createSettingFunc) where TSetting : class, ITrackable;
-    public void SetIfNullOrNotExists<TSetting>(TSetting setting) where TSetting : class, ITrackable;
+    public void SetIfNotExists<TSetting>(TSetting setting) where TSetting : class, ITrackable;
 }
