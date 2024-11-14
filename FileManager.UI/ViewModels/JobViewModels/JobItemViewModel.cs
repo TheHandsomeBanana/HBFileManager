@@ -34,6 +34,7 @@ using FileManager.Domain.JobSteps;
 using FileManager.Core.Jobs;
 using System.Windows.Controls;
 using HBLibrary.Wpf.Logging;
+using HBLibrary.Interface.Logging.Statements;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {
@@ -46,7 +47,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     public RelayCommand AddStepCommand { get; set; }
     public RelayCommand<JobStepWrapperViewModel> DeleteStepCommand { get; set; }
     public AsyncRelayCommand<JobStepWrapperViewModel> ValidateStepCommand { get; set; }
-    public RelayCommand ClearValidationLogCommand { get; set; }
 
     public string Name {
         get => Model.Name;
@@ -120,9 +120,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
-
-    public LogFlowDocument ValidationLog { get; } = new LogFlowDocument();
-
+    public ListBoxLogTarget LogTarget { get; } = new ListBoxLogTarget();
 
     private bool validationLogVisible;
     public bool ValidationLogVisible {
@@ -166,7 +164,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         AddStepCommand = new RelayCommand(AddStep, CanEditStepsList);
         DeleteStepCommand = new RelayCommand<JobStepWrapperViewModel>(DeleteStep, CanEditStepsList);
         ValidateStepCommand = new AsyncRelayCommand<JobStepWrapperViewModel>(ValidateStep, CanExecuteValidation, OnValidationException);
-        ClearValidationLogCommand = new RelayCommand(ClearValidationLog);
 
         stepsView = CollectionViewSource.GetDefaultView(Steps);
         stepsView.Filter = FilterJobSteps;
@@ -319,10 +316,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     
 
     #region Validation Logic
-    private void ClearValidationLog(object? obj) {
-        ValidationLog.Clear();
-    }
-
     private void JobItemViewModel_ValidationFinished() {
         Application.Current.Dispatcher.Invoke(() => {
             NotifyPropertyChanged(nameof(IsValidationRunning));
@@ -383,7 +376,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     private bool ValidateJobStep(JobStep jobStep) {
         ValidationLogVisible = true;
 
-        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+        LogTarget.WriteLog(LogStatement.CreateInfo($"Validating {jobStep.Name}"));
 
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
@@ -408,7 +401,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             ValidationLogVisible = true;
         });
 
-        ValidationLog.AddInfoParagraph($"Validating {jobStep.Name}");
+        LogTarget.WriteLog(LogStatement.CreateInfo($"Validating {jobStep.Name}"));
 
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
@@ -453,20 +446,18 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
 
     private void HandleLogs(ImmutableResultCollection res, JobStep arg) {
         if (res.IsSuccess) {
-            ValidationLog.AddSuccessParagraph($"{arg.Name} validated successfully");
+            LogTarget.WriteSuccessLog(LogStatement.CreateInfo($"{arg.Name} validated successfully"));
         }
         else {
-            ValidationLog.AddErrorParagraph($"{arg.Name} validation error:");
+            string errorLog = $"{arg.Name} validation error:";
 
             foreach (Result result in res) {
                 result.TapError(e => {
-                    ValidationLog.AddParagraph(new Paragraph(new Run("- " + e.Message)) {
-                        TextIndent = 10,
-                        Margin = ValidationLog.ParagraphMargin,
-                        Foreground = ValidationLog.ErrorBrush
-                    });
+                    errorLog += $"\n\t- {e.Message}";
                 });
             }
+
+            LogTarget.WriteLog(LogStatement.CreateError(errorLog));
         }
     }
     #endregion
@@ -518,6 +509,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
     private void Clear() {
         this.Steps.Clear();
-        ValidationLog.Clear();
+        LogTarget.Logs.Clear();
     }
 }

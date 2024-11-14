@@ -12,7 +12,7 @@
              xmlns:behaviors="clr-namespace:HBLibrary.Wpf.Behaviors;assembly=HBLibrary.Wpf"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DesignHeight="500"
+             d:DesignHeight="700"
              d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -25,8 +25,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
-                  attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True">
+    <ScrollViewer Style="{StaticResource PrimaryScrollViewer}">
 
         <Grid Margin="10 10 10 0">
 
@@ -35,7 +34,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Vertical"
+            <StackPanel x:Name="PropertiesStackPanel"
+                Orientation="Vertical"
                         Grid.Row="0"
                         IsEnabled="{Binding IsInitialized, FallbackValue=False}">
 
@@ -91,7 +91,8 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Border Style="{StaticResource ControlBorder}"
+                <Border x:Name="PropertiesBorder"
+                    Style="{StaticResource ControlBorder}"
                         Grid.Column="0"
                         Grid.Row="0"
                         
@@ -273,7 +274,8 @@
                 </Border>
 
 
-                <ScrollViewer Style="{StaticResource PrimaryScrollViewer}"
+                <ScrollViewer x:Name="ContentScrollViewer"
+                    Style="{StaticResource PrimaryScrollViewer}"
                               IsEnabled="{Binding IsInitialized, FallbackValue=False}"
                               attachedProperties:ScrollViewerAttachedProperties.HorizontalScrollBarMargin="0 10 0 0"
                               attachedProperties:ScrollViewerAttachedProperties.ScrollOnMouseOver="True"
@@ -304,37 +306,14 @@
                                    Text="Validation Log" />
                     </Expander.Header>
 
-                    <Grid>
+                    <controls:LogListBox Style="{StaticResource LogListBox}"
+                                         ItemsSource="{Binding LogTarget.Logs}"
+                                         CanClearLogs="True"
+                                         VerticalAlignment="Top"
+                                         Height="500"
+                                         attachedProperties:LogListBoxAttachedProperties.EnableAutoScroll="True">
 
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0"
-                                    Visibility="{Binding IsExpanded, ElementName=ExpanderValidationLog, Converter={StaticResource b2v}}">
-                            <controls:IconButton IconData="M5,13H19V11H5M3,17H17V15H3M7,7V9H21V7"
-                                                 IconFill="{StaticResource VSRedBrush}"
-                                                 BorderThickness="1"
-                                                 Width="25"
-                                                 Height="25"
-                                                 ToolTip="Clear log"
-                                                 IconWidth="20"
-                                                 IconStretch="Uniform"
-                                                 HorizontalAlignment="Left"
-                                                 Command="{Binding ClearValidationLogCommand}">
-
-                            </controls:IconButton>
-                        </StackPanel>
-
-                        <RichTextBox Style="{StaticResource PrimaryRichTextBox}"
-                                     Grid.Column="1"
-                                     IsReadOnly="True"
-                                     IsReadOnlyCaretVisible="True"
-                                     FlowDirection="LeftToRight"
-                                     attachedProperties:RichTextBoxAttachedProperties.BindableDocument="{Binding ValidationLog.Document}">
-                        </RichTextBox>
-                    </Grid>
+                    </controls:LogListBox>
                 </Expander>
             </Grid>
         </Grid>

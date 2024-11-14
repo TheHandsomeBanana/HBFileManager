@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.ExecutionViews.RunningJobsViews"
              xmlns:attachedProperties="clr-namespace:HBLibrary.Wpf.AttachedProperties;assembly=HBLibrary.Wpf"
+             xmlns:controls="clr-namespace:HBLibrary.Wpf.Controls;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
@@ -28,12 +29,13 @@
                        Text="{Binding StepType}" />
         </StackPanel>
 
-        <RichTextBox Style="{StaticResource PrimaryRichTextBox}"
-                     Grid.Row="1"
-                     IsReadOnly="True"
-                     IsReadOnlyCaretVisible="True"
-                     FlowDirection="LeftToRight"
-                     attachedProperties:RichTextBoxAttachedProperties.BindableDocument="{Binding DocumentTarget.Document}">
-        </RichTextBox>
+        <controls:LogListBox Style="{StaticResource LogListBox}"
+                             CanClearLogs="False"
+                             VerticalAlignment="Stretch"
+                             ItemsSource="{Binding LogsTarget.Logs}"
+                             d:ItemsSource="{d:SampleData ItemCount=5}"
+                             Grid.Row="1">
+            
+        </controls:LogListBox>
     </Grid>
 </UserControl>

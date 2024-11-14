@@ -2,6 +2,7 @@
 using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.Logging.Statements;
 using HBLibrary.Logging.FlowDocumentTarget;
+using HBLibrary.Wpf.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,7 +23,7 @@ public class StepRun {
     public string StepType { get; set; }
     public bool IsAsync { get; set; }
     public string Name { get; set; }
-    public FlowDocumentTarget Logs { get; set; } = new FlowDocumentTarget();
+    public ListBoxLogTarget Logs { get; set; } = new ListBoxLogTarget();
 
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();

@@ -2,6 +2,7 @@
 using FileManager.Domain.JobSteps;
 using HBLibrary.Logging.FlowDocumentTarget;
 using HBLibrary.Wpf.Extensions;
+using HBLibrary.Wpf.Logging;
 using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
 
     private readonly DispatcherTimer dispatcherTimer;
 
-    public FlowDocumentTarget DocumentTarget => Model.Logs;
+    public ListBoxLogTarget LogsTarget => Model.Logs;
     public TimeSpan Elapsed => Model.Stopwatch.Elapsed;
     public string Name => Model.Name;
     public string StepType => Model.StepType;
