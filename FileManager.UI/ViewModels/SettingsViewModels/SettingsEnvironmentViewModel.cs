@@ -84,6 +84,14 @@ namespace FileManager.UI.ViewModels.SettingsViewModels {
             }
         }
 
+        public bool ShowJobProgressLog {
+            get { return Model.ShowJobProgressLog; }
+            set {
+                Model.ShowJobProgressLog = value;
+                NotifyPropertyChanged();
+            }
+        }
+
 
         public SettingsEnvironmentViewModel() : base(new SettingsEnvironmentModel()) {
         }

@@ -97,5 +97,13 @@ public class SettingsEnvironmentModel : TrackableModel {
         }
     }
 
+    private bool showJobProgressLog;
+    public bool ShowJobProgressLog {
+        get { return showJobProgressLog; }
+        set {
+            showJobProgressLog = value;
+            NotifyTrackableChanged(value);
+        }
+    }
 
 }
