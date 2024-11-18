@@ -43,7 +43,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
 
     protected override void InitializeViewModel() {
         foreach (JobRun jobRun in jobRunner.GetRunningJobs()) {
-            RunningJobs.Add(new RunningJobViewModel(jobRun));
+            RunningJobs.Insert(0, new RunningJobViewModel(jobRun));
         }
 
         jobRunner.OnJobStarting += JobRunner_OnJobStarting;
@@ -55,7 +55,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
         Application.Current.Dispatcher.Invoke(() => {
             RunningJobViewModel runningJobVM = new RunningJobViewModel(obj);
             SelectedJobRun = runningJobVM;
-            RunningJobs.Add(runningJobVM);
+            RunningJobs.Insert(0, runningJobVM);
         });
 
         NotifyPropertyChanged(nameof(AnyJobsRunning));

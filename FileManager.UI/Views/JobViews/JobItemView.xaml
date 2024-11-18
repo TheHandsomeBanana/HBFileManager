@@ -308,6 +308,9 @@
 
                     <controls:LogListBox Style="{StaticResource LogListBox}"
                                          ItemsSource="{Binding LogTarget.Logs}"
+                                         ShowExplicitLevel="{Binding LogTargetShowLevel}"
+                                         ShowTimestamp="{Binding LogTargetShowTimestamp}"
+                                         ShowCategory="{Binding LogTargetShowCategory}"
                                          CanClearLogs="True"
                                          VerticalAlignment="Top"
                                          Height="500"

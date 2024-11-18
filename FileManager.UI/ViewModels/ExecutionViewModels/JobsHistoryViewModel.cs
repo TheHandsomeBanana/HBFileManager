@@ -43,8 +43,10 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
     protected override async Task InitializeViewModelAsync() {
         JobRun[] jobRuns = await jobExecutionManager.GetCompletedJobsAsync();
         foreach (JobRun run in jobRuns) {
-            CompletedJobs.Add(new JobHistoryViewModel(run));
+            CompletedJobs.Insert(0, new JobHistoryViewModel(run));
         }
+
+        SelectedJobRun = CompletedJobs.FirstOrDefault();
 
         currentRunningJobs = jobExecutionManager.GetRunningJobs();
 
@@ -56,7 +58,7 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
 
     private void ActiveRun_OnJobFinished(JobRun jobRun) {
         Application.Current.Dispatcher.Invoke(() => {
-            CompletedJobs.Add(new JobHistoryViewModel(jobRun));
+            CompletedJobs.Insert(0, new JobHistoryViewModel(jobRun));
         });
     }
 

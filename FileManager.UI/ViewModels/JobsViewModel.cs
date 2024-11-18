@@ -128,6 +128,9 @@ public sealed class JobsViewModel : InitializerViewModelBase, IDisposable, IDrag
             jobs.Add(jobItemViewModel);
             jobManager.AddOrUpdate(newJob);
 
+            // I have no idea why but the UI still holds onto the first other job when this job item is created
+            // Forced reload of DataContext is required.. 
+            SelectedJob = null;
             SelectedJob = jobItemViewModel;
         }
     }

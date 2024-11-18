@@ -68,7 +68,7 @@ public class JobExecutionManager : IJobExecutionManager {
         runningJobs.Remove(jobRun);
 
         container.AddOrUpdate(jobRun.Id.ToString(), jobRun, StorageEntryContentType.Json);
-
+        await container.SaveAsync();
 
         foreach (IUnityContainer container in asyncJobsContainers) {
             container.Dispose();
@@ -89,7 +89,6 @@ public class JobExecutionManager : IJobExecutionManager {
                     stepRun.EndSuccess();
                     break;
             }
-
         }
         catch (Exception ex) {
             stepRun.EndFailed(ex);
@@ -138,9 +137,11 @@ public class JobExecutionManager : IJobExecutionManager {
         throw new NotImplementedException();
     }
 
-    public async Task Schedule(Job job) {
+    public Task Schedule(Job job) {
         ScheduledJob scheduledJob = new ScheduledJob();
         OnJobScheduling?.Invoke(scheduledJob);
+
+        throw new NotImplementedException();
     }
 
     public Task Shelve(ScheduledJob job) {

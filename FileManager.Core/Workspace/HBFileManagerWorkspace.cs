@@ -102,9 +102,6 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
         jobRunnerContainerBuilder.SetContainerPath("jobruns")
             .ConfigureFileServices(fs => fs.UseJsonFileService(jfs => {
                 jfs.SetGlobalOptions(new JsonSerializerOptions {
-                    Converters = {
-                        new FlowDocumentJsonConverter()
-                    },
                     WriteIndented = true
                 });
             }));

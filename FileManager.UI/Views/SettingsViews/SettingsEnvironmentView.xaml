@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:FileManager.UI.Views.SettingsViews"
-             xmlns:baseModels="clr-namespace:FileManager.UI.Models"
              xmlns:converters="clr-namespace:HBLibrary.Wpf.Converters;assembly=HBLibrary.Wpf"
              mc:Ignorable="d"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
@@ -13,7 +12,7 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-         
+
             <converters:EnumToStringConverter x:Key="e2s" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -22,7 +21,8 @@
     <StackPanel Orientation="Vertical"
                 Margin="0 10 0 0">
 
-        <GroupBox Style="{StaticResource PrimaryGroupBox}" Padding="10 20 10 20">
+        <GroupBox Style="{StaticResource PrimaryGroupBox}"
+                  Padding="10 20 10 20">
             <GroupBox.Header>
                 <TextBlock Style="{StaticResource NormalTextBlock}"
                            Background="{StaticResource BackgroundBrush}"
@@ -32,11 +32,75 @@
                            Margin="0 0 0 3" />
             </GroupBox.Header>
 
-            <CheckBox Style="{StaticResource PrimaryCheckBox}"
-                      Content="Validate on Navigation"
-                      IsChecked="{Binding ValidateOnNavigation}">
+            <StackPanel Orientation="Vertical">
 
-            </CheckBox>
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Validate on Navigation"
+                          IsChecked="{Binding ValidateOnNavigation}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show timestamp in validation logs"
+                          IsChecked="{Binding ShowTimestampInValidationLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show timestamp in run logs"
+                          IsChecked="{Binding ShowTimestampInRunLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show timestamp in history logs"
+                          IsChecked="{Binding ShowTimestampInHistoryLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show category in validation logs"
+                          IsChecked="{Binding ShowCategoryInValidationLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show category in run logs"
+                          IsChecked="{Binding ShowCategoryInRunLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show category in history logs"
+                          IsChecked="{Binding ShowCategoryInHistoryLogs}"
+                          Margin="0 0 0 10">
+
+                </CheckBox>
+
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show log level in validation logs"
+                          IsChecked="{Binding ShowLogLevelInValidationLogs}"
+                          Margin="0 0 0 10">
+                </CheckBox>
+
+
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show log level in run logs"
+                          IsChecked="{Binding ShowLogLevelInRunLogs}"
+                          Margin="0 0 0 10">
+                </CheckBox>
+                
+                <CheckBox Style="{StaticResource PrimaryCheckBox}"
+                          Content="Show log level in history logs"
+                          IsChecked="{Binding ShowLogLevelInHistoryLogs}">
+                </CheckBox>
+            </StackPanel>
         </GroupBox>
     </StackPanel>
 </UserControl>

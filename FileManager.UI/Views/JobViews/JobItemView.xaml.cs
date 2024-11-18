@@ -13,9 +13,9 @@ public partial class JobItemView : UserControl {
         InitializeComponent();
     }
 
-    private void JobItemView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e) {
+    private async void JobItemView_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e) {
         if (e.NewValue is JobItemViewModel jobItemViewModel && !jobItemViewModel.IsInitialized) {
-            this.Dispatcher.Invoke(jobItemViewModel.InitializeAsync);
+            await this.Dispatcher.Invoke(jobItemViewModel.InitializeAsync);
         };
 
         if(e.OldValue is JobItemViewModel oldJobItemViewModel) {

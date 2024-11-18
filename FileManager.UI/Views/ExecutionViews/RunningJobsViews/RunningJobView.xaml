@@ -22,254 +22,281 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-        <ListBox Style="{StaticResource PrimaryListBox}"
-                 Grid.Column="0"
-                 d:ItemsSource="{d:SampleData ItemCount=5}"
-                 ItemsSource="{Binding RunningSteps}"
-                 SelectedItem="{Binding SelectedStepRun}"
-                 VerticalContentAlignment="Center"
-                 HorizontalContentAlignment="Stretch"
-                 BorderThickness="0 0 2 0"
-                 MinWidth="150"
-                 MaxWidth="350"
-                 Padding="0 10 0 0">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListBoxItem">
-                                <Border Background="{TemplateBinding Background}"
-                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                        BorderThickness="{TemplateBinding BorderThickness}">
-                                    <ContentPresenter HorizontalAlignment="Stretch"
-                                                      VerticalAlignment="Center"
-                                                      Margin="0">
-                                    </ContentPresenter>
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.Resources>
-               
+        <StackPanel Grid.Row="0"
+                    Margin="20 10 10 10"
+                    Orientation="Vertical"
+                    VerticalAlignment="Center">
 
-                <Style x:Key="RunStateTextStyle"
-                       TargetType="TextBlock">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.Pending}">
-                            <Setter Property="Foreground"
-                                    Value="{StaticResource ForegroundBrush}" />
-                        </DataTrigger>
+            <TextBlock Text="{Binding Name}"
+                       Foreground="{StaticResource VSAccentVioletBrush}"
+                       FontFamily="Consolas"
+                       FontSize="28"
+                       FontWeight="DemiBold"
+                       VerticalAlignment="Center">
+            </TextBlock>
 
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.Running}">
-                            <Setter Property="Foreground"
-                                    Value="{StaticResource VSBlueBrush}" />
-                        </DataTrigger>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="1">
+                <TextBlock Style="{StaticResource BigTextBlock}"
+                           FontSize="16"
+                           Text="Started at: " />
 
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}">
-                            <Setter Property="Foreground"
-                                    Value="{StaticResource VSYellowBrush}" />
-                        </DataTrigger>
+                <TextBlock Style="{StaticResource BigTextBlock}"
+                           FontSize="16"
+                           Foreground="{StaticResource ForegroundBrush}"
+                           Text="{Binding StartedAt}" />
+            </StackPanel>
+        </StackPanel>
 
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.Faulted}">
-                            <Setter Property="Foreground"
-                                    Value="{StaticResource VSRedBrush}" />
-                        </DataTrigger>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.Success}">
-                            <Setter Property="Foreground"
-                                    Value="{StaticResource VSGreenBrush}" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-
-                <Style x:Key="RunStateBorderStyle"
-                       TargetType="Border">
-                    <Style.Triggers>
-                        <!-- Trigger for Pending state - applies to all items regardless of selection -->
-                        <DataTrigger Binding="{Binding State}"
-                                     Value="{x:Static jobStepsDomain:RunState.Pending}">
-                            <Setter Property="BorderThickness"
-                                    Value="0" />
-                            <Setter Property="Background"
-                                    Value="Transparent" />
-                        </DataTrigger>
-
-                        <!-- MultiDataTriggers for Selected and RunState-based Backgrounds -->
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Running}" />
-                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background"
-                                    Value="#39454f" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
-                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background"
-                                    Value="#766a47" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Faulted}" />
-                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background"
-                                    Value="#563d3e" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Success}" />
-                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Background"
-                                    Value="#364336" />
-                        </MultiDataTrigger>
-
-                        <!-- MultiDataTriggers for MouseOver with specific RunState -->
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Running}" />
-                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush"
-                                    Value="#4da5e9" />
-                            <Setter Property="BorderThickness"
-                                    Value="1" />
-                            <Setter Property="Background"
-                                    Value="#39454f" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
-                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush"
-                                    Value="#f1c23c" />
-                            <Setter Property="BorderThickness"
-                                    Value="1" />
-                            <Setter Property="Background"
-                                    Value="#766a47" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Faulted}" />
-                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush"
-                                    Value="#e25964" />
-                            <Setter Property="BorderThickness"
-                                    Value="1" />
-                            <Setter Property="Background"
-                                    Value="#563d3e" />
-                        </MultiDataTrigger>
-
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding State}"
-                                           Value="{x:Static jobStepsDomain:RunState.Success}" />
-                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
-                                           Value="True" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="BorderBrush"
-                                    Value="#8ae28a" />
-                            <Setter Property="BorderThickness"
-                                    Value="1" />
-                            <Setter Property="Background"
-                                    Value="#364336" />
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.Resources>
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Border Style="{StaticResource RunStateBorderStyle}"
-                            Height="60"
-                            MinWidth="100"
-                            Padding="5 5 15 5"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch">
-
-                        <Grid HorizontalAlignment="Stretch"
-                              VerticalAlignment="Center">
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <controls:LoadingSpinner Grid.Column="0"
-                                                     Grid.RowSpan="2"
-                                                     Thickness="2"
-                                                     Diameter="18"
-                                                     Color="{StaticResource VSBlueBrush}"
-                                                     IsLoading="{Binding IsRunning}"
-                                                     Margin="0 0 10 0">
-
-                            </controls:LoadingSpinner>
+            <ListBox Style="{StaticResource PrimaryListBox}"
+                     Grid.Column="0"
+                     d:ItemsSource="{d:SampleData ItemCount=5}"
+                     ItemsSource="{Binding RunningSteps}"
+                     SelectedItem="{Binding SelectedStepRun}"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Stretch"
+                     BorderThickness="0 0 2 0"
+                     MinWidth="150"
+                     MaxWidth="350">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="BorderThickness"
+                                Value="1" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ContentPresenter HorizontalAlignment="Stretch"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0">
+                                        </ContentPresenter>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.Resources>
 
 
-                            <TextBlock Style="{StaticResource RunStateTextStyle}"
-                                       FontSize="14"
-                                       Text="{Binding Name}"
-                                       Grid.Row="0"
-                                       Grid.Column="1">
-                            </TextBlock>
+                    <Style x:Key="RunStateTextStyle"
+                           TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Pending}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource ForegroundBrush}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Running}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSBlueBrush}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSYellowBrush}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Faulted}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSRedBrush}" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Success}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSGreenBrush}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+
+                    <Style x:Key="RunStateBorderStyle"
+                           TargetType="Border">
+                        <Style.Triggers>
+                            <!-- Trigger for Pending state - applies to all items regardless of selection -->
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Pending}">
+                                <Setter Property="BorderBrush"
+                                        Value="Transparent" />
+                                <Setter Property="Background"
+                                        Value="Transparent" />
+                            </DataTrigger>
+
+                            <!-- MultiDataTriggers for Selected and RunState-based Backgrounds -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Running}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#39454f" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#766a47" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Faulted}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#563d3e" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Success}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#364336" />
+                            </MultiDataTrigger>
+
+                            <!-- MultiDataTriggers for MouseOver with specific RunState -->
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Running}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#4da5e9" />
+                                <Setter Property="Background"
+                                        Value="#39454f" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#f1c23c" />
+                                <Setter Property="Background"
+                                        Value="#766a47" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Faulted}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#e25964" />
+                                <Setter Property="Background"
+                                        Value="#563d3e" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Success}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#8ae28a" />
+                                <Setter Property="Background"
+                                        Value="#364336" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Resources>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource RunStateBorderStyle}"
+                                BorderThickness="1"
+                                Height="60"
+                                MinWidth="100"
+                                Padding="5 5 15 5"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+
+                            <Grid HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <controls:LoadingSpinner Grid.Column="0"
+                                                         Grid.RowSpan="2"
+                                                         Thickness="2"
+                                                         Diameter="18"
+                                                         Color="{StaticResource VSBlueBrush}"
+                                                         IsLoading="{Binding IsRunning}"
+                                                         Margin="0 0 10 0">
+
+                                </controls:LoadingSpinner>
+
+
+                                <TextBlock Style="{StaticResource RunStateTextStyle}"
+                                           FontSize="14"
+                                           Text="{Binding Name}"
+                                           Grid.Row="0"
+                                           Grid.Column="1">
+                                </TextBlock>
 
 
 
-                            <TextBlock Style="{StaticResource NormalTextBlock}"
-                                       Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}"
-                                       Grid.Row="1"
-                                       Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+                                <TextBlock Style="{StaticResource NormalTextBlock}"
+                                           Text="{Binding Elapsed, StringFormat={}{0:hh\\:mm\\:ss}}"
+                                           Grid.Row="1"
+                                           Grid.Column="1">
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
-        <runningStepView:RunningStepView DataContext="{Binding SelectedStepRun}"
-                                         Grid.Column="1"
-                                         Visibility="{Binding DataContext.SelectedStepRun, Converter={StaticResource n2v}, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            <runningStepView:RunningStepView DataContext="{Binding SelectedStepRun}"
+                                             Grid.Column="1"
+                                             Visibility="{Binding DataContext.SelectedStepRun, Converter={StaticResource n2v}, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        </Grid>
     </Grid>
 </UserControl>

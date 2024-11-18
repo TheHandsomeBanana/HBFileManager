@@ -29,7 +29,6 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
     private readonly DispatcherTimer dispatcherTimer;
 
     public TimeSpan Elapsed => Model.Stopwatch.Elapsed;
-
     public string Name => Model.Name;
 
     public ObservableCollection<RunningStepViewModel> RunningSteps { get; set; } = [];
@@ -51,14 +50,27 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         }
     }
 
+    public DateTime? StartedAt { 
+        get => Model.StartedAt;
+        set {
+            Model.StartedAt = value;
+            NotifyPropertyChanged();
+        }
+    }
+
     public RunningJobViewModel(JobRun model) : base(model) {
         dispatcherTimer = new DispatcherTimer {
             Interval = TimeSpan.FromMilliseconds(100)
         };
 
         dispatcherTimer.Tick += DispatcherTimer_Tick;
+        model.OnJobStarting += Model_OnJobStarting;
         model.OnJobFinished += JobRun_OnJobFinished;
         dispatcherTimer.Start();
+    }
+
+    private void Model_OnJobStarting() {
+        NotifyPropertyChanged(nameof(StartedAt));
     }
 
     protected override void InitializeViewModel() {

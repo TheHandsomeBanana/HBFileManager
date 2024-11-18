@@ -69,12 +69,12 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             }
             else {
                 CheckAllIsValid()
-                    .ContinueWith(e => { 
+                    .ContinueWith(e => {
                         CanRun = e.Result && IsEnabled;
                         NotifyPropertyChanged(nameof(IsValidationError));
                         NotifyPropertyChanged(nameof(IsValidationSuccess));
 
-                    }, 
+                    },
                     TaskContinuationOptions.OnlyOnRanToCompletion).FireAndForget(OnInitializeException);
             }
         }
@@ -121,6 +121,11 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     }
 
     public ListBoxLogTarget LogTarget { get; } = new ListBoxLogTarget();
+    public bool LogTargetShowLevel { get; }
+    public bool LogTargetShowTimestamp { get; }
+    public bool LogTargetShowCategory { get; }
+
+
 
     private bool validationLogVisible;
     public bool ValidationLogVisible {
@@ -168,6 +173,13 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         stepsView = CollectionViewSource.GetDefaultView(Steps);
         stepsView.Filter = FilterJobSteps;
         stepsView.CollectionChanged += StepsView_CollectionChanged;
+
+        ISettingsService settingsService = container.Resolve<ISettingsService>();
+        SettingsEnvironmentModel environmentSettings = settingsService.GetSetting<SettingsEnvironmentModel>()!;
+
+        LogTargetShowLevel = environmentSettings.ShowLogLevelInValidationLogs;
+        LogTargetShowTimestamp = environmentSettings.ShowTimestampInValidationLogs;
+        LogTargetShowCategory = environmentSettings.ShowCategoryInValidationLogs;
     }
 
     protected override async Task InitializeViewModelAsync() {
@@ -313,7 +325,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
     }
 
-    
+
 
     #region Validation Logic
     private void JobItemViewModel_ValidationFinished() {
@@ -366,7 +378,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         }
 
         // Quit Validation
-        if(token.IsCancellationRequested) {
+        if (token.IsCancellationRequested) {
             return;
         }
 
@@ -463,7 +475,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     #endregion
 
     public void Reset() {
-        if(isDisposed) {
+        if (isDisposed) {
             return;
         }
 
