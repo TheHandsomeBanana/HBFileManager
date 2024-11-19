@@ -35,6 +35,8 @@ using FileManager.Core.Jobs;
 using System.Windows.Controls;
 using HBLibrary.Wpf.Logging;
 using HBLibrary.Interface.Logging.Statements;
+using HBLibrary.Logging.Statements;
+using HBLibrary.Wpf.Logging.Statements;
 
 namespace FileManager.UI.ViewModels.JobViewModels;
 public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDragDropTarget, IResetable, IDisposable {
@@ -388,6 +390,8 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
     private bool ValidateJobStep(JobStep jobStep) {
         ValidationLogVisible = true;
 
+        LogTarget.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
+
         LogTarget.WriteLog(LogStatement.CreateInfo($"Validating {jobStep.Name}"));
 
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();
@@ -401,6 +405,8 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         tempContainer.Dispose();
 
         HandleLogs(res, jobStep);
+        LogTarget.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
+        LogTarget.WriteLogBlock(LogBlockStatement.CreateEmptyBlock());
 
         CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
 
@@ -413,6 +419,7 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
             ValidationLogVisible = true;
         });
 
+        LogTarget.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
         LogTarget.WriteLog(LogStatement.CreateInfo($"Validating {jobStep.Name}"));
 
         ILoggerFactory loggerFactory = container.Resolve<ILoggerFactory>();

@@ -2,7 +2,9 @@
 using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.Logging.Statements;
 using HBLibrary.Logging.FlowDocumentTarget;
+using HBLibrary.Logging.Statements;
 using HBLibrary.Wpf.Logging;
+using HBLibrary.Wpf.Logging.Statements;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -55,6 +57,7 @@ public class StepRun {
         State = RunState.Running;
         OnStepStarting?.Invoke();
 
+        Logs.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
         Logs.WriteLog(new LogStatement($"{Name} started", Name, LogLevel.Info, DateTime.UtcNow));
         step.Execute(container);
     }
@@ -63,6 +66,9 @@ public class StepRun {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
+
+        Logs.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
+        Logs.WriteLog(new LogStatement($"{Name} started", Name, LogLevel.Info, DateTime.UtcNow));
 
         return step.ExecuteAsync(container);
     }
@@ -77,6 +83,7 @@ public class StepRun {
 
     public void EndWithWarnings() {
         Logs.WriteSuccessLog(new LogStatement($"{Name} completed with warnings", Name, LogLevel.Warning, DateTime.UtcNow));
+
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.CompletedWithWarnings;
@@ -85,6 +92,7 @@ public class StepRun {
 
     public void EndFailed(Exception e) {
         Logs.WriteLog(new LogStatement(e.Message, Name, LogLevel.Fatal, DateTime.UtcNow));
+
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Faulted;
