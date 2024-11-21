@@ -29,7 +29,8 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
     public string Name => Model.Name;
     public string StepType => Model.StepType;
     public RunState State => Model.State;
-    public bool IsRunning => Model.State == RunState.Running;
+    public bool IsPending => Model.State == RunState.Pending;
+    public bool IsRunning => Model.State == RunState.Running || Model.State == RunState.RunningAsync;
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;

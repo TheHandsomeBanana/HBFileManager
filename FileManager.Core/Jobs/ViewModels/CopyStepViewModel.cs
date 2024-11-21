@@ -31,8 +31,8 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         }
     }
 
-    private EntryType? sourceType;
-    public EntryType? SourceType {
+    private EntryBrowseType? sourceType;
+    public EntryBrowseType? SourceType {
         get => sourceType;
         set {
             sourceType = value;
@@ -54,8 +54,8 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         }
     }
 
-    private EntryType? destinationType;
-    public EntryType? DestinationType {
+    private EntryBrowseType? destinationType;
+    public EntryBrowseType? DestinationType {
         get => destinationType;
         set {
             destinationType = value;
@@ -67,8 +67,8 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
     }
 
 
-    public EntryType[] AvailableSourceTypes => [EntryType.Directory, EntryType.File];
-    public EntryType[] AvailableDestinationTypes => [EntryType.Directory];
+    public EntryBrowseType[] AvailableSourceTypes => [EntryBrowseType.Directory, EntryBrowseType.File];
+    public EntryBrowseType[] AvailableDestinationTypes => [EntryBrowseType.Directory];
 
     public bool ModifiedOnly {
         get => Model.ModifiedOnly;
@@ -198,7 +198,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
 
     private void BrowseSource(object? obj) {
         switch (SourceType) {
-            case EntryType.File:
+            case EntryBrowseType.File:
                 OpenFileDialog fileDialog = new OpenFileDialog {
                     Title = "Select source file"
                 };
@@ -208,7 +208,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
                 }
 
                 break;
-            case EntryType.Directory:
+            case EntryBrowseType.Directory:
                 OpenFolderDialog folderDialog = new OpenFolderDialog {
                     Title = "Select source folder"
                 };
@@ -223,7 +223,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
 
     private void BrowseDestination(object? obj) {
         switch (DestinationType) {
-            case EntryType.File:
+            case EntryBrowseType.File:
                 OpenFileDialog fileDialog = new OpenFileDialog();
                 fileDialog.Title = "Select destination file";
 
@@ -232,7 +232,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
                 }
 
                 break;
-            case EntryType.Directory:
+            case EntryBrowseType.Directory:
                 OpenFolderDialog folderDialog = new OpenFolderDialog();
                 folderDialog.Title = "Select destination folder";
 

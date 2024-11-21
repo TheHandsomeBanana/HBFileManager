@@ -35,7 +35,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
 
     public RunState State => Model.State;
 
-    public bool IsRunning => Model.State == RunState.Running;
+    public bool IsRunning => Model.State == RunState.Running || Model.State == RunState.RunningAsync;
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
@@ -77,12 +77,32 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         foreach(StepRun stepRun in Model.StepRuns) {
             RunningStepViewModel stepRunVM = new RunningStepViewModel(stepRun);
             stepRun.OnStepStarting += () => OnStepStarting(stepRunVM);
+            stepRun.OnStepFinished += OnStepFinished;
             RunningSteps.Add(stepRunVM);
         }
+
+        SelectedStepRun = RunningSteps.FirstOrDefault();
     }
 
     private void OnStepStarting(RunningStepViewModel stepRun) {
+        if(stepRun.Model.IsAsync) {
+            // While there are steps running do not select new async step
+            if(RunningSteps.Any(e => e.IsPending || e.IsRunning)) {
+                return;
+            }
+        }
+
         SelectedStepRun = stepRun;
+    }
+
+    private void OnStepFinished() {
+        if (RunningSteps.Any(e => !e.Model.IsAsync && (e.IsRunning || e.IsPending))) {
+            // If there are sync steps running or pending return;
+            return;
+        }
+
+        // If there are no more sync steps, select first running async step
+        SelectedStepRun = RunningSteps.FirstOrDefault(e => e.Model.IsAsync && e.IsRunning);
     }
 
     private void JobRun_OnJobFinished() {
@@ -110,6 +130,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         Model.OnJobFinished -= JobRun_OnJobFinished;
         foreach (RunningStepViewModel stepRun in RunningSteps) {
             stepRun.Model.OnStepStarting -= () => OnStepStarting(stepRun);
+            stepRun.Model.OnStepFinished -= OnStepFinished;
             stepRun.Dispose();
         }
 

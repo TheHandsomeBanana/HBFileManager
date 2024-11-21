@@ -29,7 +29,6 @@ public class CopyStep : JobStep {
 
     #region Logic
     public override void Execute(IUnityContainer container) {
-        ILogger logger = container.Resolve<ILogger>();
         IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
 
         IEnumerable<string> filteredSource = GetFilteredSourceItems();
@@ -44,7 +43,6 @@ public class CopyStep : JobStep {
     }
 
     public override async Task ExecuteAsync(IUnityContainer container) {
-        IAsyncLogger logger = container.Resolve<IAsyncLogger>();
         IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
 
         IEnumerable<string> filteredSource = GetFilteredSourceItems();
@@ -80,13 +78,13 @@ public class CopyStep : JobStep {
         foreach (Entry source in SourceItems) {
 
             switch (source.Type) {
-                case EntryType.File:
+                case EntryBrowseType.File:
                     if (!File.Exists(source.Path)) {
                         string error = $"Source file '{source.Path}' does not exist.";
                         results.Add(Result.Fail(error));
                     }
                     break;
-                case EntryType.Directory:
+                case EntryBrowseType.Directory:
                     if (!Directory.Exists(source.Path)) {
                         string error = $"Source directory '{source.Path}' does not exist.";
                         results.Add(Result.Fail(error));
@@ -113,13 +111,13 @@ public class CopyStep : JobStep {
         foreach (Entry source in SourceItems) {
 
             switch (source.Type) {
-                case EntryType.File:
+                case EntryBrowseType.File:
                     if (!File.Exists(source.Path)) {
                         string error = $"Source file '{source.Path}' does not exist.";
                         results.Add(Result.Fail(error));
                     }
                     break;
-                case EntryType.Directory:
+                case EntryBrowseType.Directory:
                     if (!Directory.Exists(source.Path)) {
                         string error = $"Source directory '{source.Path}' does not exist.";
                         results.Add(Result.Fail(error));
@@ -148,8 +146,8 @@ public class CopyStep : JobStep {
         IEnumerable<string> fullSourceItems = SourceItems
             .SelectMany(e => {
                 return e.Type switch {
-                    EntryType.File => [e.Path],
-                    EntryType.Directory => Directory.EnumerateFiles(e.Path, "*", SearchOption.AllDirectories),
+                    EntryBrowseType.File => [e.Path],
+                    EntryBrowseType.Directory => Directory.EnumerateFiles(e.Path, "*", SearchOption.AllDirectories),
                     _ => [],
                 };
             });
@@ -199,6 +197,6 @@ public class CopyStep : JobStep {
 }
 
 public class Entry {
-    public required EntryType Type { get; set; }
+    public required EntryBrowseType Type { get; set; }
     public required string Path { get; set; }
 }

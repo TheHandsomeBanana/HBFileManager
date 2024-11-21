@@ -46,6 +46,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
             RunningJobs.Insert(0, new RunningJobViewModel(jobRun));
         }
 
+        SelectedJobRun = RunningJobs.FirstOrDefault();
         jobRunner.OnJobStarting += JobRunner_OnJobStarting;
 
         NotifyPropertyChanged(nameof(AnyJobsRunning));

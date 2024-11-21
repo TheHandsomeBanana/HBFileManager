@@ -8,8 +8,10 @@ using HBLibrary.Interface.IO.Storage.Entries;
 using HBLibrary.Interface.Logging;
 using HBLibrary.Interface.Plugins;
 using HBLibrary.IO;
+using HBLibrary.Logging;
 using HBLibrary.Logging.FlowDocumentTarget;
 using HBLibrary.Plugins;
+using HBLibrary.Wpf.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,16 +108,14 @@ public class JobExecutionManager : IJobExecutionManager {
     }
 
     private static UnityContainer CreateTempContainer(StepRun stepRun, IUnityContainer mainContainer) {
-        ILoggerFactory loggerFactory = mainContainer.Resolve<ILoggerFactory>();
         UnityContainer tempContainer = new UnityContainer();
+        LoggerFactory loggerFactory = new LoggerFactory();
 
-        ILogger tempLogger = loggerFactory.CreateLogger(stepRun.Name, e => e.AddTarget(stepRun.Logs).Build());
-        IAsyncLogger tempAsyncLogger = loggerFactory.CreateAsyncLogger(stepRun.Name, e => e.AddTarget(stepRun.Logs).Build());
-
-        tempContainer.RegisterInstance(tempLogger);
-        tempContainer.RegisterInstance(tempAsyncLogger);
+        IExtendedLogger extendedLogger = loggerFactory.CreateExtendedLogger(stepRun.Name, e => e.AddTarget(stepRun.Logs).Build());
+        tempContainer.RegisterInstance<ILoggerFactory>(loggerFactory);
+        tempContainer.RegisterInstance(extendedLogger);
+        
         tempContainer.RegisterType<IFileEntryService, FileEntryService>();
-
         tempContainer.RegisterType<IExecutionStateHandler, ExecutionStateHandler>(new ContainerControlledLifetimeManager());
 
         return tempContainer;

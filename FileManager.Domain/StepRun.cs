@@ -65,10 +65,11 @@ public class StepRun {
     public Task StartAsync(UnityContainer container) {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
-        State = RunState.Running;
+        State = RunState.RunningAsync;
+        OnStepStarting?.Invoke();
 
         Logs.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
-        Logs.WriteLog(new LogStatement($"{Name} started", Name, LogLevel.Info, DateTime.UtcNow));
+        Logs.WriteLog(new LogStatement($"{Name} started asynchronously", Name, LogLevel.Info, DateTime.UtcNow));
 
         return step.ExecuteAsync(container);
     }

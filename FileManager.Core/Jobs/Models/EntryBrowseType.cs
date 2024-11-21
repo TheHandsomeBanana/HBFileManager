@@ -1,5 +1,5 @@
 ﻿namespace FileManager.Core.Jobs.Models;
-public enum EntryType {
+public enum EntryBrowseType {
     File,
     Directory,
     Archive

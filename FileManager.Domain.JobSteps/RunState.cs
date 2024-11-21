@@ -8,6 +8,7 @@ namespace FileManager.Domain.JobSteps;
 public enum RunState {
     Pending,
     Running,
+    RunningAsync,
     Faulted,
     Success,
     CompletedWithWarnings

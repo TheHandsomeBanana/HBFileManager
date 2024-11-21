@@ -106,6 +106,12 @@
                                 <Setter Property="Foreground"
                                         Value="{StaticResource VSBlueBrush}" />
                             </DataTrigger>
+                            
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.RunningAsync}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSBlueBrush}" />
+                            </DataTrigger>
 
                             <DataTrigger Binding="{Binding State}"
                                          Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}">
@@ -154,6 +160,17 @@
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.RunningAsync}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#39454f" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
                                                Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
                                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                                Value="True" />
@@ -189,6 +206,19 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding State}"
                                                Value="{x:Static jobStepsDomain:RunState.Running}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#4da5e9" />
+                                <Setter Property="Background"
+                                        Value="#39454f" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.RunningAsync}" />
                                     <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                                Value="True" />
                                 </MultiDataTrigger.Conditions>
