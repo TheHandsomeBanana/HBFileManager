@@ -42,6 +42,8 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
     public JobManager? JobManager { get; set; }
     [JsonIgnore]
     public JobExecutionManager? JobExecutionManager { get; set; }
+    [JsonIgnore]
+    public JobHistoryManager? JobHistoryManager { get; set; }
 
 
     public HBFileManagerWorkspace() : base() {
@@ -120,18 +122,19 @@ public sealed class HBFileManagerWorkspace : ApplicationWorkspace {
             });
         }
 
-        IStorageEntryContainer jobRunnerContainer = jobRunnerContainerBuilder.Build();
+        IStorageEntryContainer jobRunContainer = jobRunnerContainerBuilder.Build();
 
         Storage = ApplicationStorage.CreateBuilder(Path.GetDirectoryName(FullPath)!)
            .AddContainer(typeof(JobManager), _ => jobContainer)
-           .AddContainer(typeof(JobExecutionManager), _ => jobRunnerContainer)
+           .AddContainer(typeof(JobExecutionManager), _ => jobRunContainer)
            .Build();
 
 
         IUnityContainer mainContainer = UnityBase.Registry.Get(DIContainerGuids.FileManagerContainerGuid);
 
         JobManager = new JobManager(jobContainer);
-        JobExecutionManager = new JobExecutionManager(jobRunnerContainer, pluginManager);
+        JobExecutionManager = new JobExecutionManager(jobRunContainer, pluginManager);
+        JobHistoryManager = new JobHistoryManager(jobRunContainer);
 
         foreach (IStorageEntryContainer entryContainer in Storage.GetContainers()) {
             entryContainer.ChangeTracker?.HookStateChanged();

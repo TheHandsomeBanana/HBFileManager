@@ -405,8 +405,6 @@ public sealed class JobItemViewModel : AsyncInitializerViewModelBase<Job>, IDrag
         tempContainer.Dispose();
 
         HandleLogs(res, jobStep);
-        LogTarget.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
-        LogTarget.WriteLogBlock(LogBlockStatement.CreateEmptyBlock());
 
         CanRun = res.IsSuccess && IsEnabled && Steps.All(e => e.StepContext!.IsValid);
 

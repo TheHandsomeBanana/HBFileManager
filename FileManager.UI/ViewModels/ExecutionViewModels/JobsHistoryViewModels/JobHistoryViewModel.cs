@@ -5,6 +5,7 @@ using FileManager.Domain.JobSteps;
 using FileManager.UI.ViewModels.ExecutionViewModels.RunningJobsViewModels;
 using HBLibrary.DI;
 using HBLibrary.Interface.Workspace;
+using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,8 @@ using Unity;
 
 namespace FileManager.UI.ViewModels.ExecutionViewModels.JobsHistoryViewModels;
 public class JobHistoryViewModel : ViewModelBase<JobRun> {
+    private readonly JobHistoryManager jobHistoryManager;
+
     public TimeSpan Elapsed => Model.Duration.GetValueOrDefault();
     public string Name => Model.Name;
     public bool IsSuccess => Model.State == RunState.Success;
@@ -33,11 +36,27 @@ public class JobHistoryViewModel : ViewModelBase<JobRun> {
         }
     }
 
+    public RelayCommand<JobHistoryViewModel> DeleteJobCommand { get; set; }
+    public event Action<JobHistoryViewModel>? OnJobDeleted;
+
     public JobHistoryViewModel(JobRun model) : base(model) {
+        IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
+
+        IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
+        jobHistoryManager = workspaceManager.CurrentWorkspace!.JobHistoryManager!;
+
+
+        DeleteJobCommand = new RelayCommand<JobHistoryViewModel>(DeleteJob);
+
         foreach (StepRun stepRun in model.StepRuns) {
             CompletedSteps.Add(new StepHistoryViewModel(stepRun));   
         }
 
         SelectedStepRun = CompletedSteps.FirstOrDefault();
+    }
+
+    private void DeleteJob(JobHistoryViewModel obj) {
+        jobHistoryManager.DeleteJob(obj.Model.Id);
+        OnJobDeleted?.Invoke(obj);
     }
 }

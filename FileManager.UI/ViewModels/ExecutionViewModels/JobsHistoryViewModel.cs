@@ -4,6 +4,7 @@ using FileManager.Domain;
 using FileManager.UI.ViewModels.ExecutionViewModels.JobsHistoryViewModels;
 using HBLibrary.DI;
 using HBLibrary.Interface.Workspace;
+using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.Views;
 using System;
@@ -21,6 +22,7 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
     private JobRun[]? currentRunningJobs;
 
     private readonly JobExecutionManager jobExecutionManager;
+    private readonly JobHistoryManager jobHistoryManager;
     public ObservableCollection<JobHistoryViewModel> CompletedJobs { get; set; } = [];
 
     private JobHistoryViewModel? selectedJobRun;
@@ -32,20 +34,29 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
         }
     }
 
+    public AsyncRelayCommand ClearJobsHistoryCommand { get; }
+
     public JobsHistoryViewModel() {
         IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
 
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
         jobExecutionManager = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
+        jobHistoryManager = workspaceManager.CurrentWorkspace!.JobHistoryManager!;
 
+        ClearJobsHistoryCommand = new AsyncRelayCommand(ClearJobsHistory, _ => CompletedJobs.Any(), OnClearJobsHistoryException);
     }
 
+    
+
     protected override async Task InitializeViewModelAsync() {
-        JobRun[] jobRuns = await jobExecutionManager.GetCompletedJobsAsync();
+        JobRun[] jobRuns = await jobHistoryManager.GetCompletedJobsAsync();
         foreach (JobRun run in jobRuns) {
-            CompletedJobs.Insert(0, new JobHistoryViewModel(run));
+            JobHistoryViewModel jobHistoryViewModel = new JobHistoryViewModel(run);
+            jobHistoryViewModel.OnJobDeleted += JobHistoryViewModel_OnJobDeleted;
+            CompletedJobs.Insert(0, jobHistoryViewModel);
         }
 
+        ClearJobsHistoryCommand.NotifyCanExecuteChanged();
         SelectedJobRun = CompletedJobs.FirstOrDefault();
 
         currentRunningJobs = jobExecutionManager.GetRunningJobs();
@@ -53,17 +64,35 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
         foreach (JobRun activeRun in currentRunningJobs) {
             activeRun.OnJobFinished += () => ActiveRun_OnJobFinished(activeRun);
         }
-
     }
 
-    private void ActiveRun_OnJobFinished(JobRun jobRun) {
-        Application.Current.Dispatcher.Invoke(() => {
-            CompletedJobs.Insert(0, new JobHistoryViewModel(jobRun));
-        });
+    private void JobHistoryViewModel_OnJobDeleted(JobHistoryViewModel obj) {
+        CompletedJobs?.Remove(obj);
+        SelectedJobRun = CompletedJobs?.FirstOrDefault();
+        ClearJobsHistoryCommand.NotifyCanExecuteChanged();
     }
 
     protected override void OnInitializeException(Exception exception) {
         HBDarkMessageBox.Show("Initialize error", exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private async Task ClearJobsHistory(object? arg) {
+        await jobHistoryManager.ClearJobsAsync();
+        Application.Current.Dispatcher.Invoke(CompletedJobs.Clear);
+    }
+
+    private void OnClearJobsHistoryException(Exception exception) {
+        HBDarkMessageBox.Show("Clear failed", exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    private void ActiveRun_OnJobFinished(JobRun jobRun) {
+        Application.Current.Dispatcher.Invoke(() => {
+            JobHistoryViewModel jobHistoryViewModel = new JobHistoryViewModel(jobRun);
+            jobHistoryViewModel.OnJobDeleted += JobHistoryViewModel_OnJobDeleted;
+
+            CompletedJobs.Insert(0, jobHistoryViewModel);
+            ClearJobsHistoryCommand.NotifyCanExecuteChanged();
+        });
     }
 
     public void Dispose() {
@@ -71,6 +100,10 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
             foreach (JobRun activeRun in currentRunningJobs) {
                 activeRun.OnJobFinished -= () => ActiveRun_OnJobFinished(activeRun);
             }
+        }
+
+        foreach(JobHistoryViewModel jobHistoryViewModel in CompletedJobs) {
+            jobHistoryViewModel.OnJobDeleted -= JobHistoryViewModel_OnJobDeleted;
         }
     }
 }
