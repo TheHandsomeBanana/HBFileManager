@@ -1,4 +1,5 @@
-﻿using FileManager.Core.Jobs.ViewModels;
+﻿using FileManager.Core.Jobs.Models.Copy;
+using FileManager.Core.Jobs.ViewModels;
 using FileManager.Core.Jobs.Views;
 using FileManager.Core.JobSteps;
 using FileManager.Domain.JobSteps;

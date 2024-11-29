@@ -1,4 +1,5 @@
 ﻿using FileManager.Core.Jobs.Models;
+using FileManager.Core.Jobs.Models.Copy;
 using FileManager.Core.JobSteps;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Models;
