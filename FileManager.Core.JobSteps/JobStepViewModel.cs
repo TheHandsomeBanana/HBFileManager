@@ -29,12 +29,12 @@ public class JobStepViewModel<TModel> : ViewModelBase<TModel>, IJobStepContext w
             Model.IsEnabled = value;
             NotifyPropertyChanged();
 
-            if (value && !AsyncValidationRunning && !ValidationRunning) {
-                InvokeAsyncValidation()
-                    .ContinueWith(e => {
-                        IsValid = e.Result;
-                    }, TaskContinuationOptions.OnlyOnRanToCompletion);
-            }
+            //if (value && !AsyncValidationRunning && !ValidationRunning) {
+            //    InvokeAsyncValidation()
+            //        .ContinueWith(e => {
+            //            IsValid = e.Result;
+            //        }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            //}
         }
     }
 

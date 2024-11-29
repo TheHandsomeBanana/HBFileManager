@@ -102,7 +102,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         }
 
         // If there are no more sync steps, select first running async step
-        SelectedStepRun = RunningSteps.FirstOrDefault(e => e.Model.IsAsync && e.IsRunning);
+        SelectedStepRun = RunningSteps.FirstOrDefault(e => e.Model.IsAsync && e.IsRunning) ?? RunningSteps.Last();
     }
 
     private void JobRun_OnJobFinished() {

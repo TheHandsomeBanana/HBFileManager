@@ -98,7 +98,8 @@
                              ShowCategory="{Binding ShowCategory, Mode=OneTime}"
                              ItemsSource="{Binding LogsTarget.Logs}"
                              d:ItemsSource="{d:SampleData ItemCount=5}"
-                             Grid.Row="2">
+                             Grid.Row="2"
+                             attachedProperties:LogListBoxAttachedProperties.EnableAutoScroll="True">
 
         </controls:LogListBox>
     </Grid>
