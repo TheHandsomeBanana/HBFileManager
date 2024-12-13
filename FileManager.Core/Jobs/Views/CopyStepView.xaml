@@ -200,32 +200,24 @@
 
                     <Grid Margin="0 0 0 5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="30" />
                             <ColumnDefinition Width="85" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox Grid.Column="0"
-                                  Style="{StaticResource PrimaryComboBox}"
-                                  Width="Auto"
-                                  SelectedItem="{Binding DestinationType}"
-                                  ItemsSource="{Binding AvailableDestinationTypes}">
-
-                        </ComboBox>
                         <TextBox Style="{StaticResource PrimaryTextBox}"
                                  Text="{Binding Destination, UpdateSourceTrigger=PropertyChanged}"
                                  ToolTip="{Binding Destination, Mode=OneWay}"
-                                 Grid.Column="1"
-                                 Margin="5 0 5 0" />
+                                 Grid.Column="0"
+                                 Margin="0 0 5 0" />
                         <Button Style="{StaticResource BrowseButton}"
                                 HorizontalContentAlignment="Center"
-                                Grid.Column="2"
+                                Grid.Column="1"
                                 Command="{Binding BrowseDestinationCommand}" />
 
                         <Button Style="{StaticResource PrimaryButton}"
                                 HorizontalContentAlignment="Center"
-                                Grid.Column="3"
+                                Grid.Column="2"
                                 Margin="5 0 0 0"
                                 Content="Add"
                                 Command="{Binding AddDestinationCommand}" />
@@ -236,17 +228,7 @@
                               SelectedItem="{Binding SelectedDestination}">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn DisplayMemberBinding="{Binding Type}"
-                                                Width="Auto">
-                                    <GridViewColumn.Header>
-                                        <TextBlock Style="{StaticResource NormalTextBlock}"
-                                                   FontWeight="Bold"
-                                                   Text="Type" />
-                                    </GridViewColumn.Header>
-                                </GridViewColumn>
-
-                                <GridViewColumn DisplayMemberBinding="{Binding Path}"
-                                                Width="Auto">
+                                <GridViewColumn Width="Auto">
                                     <GridViewColumn.Header>
                                         <TextBlock Style="{StaticResource NormalTextBlock}"
                                                    FontWeight="Bold"

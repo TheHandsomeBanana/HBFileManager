@@ -26,6 +26,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- Success -->
@@ -60,7 +61,16 @@
                   Margin="0 0 10 0"
                   Visibility="{Binding IsError, Converter={StaticResource b2v}}" />
 
-
+            <!-- Canceled -->
+            <Path Grid.Column="0"
+                  Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.63,15.55 5.68,16.91L16.91,5.68C15.55,4.63 13.85,4 12,4M12,20A8,8 0 0,0 20,12C20,10.15 19.37,8.45 18.32,7.09L7.09,18.32C8.45,19.37 10.15,20 12,20Z"
+                  Fill="{StaticResource VSYellowBrush}"
+                  Stretch="Uniform"
+                  Height="30"
+                  Width="30"
+                  Margin="0 0 10 0"
+                  Visibility="{Binding IsCanceled, Converter={StaticResource b2v}}" />
+            
             <StackPanel Grid.Column="1"
                         Orientation="Vertical"
                         VerticalAlignment="Center">
@@ -85,6 +95,29 @@
                                Text="{Binding StepType}" />
                 </StackPanel>
             </StackPanel>
+
+            <Button Style="{StaticResource AccentButtonRed}"
+                    Grid.Column="2"
+                    HorizontalContentAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Height="Auto"
+                    Width="120"
+                    Command="{Binding CancelStepCommand}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Path Data="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12C4,13.85 4.63,15.55 5.68,16.91L16.91,5.68C15.55,4.63 13.85,4 12,4M12,20A8,8 0 0,0 20,12C20,10.15 19.37,8.45 18.32,7.09L7.09,18.32C8.45,19.37 10.15,20 12,20Z"
+                              Fill="{StaticResource VSRedBrush}"
+                              Margin="0 0 5 0"
+                              Stretch="Uniform" />
+
+                        <TextBlock Text="Cancel step"
+                                   Grid.Column="1"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button.Content>
+            </Button>
 
         </Grid>
 

@@ -17,10 +17,10 @@ public interface IJobStep {
     public bool IsAsync { get; set; }
     public bool IsEnabled { get; set; }
     public int ExecutionOrder { get; set; }
-    public void Execute(IUnityContainer container);
+    public void Execute(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default);
     public ImmutableResultCollection Validate(IUnityContainer container);
 
-    public Task ExecuteAsync(IUnityContainer container);
+    public Task ExecuteAsync(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default);
     public Task<ImmutableResultCollection> ValidateAsync(IUnityContainer container);
 
     public UserControl? GetJobStepView();

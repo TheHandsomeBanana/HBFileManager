@@ -68,8 +68,8 @@ public abstract class JobStep : TrackableModel, IJobStep {
         }
     }
 
-    public abstract void Execute(IUnityContainer container);
-    public abstract Task ExecuteAsync(IUnityContainer container);
+    public abstract void Execute(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default);
+    public abstract Task ExecuteAsync(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default);
     public abstract UserControl? GetJobStepView();
     public abstract IJobStepContext? GetJobStepDataContext();
     public abstract ImmutableResultCollection Validate(IUnityContainer container);

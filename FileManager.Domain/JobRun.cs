@@ -18,15 +18,20 @@ public class JobRun {
     public StepRun[] StepRuns { get; set; }
 
     public event Action? OnJobStarting;
+    public event Action? OnJobStarted;
     public event Action? OnJobFinished;
 
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
+    [JsonIgnore]
+    public CancellationTokenSource CancellationTokenSource { get; }
+
     public JobRun(string jobName, StepRun[] stepRuns) {
         State = RunState.Pending;
         Name = jobName;
         StepRuns = stepRuns;
+        CancellationTokenSource = new CancellationTokenSource();
     }
 
     // Json Constructor
@@ -42,27 +47,33 @@ public class JobRun {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.Running;
+        OnJobStarted?.Invoke();
     }
 
-    public void End() {
+    public void End(bool canceled) {
         Stopwatch.Stop();
         FinishedAt = DateTime.UtcNow;
-        foreach (StepRun step in StepRuns) {
-            if (State != RunState.CompletedWithWarnings && step.State == RunState.CompletedWithWarnings) {
-                State = RunState.CompletedWithWarnings;
+        if (canceled) {
+            State = RunState.Canceled;
+        }
+        else {
+            foreach (StepRun step in StepRuns) {
+                if (State != RunState.CompletedWithWarnings && step.State == RunState.CompletedWithWarnings) {
+                    State = RunState.CompletedWithWarnings;
+                }
+
+                if (step.State == RunState.Faulted) {
+                    State = RunState.Faulted;
+                    break;
+                }
             }
 
-            if (step.State == RunState.Faulted) {
-                State = RunState.Faulted;
-                break;
+            if (State == RunState.Running) {
+                State = RunState.Success;
             }
         }
-
-        if (State == RunState.Running) {
-            State = RunState.Success;
-        }
-
 
         OnJobFinished?.Invoke();
+        CancellationTokenSource.Dispose();
     }
 }

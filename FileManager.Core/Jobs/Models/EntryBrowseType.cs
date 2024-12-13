@@ -2,5 +2,4 @@
 public enum EntryBrowseType {
     File,
     Directory,
-    Archive
 }

@@ -1,5 +1,6 @@
 ﻿using FileManager.Core.Jobs.ViewModels;
 using FileManager.Core.Jobs.Views;
+using FileManager.Core.JobSteps;
 using FileManager.Domain.JobSteps;
 using HBLibrary.Common;
 using HBLibrary.Core.Limiter;
@@ -23,7 +24,7 @@ namespace FileManager.Core.Jobs.Models.Copy;
 public class CopyStep : JobStep {
     #region Model
     public List<Entry> SourceItems { get; set; } = [];
-    public List<Entry> DestinationItems { get; set; } = [];
+    public List<string> DestinationItems { get; set; } = [];
     public bool ModifiedOnly { get; set; }
     public TimeSpan? TimeDifference { get; set; }
     public string? TimeDifferenceText { get; set; }
@@ -31,18 +32,24 @@ public class CopyStep : JobStep {
     #endregion
 
     #region Logic
-    public override void Execute(IUnityContainer container) {
+    public override void Execute(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
         IExtendedLogger logger = container.Resolve<IExtendedLogger>();
+        IExecutionStateHandler executionStateHandler = container.Resolve<IExecutionStateHandler>();
 
-        CopyStepService copyStepService = new CopyStepService(logger, fileEntryService, SourceItems, DestinationItems, ModifiedOnly, TimeDifference);
+        CopyStepService copyStepService = new CopyStepService(logger, fileEntryService, executionStateHandler, SourceItems, DestinationItems, ModifiedOnly, TimeDifference);
 
         foreach (Entry sourceEntry in SourceItems) {
-            foreach (Entry destinationEntry in DestinationItems) {
+            foreach (string destination in DestinationItems) {
+                if (jobCancellationToken.IsCancellationRequested || stepCancellationToken.IsCancellationRequested) {
+                    executionStateHandler.IsCanceled();
+                    return;
+                }
+
                 switch (sourceEntry.Type) {
                     case EntryBrowseType.File:
                         if (copyStepService.ShouldCopy(sourceEntry.Path)) {
-                            copyStepService.Copy(sourceEntry.Path, destinationEntry.Path);
+                            copyStepService.Copy(sourceEntry.Path, destination);
                             copyStepService.LogProcessedFile();
                         }
                         else {
@@ -50,25 +57,31 @@ public class CopyStep : JobStep {
                         }
                         break;
                     case EntryBrowseType.Directory:
-                        copyStepService.CopyDirectory(sourceEntry.Path, destinationEntry.Path);
+                        copyStepService.CopyDirectory(sourceEntry.Path, destination, stepCancellationToken, jobCancellationToken);
                         break;
                 }
             }
         }
     }
 
-    public override async Task ExecuteAsync(IUnityContainer container) {
+    public override async Task ExecuteAsync(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         IFileEntryService fileEntryService = container.Resolve<IFileEntryService>();
         IExtendedLogger logger = container.Resolve<IExtendedLogger>();
+        IExecutionStateHandler executionStateHandler = container.Resolve<IExecutionStateHandler>();
 
-        CopyStepService copyStepService = new CopyStepService(logger, fileEntryService, SourceItems, DestinationItems, ModifiedOnly, TimeDifference);
+        CopyStepService copyStepService = new CopyStepService(logger, fileEntryService, executionStateHandler, SourceItems, DestinationItems, ModifiedOnly, TimeDifference);
 
         foreach (Entry sourceEntry in SourceItems) {
-            foreach (Entry destinationEntry in DestinationItems) {
+            foreach (string destination in DestinationItems) {
+                if (jobCancellationToken.IsCancellationRequested || stepCancellationToken.IsCancellationRequested) {
+                    executionStateHandler.IsCanceled();
+                    return;
+                }
+
                 switch (sourceEntry.Type) {
                     case EntryBrowseType.File:
                         if (copyStepService.ShouldCopy(sourceEntry.Path)) {
-                            await copyStepService.CopyAsync(sourceEntry.Path, destinationEntry.Path);
+                            await copyStepService.CopyAsync(sourceEntry.Path, destination);
                             copyStepService.LogProcessedFile();
                         }
                         else {
@@ -76,7 +89,7 @@ public class CopyStep : JobStep {
                         }
                         break;
                     case EntryBrowseType.Directory:
-                        await copyStepService.CopyDirectoryAsync(sourceEntry.Path, destinationEntry.Path);
+                        await copyStepService.CopyDirectoryAsync(sourceEntry.Path, destination, stepCancellationToken, jobCancellationToken);
                         break;
                 }
             }
@@ -104,9 +117,9 @@ public class CopyStep : JobStep {
             }
         }
 
-        foreach (Entry destination in DestinationItems) {
-            if (!Directory.Exists(destination.Path)) {
-                string error = $"Destination directory '{destination.Path}' does not exist.";
+        foreach (string destination in DestinationItems) {
+            if (!Directory.Exists(destination)) {
+                string error = $"Destination directory '{destination}' does not exist.";
                 results.Add(Result.Fail(error));
             }
         }
@@ -137,10 +150,10 @@ public class CopyStep : JobStep {
             }
         }
 
-        foreach (Entry destination in DestinationItems) {
+        foreach (string destination in DestinationItems) {
 
-            if (!Directory.Exists(destination.Path)) {
-                string error = $"Destination directory '{destination.Path}' does not exist.";
+            if (!Directory.Exists(destination)) {
+                string error = $"Destination directory '{destination}' does not exist.";
                 results.Add(Result.Fail(error));
             }
         }
@@ -163,7 +176,15 @@ public class CopyStep : JobStep {
     }
 }
 
-public class Entry {
+public class Entry : TrackableModel {
     public required EntryBrowseType Type { get; set; }
-    public required string Path { get; set; }
+
+    private string path = "";
+    public required string Path { 
+        get => path; 
+        set {
+            path = value;
+            NotifyTrackableChanged(value, nameof(Path));
+        } 
+    }
 }

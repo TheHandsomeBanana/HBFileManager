@@ -82,7 +82,7 @@ public sealed class JobsHistoryViewModel : AsyncInitializerViewModelBase, IDispo
     }
 
     private void OnClearJobsHistoryException(Exception exception) {
-        HBDarkMessageBox.Show("Clear failed", exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+        ApplicationHandler.ShowError("Clear failed", exception.Message);
     }
 
     private void ActiveRun_OnJobFinished(JobRun jobRun) {

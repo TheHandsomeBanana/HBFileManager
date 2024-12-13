@@ -9,4 +9,5 @@ namespace FileManager.Core.JobSteps;
 public interface IExecutionStateHandler {
     public RunState State { get; }
     public void WillCompleteWithWarnings();
+    public void IsCanceled();
 }

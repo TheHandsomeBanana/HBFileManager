@@ -36,11 +36,10 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
 
         RunJobCommand = new AsyncRelayCommand<ExecutableJobViewModel>(RunJobAsync, e => e!.Model.OnDemand, e => OnException("Run error", e));
         ScheduleJobCommand = new AsyncRelayCommand<ExecutableJobViewModel>(ScheduleJob, e => e!.Model.Scheduled, e => OnException("Scheduling error", e));
-
     }
 
     private void OnException(string title, Exception exception) {
-        HBDarkMessageBox.Show(title, exception.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+        ApplicationHandler.ShowError(title, exception.Message);
     }
 
     private Task ScheduleJob(ExecutableJobViewModel job) {
@@ -48,7 +47,7 @@ public class ExecutableJobViewModel : ViewModelBase<Job> {
     }
 
     private async Task RunJobAsync(ExecutableJobViewModel job) {
-        JobExecutionManager jobRunner = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
-        await Task.Run(() => jobRunner.RunAsync(job.Model, mainContainer));
+        JobExecutionManager jobExecutionManager = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
+        await Task.Run(() => jobExecutionManager.RunAsync(job.Model, mainContainer));
     }
 }

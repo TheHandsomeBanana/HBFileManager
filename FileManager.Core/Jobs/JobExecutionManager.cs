@@ -53,20 +53,27 @@ public class JobExecutionManager : IJobExecutionManager {
 
         List<Task> asyncJobs = [];
         List<IUnityContainer> asyncJobsContainers = [];
+        bool canceled = false;
         foreach (StepRun stepRun in jobRun.StepRuns) {
+            if(jobRun.CancellationTokenSource.IsCancellationRequested) {
+                stepRun.EndCanceled();
+                canceled = true;
+                continue;
+            }
+
             UnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
             if (stepRun.IsAsync) {
-                asyncJobs.Add(RunStepAsync(stepRun, tempContainer));
+                asyncJobs.Add(RunStepAsync(stepRun, tempContainer, jobRun.CancellationTokenSource.Token));
                 asyncJobsContainers.Add(tempContainer);
             }
             else {
-                RunStep(stepRun, tempContainer);
+                RunStep(stepRun, tempContainer, jobRun.CancellationTokenSource.Token);
                 tempContainer.Dispose();
             }
         }
 
         await Task.WhenAll(asyncJobs);
-        jobRun.End();
+        jobRun.End(canceled || jobRun.CancellationTokenSource.IsCancellationRequested);
         runningJobs.Remove(jobRun);
 
         container.AddOrUpdate(jobRun.Id.ToString(), jobRun, StorageEntryContentType.Json);
@@ -77,15 +84,18 @@ public class JobExecutionManager : IJobExecutionManager {
         }
     }
 
-    private static void RunStep(StepRun stepRun, UnityContainer container) {
+    private static void RunStep(StepRun stepRun, UnityContainer container, CancellationToken jobCancellationToken = default) {
         try {
-            stepRun.Start(container);
+            stepRun.Start(container, jobCancellationToken);
 
             IExecutionStateHandler stateHandler = container.Resolve<IExecutionStateHandler>();
 
             switch (stateHandler.State) {
                 case RunState.CompletedWithWarnings:
                     stepRun.EndWithWarnings();
+                    break;
+                case RunState.Canceled:
+                    stepRun.EndCanceled();
                     break;
                 default:
                     stepRun.EndSuccess();
@@ -97,10 +107,22 @@ public class JobExecutionManager : IJobExecutionManager {
         }
     }
 
-    private static async Task RunStepAsync(StepRun stepRun, UnityContainer container) {
+    private static async Task RunStepAsync(StepRun stepRun, UnityContainer container, CancellationToken jobCancellationToken = default) {
         try {
-            await stepRun.StartAsync(container);
-            stepRun.EndSuccess();
+            await stepRun.StartAsync(container, jobCancellationToken);
+            IExecutionStateHandler stateHandler = container.Resolve<IExecutionStateHandler>();
+
+            switch (stateHandler.State) {
+                case RunState.CompletedWithWarnings:
+                    stepRun.EndWithWarnings();
+                    break;
+                case RunState.Canceled:
+                    stepRun.EndCanceled();
+                    break;
+                default:
+                    stepRun.EndSuccess();
+                    break;
+            }
         }
         catch (Exception ex) {
             stepRun.EndFailed(ex);

@@ -14,4 +14,8 @@ public class ExecutionStateHandler : IExecutionStateHandler {
     public void WillCompleteWithWarnings() {
         State = RunState.CompletedWithWarnings;
     }
+
+    public void IsCanceled() {
+        State = RunState.Canceled;
+    }
 }

@@ -32,8 +32,8 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         }
     }
 
-    private EntryBrowseType? sourceType;
-    public EntryBrowseType? SourceType {
+    private EntryBrowseType sourceType;
+    public EntryBrowseType SourceType {
         get => sourceType;
         set {
             sourceType = value;
@@ -55,21 +55,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         }
     }
 
-    private EntryBrowseType? destinationType;
-    public EntryBrowseType? DestinationType {
-        get => destinationType;
-        set {
-            destinationType = value;
-            NotifyPropertyChanged();
-
-            Destination = null;
-            BrowseDestinationCommand.NotifyCanExecuteChanged();
-        }
-    }
-
-
     public EntryBrowseType[] AvailableSourceTypes => [EntryBrowseType.Directory, EntryBrowseType.File];
-    public EntryBrowseType[] AvailableDestinationTypes => [EntryBrowseType.Directory];
 
     public bool ModifiedOnly {
         get => Model.ModifiedOnly;
@@ -104,7 +90,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
     }
 
     public ObservableCollection<Entry> SourceItems { get; set; }
-    public ObservableCollection<Entry> DestinationItems { get; set; }
+    public ObservableCollection<string> DestinationItems { get; set; }
 
     private Entry? selectedSource;
     public Entry? SelectedSource {
@@ -115,8 +101,8 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         }
     }
 
-    private Entry? selectedDestination;
-    public Entry? SelectedDestination {
+    private string? selectedDestination;
+    public string? SelectedDestination {
         get { return selectedDestination; }
         set {
             selectedDestination = value;
@@ -131,7 +117,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
     public RelayCommand AddSourceCommand { get; set; }
     public RelayCommand AddDestinationCommand { get; set; }
     public RelayCommand<Entry> DeleteSourceCommand { get; set; }
-    public RelayCommand<Entry> DeleteDestinationCommand { get; set; }
+    public RelayCommand<string> DeleteDestinationCommand { get; set; }
     public CopyStepViewModel(CopyStep model) : base(model) {
         SourceItems = new ObservableCollection<Entry>(Model.SourceItems);
 
@@ -142,7 +128,7 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
             NotifyValidationRequired();
         };
 
-        DestinationItems = new ObservableCollection<Entry>(Model.DestinationItems);
+        DestinationItems = new ObservableCollection<string>(Model.DestinationItems);
 
         // Refresh Model collection on change
         DestinationItems.CollectionChanged += (_, _) => {
@@ -151,21 +137,21 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
             NotifyValidationRequired();
         };
 
-        BrowseSourceCommand = new RelayCommand(BrowseSource, _ => SourceType is not null);
-        BrowseDestinationCommand = new RelayCommand(BrowseDestination, _ => DestinationType is not null);
+        BrowseSourceCommand = new RelayCommand(BrowseSource);
+        BrowseDestinationCommand = new RelayCommand(BrowseDestination);
         ToggleInfoPopupCommand = new RelayCommand(ToggleInfoPopup);
 
-        AddSourceCommand = new RelayCommand(AddSource, _ => SourceType is not null && Source is not null);
-        AddDestinationCommand = new RelayCommand(AddDestination, _ => DestinationType is not null && Destination is not null);
+        AddSourceCommand = new RelayCommand(AddSource, _ => Source is not null);
+        AddDestinationCommand = new RelayCommand(AddDestination, _ => Destination is not null);
 
         DeleteSourceCommand = new RelayCommand<Entry>(DeleteSource);
-        DeleteDestinationCommand = new RelayCommand<Entry>(DeleteDestination);
+        DeleteDestinationCommand = new RelayCommand<string>(DeleteDestination);
 
         TimeDifference = model.TimeDifference;
         TimeDifferenceUnit = model.TimeDifferenceUnit;
     }
 
-    private void DeleteDestination(Entry obj) {
+    private void DeleteDestination(string obj) {
         DestinationItems.Remove(obj);
     }
 
@@ -174,23 +160,26 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
     }
 
     private void AddDestination(object? obj) {
-        DestinationItems.Add(new Entry {
-            Type = DestinationType!.Value,
-            Path = Destination!
-        });
+        string[] destinations = Destination?.Split("; ") ?? [];
+
+        foreach (string dest in destinations) {
+            DestinationItems.Add(dest);
+        }
 
         Destination = null;
-        DestinationType = null;
     }
 
     private void AddSource(object? obj) {
-        SourceItems.Add(new Entry {
-            Type = SourceType!.Value,
-            Path = Source!
-        });
+        string[] sourceItems = Source?.Split("; ") ?? [];
+
+        foreach (string source in sourceItems) {
+            SourceItems.Add(new Entry {
+                Type = SourceType,
+                Path = source
+            });
+        }
 
         Source = null;
-        SourceType = null;
     }
 
     private void ToggleInfoPopup(object? obj) {
@@ -201,21 +190,23 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
         switch (SourceType) {
             case EntryBrowseType.File:
                 OpenFileDialog fileDialog = new OpenFileDialog {
-                    Title = "Select source file"
+                    Title = "Select source file",
+                    Multiselect = true,
                 };
 
                 if (fileDialog.ShowDialog() is true) {
-                    Source = fileDialog.FileName;
+                    Source = string.Join("; ", fileDialog.FileNames);
                 }
 
                 break;
             case EntryBrowseType.Directory:
                 OpenFolderDialog folderDialog = new OpenFolderDialog {
-                    Title = "Select source folder"
+                    Title = "Select source folder",
+                    Multiselect = true,
                 };
 
                 if (folderDialog.ShowDialog() is true) {
-                    Source = folderDialog.FolderName;
+                    Source = string.Join("; ", folderDialog.FolderNames);
                 }
 
                 break;
@@ -223,25 +214,12 @@ public class CopyStepViewModel : JobStepViewModel<CopyStep> {
     }
 
     private void BrowseDestination(object? obj) {
-        switch (DestinationType) {
-            case EntryBrowseType.File:
-                OpenFileDialog fileDialog = new OpenFileDialog();
-                fileDialog.Title = "Select destination file";
+        OpenFolderDialog folderDialog = new OpenFolderDialog();
+        folderDialog.Title = "Select destination folder";
+        folderDialog.Multiselect = true;
 
-                if (fileDialog.ShowDialog() is true) {
-                    Destination = fileDialog.FileName;
-                }
-
-                break;
-            case EntryBrowseType.Directory:
-                OpenFolderDialog folderDialog = new OpenFolderDialog();
-                folderDialog.Title = "Select destination folder";
-
-                if (folderDialog.ShowDialog() is true) {
-                    Destination = folderDialog.FolderName;
-                }
-
-                break;
+        if (folderDialog.ShowDialog() is true) {
+            Destination = string.Join("; ", folderDialog.FolderNames);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using HBLibrary.Core;
+﻿using FileManager.Core.JobSteps;
+using HBLibrary.Core;
 using HBLibrary.Core.Limiter;
 using HBLibrary.Interface.IO;
 using HBLibrary.Wpf.Logging;
@@ -7,24 +8,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FileManager.Core.Jobs.Models.Copy;
 public class CopyStepService {
     private readonly IExtendedLogger logger;
     private readonly IFileEntryService fileEntryService;
+    private readonly IExecutionStateHandler executionStateHandler;
     private readonly ConsoleProgressBar progressBar;
     private readonly List<Entry> sourceItems;
-    private readonly List<Entry> destinationItems;
+    private readonly List<string> destinationItems;
     private readonly bool modifiedOnly;
     private readonly TimeSpan? timeDifference;
 
     internal CopyStepLogData CopyStepLogData { get; }
 
 
-    public CopyStepService(IExtendedLogger logger, IFileEntryService fileEntryService, List<Entry> sourceItems, List<Entry> destinationItems, bool modifiedOnly, TimeSpan? timeDifference) {
+    public CopyStepService(IExtendedLogger logger, IFileEntryService fileEntryService, IExecutionStateHandler executionStateHandler, List<Entry> sourceItems, List<string> destinationItems, bool modifiedOnly, TimeSpan? timeDifference) {
         this.logger = logger;
         this.fileEntryService = fileEntryService;
+        this.executionStateHandler = executionStateHandler;
         this.sourceItems = sourceItems;
         this.destinationItems = destinationItems;
         this.modifiedOnly = modifiedOnly;
@@ -66,7 +70,7 @@ public class CopyStepService {
         logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"FILE::Copied {source} to {destination}.");
     }
 
-    public void CopyDirectory(string sourceDirectory, string destinationDirectory) {
+    public void CopyDirectory(string sourceDirectory, string destinationDirectory, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"DIR::Copying {sourceDirectory} contents to {destinationDirectory}.");
 
         string? directoryName = Path.GetFileName(sourceDirectory); // Returns the name of the directory
@@ -78,6 +82,11 @@ public class CopyStepService {
         Directory.CreateDirectory(nestedDirectory);
 
         foreach (string file in Directory.EnumerateFiles(sourceDirectory)) {
+            if (jobCancellationToken.IsCancellationRequested || stepCancellationToken.IsCancellationRequested) {
+                executionStateHandler.IsCanceled();
+                return;
+            }
+
             if (ShouldCopy(file)) {
                 string destinationFilePath = Path.Combine(nestedDirectory, Path.GetFileName(file));
                 logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"FILE::Copying {file} to {destinationDirectory}.");
@@ -91,13 +100,13 @@ public class CopyStepService {
         }
 
         foreach (string directory in Directory.EnumerateDirectories(sourceDirectory)) {
-            CopyDirectory(directory, nestedDirectory);
+            CopyDirectory(directory, nestedDirectory, stepCancellationToken, jobCancellationToken);
         }
 
         logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"DIR::Copied {sourceDirectory} contents to {destinationDirectory}.");
     }
 
-    public async Task CopyDirectoryAsync(string sourceDirectory, string destinationDirectory) {
+    public async Task CopyDirectoryAsync(string sourceDirectory, string destinationDirectory, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"DIR::Copying {sourceDirectory} contents to {destinationDirectory}.");
 
         string? directoryName = Path.GetFileName(sourceDirectory); // Returns the name of the directory
@@ -110,6 +119,12 @@ public class CopyStepService {
 
         List<Task> copyTasks = [];
         foreach (string file in Directory.EnumerateFiles(sourceDirectory)) {
+            if (jobCancellationToken.IsCancellationRequested || stepCancellationToken.IsCancellationRequested) {
+                executionStateHandler.IsCanceled();
+                await Task.WhenAll(copyTasks); // Wait until all running copy tasks finished
+                return;
+            }
+
             if (ShouldCopy(file)) {
                 await IOAsyncLimiter.FileSemaphore.WaitAsync();
                 copyTasks.Add(Task.Run(async () => {
@@ -133,7 +148,7 @@ public class CopyStepService {
 
 
         foreach (string directory in Directory.GetDirectories(sourceDirectory)) {
-            await CopyDirectoryAsync(directory, nestedDirectory);
+            await CopyDirectoryAsync(directory, nestedDirectory, stepCancellationToken, jobCancellationToken);
         }
 
         logger.RewriteIndexed(CopyStepLogData.CopyLogIndex, $"DIR::Copied {sourceDirectory} contents to {destinationDirectory}.");
@@ -158,8 +173,8 @@ public class CopyStepService {
     private string? FindDestinationFromSourceFile(string filepath) {
         string filename = Path.GetFileName(filepath);
 
-        foreach (Entry destination in destinationItems) {
-            string possibleDestinationFile = Path.Combine(destination.Path, filename);
+        foreach (string destination in destinationItems) {
+            string possibleDestinationFile = Path.Combine(destination, filename);
 
             if (File.Exists(possibleDestinationFile)) {
                 return possibleDestinationFile;

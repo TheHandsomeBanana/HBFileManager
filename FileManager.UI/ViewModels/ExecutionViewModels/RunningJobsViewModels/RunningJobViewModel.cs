@@ -5,6 +5,7 @@ using FileManager.Domain.JobSteps;
 using FileManager.UI.ViewModels.JobViewModels.JobStepViewModels;
 using HBLibrary.Interface.Core;
 using HBLibrary.Logging.FlowDocumentTarget;
+using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Extensions;
 using HBLibrary.Wpf.ViewModels;
 using HBLibrary.Wpf.Views;
@@ -24,8 +25,6 @@ using System.Windows.Threading;
 
 namespace FileManager.UI.ViewModels.ExecutionViewModels.RunningJobsViewModels;
 public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDisposable {
-
-
     private readonly DispatcherTimer dispatcherTimer;
 
     public TimeSpan Elapsed => Model.Stopwatch.Elapsed;
@@ -39,6 +38,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
+    public bool IsCanceled => Model.State == RunState.Canceled;
 
 
     private RunningStepViewModel? selectedStepRun;
@@ -50,7 +50,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         }
     }
 
-    public DateTime? StartedAt { 
+    public DateTime? StartedAt {
         get => Model.StartedAt;
         set {
             Model.StartedAt = value;
@@ -58,23 +58,43 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         }
     }
 
+    private bool isCanceling = false;
+    public AsyncRelayCommand CancelJobCommand { get; }
+
     public RunningJobViewModel(JobRun model) : base(model) {
+        CancelJobCommand = new AsyncRelayCommand(CancelJob, _ => IsRunning && !isCanceling, OnCancelJobException);
+
         dispatcherTimer = new DispatcherTimer {
             Interval = TimeSpan.FromMilliseconds(100)
         };
 
         dispatcherTimer.Tick += DispatcherTimer_Tick;
-        model.OnJobStarting += Model_OnJobStarting;
+        model.OnJobStarted += JobRun_OnJobStarted;
         model.OnJobFinished += JobRun_OnJobFinished;
         dispatcherTimer.Start();
     }
 
-    private void Model_OnJobStarting() {
-        NotifyPropertyChanged(nameof(StartedAt));
+    private void JobRun_OnJobStarted() {
+        Application.Current.Dispatcher.Invoke(() => {
+            CancelJobCommand.NotifyCanExecuteChanged();
+            NotifyPropertyChanged(nameof(StartedAt));
+        });
+    }
+
+    private void OnCancelJobException(Exception exception) {
+        ApplicationHandler.ShowError("Canceling error", "Could not cancel job - " + exception.Message);
+    }
+
+    private async Task CancelJob(object? arg) {
+        isCanceling = true;
+        Application.Current.Dispatcher.Invoke(CancelJobCommand.NotifyCanExecuteChanged);
+
+        await Model.CancellationTokenSource.CancelAsync();
+        isCanceling = false;
     }
 
     protected override void InitializeViewModel() {
-        foreach(StepRun stepRun in Model.StepRuns) {
+        foreach (StepRun stepRun in Model.StepRuns) {
             RunningStepViewModel stepRunVM = new RunningStepViewModel(stepRun);
             stepRun.OnStepStarting += () => OnStepStarting(stepRunVM);
             stepRun.OnStepFinished += OnStepFinished;
@@ -85,9 +105,9 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
     }
 
     private void OnStepStarting(RunningStepViewModel stepRun) {
-        if(stepRun.Model.IsAsync) {
+        if (stepRun.Model.IsAsync) {
             // While there are steps running do not select new async step
-            if(RunningSteps.Any(e => e.IsPending || e.IsRunning)) {
+            if (RunningSteps.Any(e => e.IsPending || e.IsRunning)) {
                 return;
             }
         }
@@ -114,6 +134,8 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
             NotifyPropertyChanged(nameof(IsSuccess));
             NotifyPropertyChanged(nameof(IsError));
             NotifyPropertyChanged(nameof(IsWarning));
+            NotifyPropertyChanged(nameof(IsCanceled));
+            CancelJobCommand.NotifyCanExecuteChanged();
         });
     }
 
@@ -121,13 +143,14 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
         NotifyPropertyChanged(nameof(Elapsed));
     }
 
-   
+
 
     public void Dispose() {
         dispatcherTimer.Stop();
 
         dispatcherTimer.Tick -= DispatcherTimer_Tick;
         Model.OnJobFinished -= JobRun_OnJobFinished;
+        Model.OnJobStarted -= JobRun_OnJobStarted;
         foreach (RunningStepViewModel stepRun in RunningSteps) {
             stepRun.Model.OnStepStarting -= () => OnStepStarting(stepRun);
             stepRun.Model.OnStepFinished -= OnStepFinished;

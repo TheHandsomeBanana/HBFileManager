@@ -1,10 +1,12 @@
 ﻿using FileManager.Core.Jobs.Models;
 using FileManager.Core.Jobs.Models.Copy;
+using FileManager.Core.Jobs.Models.Zip;
 using FileManager.Core.JobSteps;
 using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Models;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace FileManager.Core.Jobs.ViewModels;
 public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
@@ -28,11 +30,11 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
         }
     }
 
-    private EntryBrowseType? sourceType;
-    public EntryBrowseType? SourceBrowseType {
-        get => sourceType;
+    private EntryBrowseType sourceBrowseType;
+    public EntryBrowseType SourceBrowseType {
+        get => sourceBrowseType;
         set {
-            sourceType = value;
+            sourceBrowseType = value;
             NotifyPropertyChanged();
 
             Source = null;
@@ -40,67 +42,31 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
         }
     }
 
-    private string? destination;
+    private string archiveName = "archive";
+    public string ArchiveName {
+        get { return archiveName; }
+        set {
+            archiveName = value;
+            NotifyPropertyChanged();
+
+
+            Destination = Destination?.Substring(0, Destination.IndexOf(Path.GetFileName(Destination))) + value + ".zip";
+        }
+    }
+
+
     public string? Destination {
-        get => destination;
+        get => Model.Destination;
         set {
-            destination = value;
+            Model.Destination = value;
             NotifyPropertyChanged();
-
-            AddDestinationCommand.NotifyCanExecuteChanged();
         }
     }
-
-    private EntryBrowseType? destinationType;
-    public EntryBrowseType? DestinationBrowseType {
-        get => destinationType;
-        set {
-            destinationType = value;
-            NotifyPropertyChanged();
-
-            Destination = null;
-            BrowseDestinationCommand.NotifyCanExecuteChanged();
-        }
-    }
-
 
     public EntryBrowseType[] AvailableSourceTypes => [EntryBrowseType.Directory, EntryBrowseType.File];
-    public EntryBrowseType[] AvailableDestinationTypes => [EntryBrowseType.Directory];
 
-    public bool ModifiedOnly {
-        get => Model.ModifiedOnly;
-        set {
-            Model.ModifiedOnly = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public TimeSpan? TimeDifference {
-        get => Model.TimeDifference;
-        set {
-            Model.TimeDifference = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public string? TimeDifferenceText {
-        get => Model.TimeDifferenceText;
-        set {
-            Model.TimeDifferenceText = value;
-            NotifyPropertyChanged();
-        }
-    }
-
-    public TimeUnit? TimeDifferenceUnit {
-        get => Model.TimeDifferenceUnit;
-        set {
-            Model.TimeDifferenceUnit = value;
-            NotifyPropertyChanged();
-        }
-    }
 
     public ObservableCollection<Entry> SourceItems { get; set; }
-    public ObservableCollection<Entry> DestinationItems { get; set; }
 
     private Entry? selectedSource;
     public Entry? SelectedSource {
@@ -111,23 +77,12 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
         }
     }
 
-    private Entry? selectedDestination;
-    public Entry? SelectedDestination {
-        get { return selectedDestination; }
-        set {
-            selectedDestination = value;
-            NotifyPropertyChanged();
-        }
-    }
-
     public RelayCommand BrowseSourceCommand { get; set; }
     public RelayCommand BrowseDestinationCommand { get; set; }
     public RelayCommand ToggleInfoPopupCommand { get; set; }
 
     public RelayCommand AddSourceCommand { get; set; }
-    public RelayCommand AddDestinationCommand { get; set; }
     public RelayCommand<Entry> DeleteSourceCommand { get; set; }
-    public RelayCommand<Entry> DeleteDestinationCommand { get; set; }
 
     public ZipArchiveStepViewModel(ZipArchiveStep model) : base(model) {
         SourceItems = new ObservableCollection<Entry>(Model.SourceItems);
@@ -139,55 +94,33 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
             NotifyValidationRequired();
         };
 
-        DestinationItems = new ObservableCollection<Entry>(Model.DestinationItems);
 
-        // Refresh Model collection on change
-        DestinationItems.CollectionChanged += (_, _) => {
-            Model.DestinationItems.Clear();
-            Model.DestinationItems.AddRange(DestinationItems);
-            NotifyValidationRequired();
-        };
-
-        BrowseSourceCommand = new RelayCommand(BrowseSource, _ => SourceBrowseType is not null);
-        BrowseDestinationCommand = new RelayCommand(BrowseDestination, _ => DestinationBrowseType is not null);
+        BrowseSourceCommand = new RelayCommand(BrowseSource);
+        BrowseDestinationCommand = new RelayCommand(BrowseDestination);
         ToggleInfoPopupCommand = new RelayCommand(ToggleInfoPopup);
-
-        AddSourceCommand = new RelayCommand(AddSource, _ => SourceBrowseType is not null && Source is not null);
-        AddDestinationCommand = new RelayCommand(AddDestination, _ => DestinationBrowseType is not null && Destination is not null);
-
+        AddSourceCommand = new RelayCommand(AddSource, _ => Source is not null);
         DeleteSourceCommand = new RelayCommand<Entry>(DeleteSource);
-        DeleteDestinationCommand = new RelayCommand<Entry>(DeleteDestination);
 
-        TimeDifference = model.TimeDifference;
-        TimeDifferenceUnit = model.TimeDifferenceUnit;
-    }
-
-    private void DeleteDestination(Entry obj) {
-        DestinationItems.Remove(obj);
+        if (!string.IsNullOrEmpty(Destination)) {
+            ArchiveName = Path.GetFileNameWithoutExtension(Destination);
+        }
     }
 
     private void DeleteSource(Entry obj) {
         SourceItems.Remove(obj);
     }
 
-    private void AddDestination(object? obj) {
-        DestinationItems.Add(new Entry {
-            Type = DestinationBrowseType!.Value,
-            Path = Destination!
-        });
-
-        Destination = null;
-        DestinationBrowseType = null;
-    }
-
     private void AddSource(object? obj) {
-        SourceItems.Add(new Entry {
-            Type = SourceBrowseType!.Value,
-            Path = Source!
-        });
+        string[] sourceItems = Source?.Split("; ") ?? [];
+
+        foreach (string item in sourceItems) {
+            SourceItems.Add(new Entry {
+                Type = SourceBrowseType,
+                Path = item!
+            });
+        }
 
         Source = null;
-        SourceBrowseType = null;
     }
 
     private void ToggleInfoPopup(object? obj) {
@@ -198,21 +131,23 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
         switch (SourceBrowseType) {
             case EntryBrowseType.File:
                 OpenFileDialog fileDialog = new OpenFileDialog {
-                    Title = "Select source file"
+                    Title = "Select source file",
+                    Multiselect = true,
                 };
 
                 if (fileDialog.ShowDialog() is true) {
-                    Source = fileDialog.FileName;
+                    Source = string.Join("; ", fileDialog.FileNames);
                 }
 
                 break;
             case EntryBrowseType.Directory:
                 OpenFolderDialog folderDialog = new OpenFolderDialog {
-                    Title = "Select source folder"
+                    Title = "Select source folder",
+                    Multiselect = true,
                 };
 
                 if (folderDialog.ShowDialog() is true) {
-                    Source = folderDialog.FolderName;
+                    Source = string.Join(";", folderDialog.FolderNames);
                 }
 
                 break;
@@ -220,16 +155,11 @@ public class ZipArchiveStepViewModel : JobStepViewModel<ZipArchiveStep> {
     }
 
     private void BrowseDestination(object? obj) {
-        switch (DestinationBrowseType) {
-            case EntryBrowseType.Directory:
-                OpenFolderDialog folderDialog = new OpenFolderDialog();
-                folderDialog.Title = "Select destination folder";
+        OpenFolderDialog folderDialog = new OpenFolderDialog();
+        folderDialog.Title = "Select destination folder";
 
-                if (folderDialog.ShowDialog() is true) {
-                    Destination = folderDialog.FolderName;
-                }
-
-                break;
+        if (folderDialog.ShowDialog() is true) {
+            Destination = System.IO.Path.Combine(folderDialog.FolderName, archiveName + ".zip");
         }
     }
 }

@@ -18,7 +18,7 @@ using Unity;
 namespace FileManager.UI.ViewModels.ExecutionViewModels;
 
 public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
-    private readonly JobExecutionManager jobRunner;
+    private readonly JobExecutionManager jobExecutionManager;
 
     public ObservableCollection<RunningJobViewModel> RunningJobs { get; set; }
 
@@ -36,18 +36,18 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
     public RunningJobsViewModel() {
         IUnityContainer mainContainer = UnityBase.Registry.Get(ApplicationHandler.FileManagerContainerGuid);
         IApplicationWorkspaceManager<HBFileManagerWorkspace> workspaceManager = mainContainer.Resolve<IApplicationWorkspaceManager<HBFileManagerWorkspace>>();
-        jobRunner = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
+        jobExecutionManager = workspaceManager.CurrentWorkspace!.JobExecutionManager!;
 
         RunningJobs = [];
     }
 
     protected override void InitializeViewModel() {
-        foreach (JobRun jobRun in jobRunner.GetRunningJobs()) {
+        foreach (JobRun jobRun in jobExecutionManager.GetRunningJobs()) {
             RunningJobs.Insert(0, new RunningJobViewModel(jobRun));
         }
 
         SelectedJobRun = RunningJobs.FirstOrDefault();
-        jobRunner.OnJobStarting += JobRunner_OnJobStarting;
+        jobExecutionManager.OnJobStarting += JobRunner_OnJobStarting;
 
         NotifyPropertyChanged(nameof(AnyJobsRunning));
     }
@@ -63,7 +63,7 @@ public class RunningJobsViewModel : InitializerViewModelBase, IDisposable {
     }
 
     public void Dispose() {
-        jobRunner.OnJobStarting -= JobRunner_OnJobStarting;
+        jobExecutionManager.OnJobStarting -= JobRunner_OnJobStarting;
 
         foreach (RunningJobViewModel runningJob in RunningJobs) {
             runningJob.Dispose();

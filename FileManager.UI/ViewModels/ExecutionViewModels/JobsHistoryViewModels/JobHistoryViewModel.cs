@@ -24,6 +24,7 @@ public class JobHistoryViewModel : ViewModelBase<JobRun> {
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
+    public bool IsCanceled => Model.State == RunState.Canceled;
     public DateTime? StartedAt => Model.StartedAt;
 
     public ObservableCollection<StepHistoryViewModel> CompletedSteps { get; set; } = [];

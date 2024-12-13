@@ -15,11 +15,11 @@ namespace FileManager.Core.JobSteps.PluginTest;
 [PluginTypeName("Update Azure Storage")]
 [PluginDescription("Used to update a specified Azure storage with many adaptions and whatever lorem ipsum")]
 public class UpdateAzureStorage : JobStep {
-    public override void Execute(IUnityContainer container) {
+    public override void Execute(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         throw new NotImplementedException();
     }
 
-    public override Task ExecuteAsync(IUnityContainer container) {
+    public override Task ExecuteAsync(IUnityContainer container, CancellationToken stepCancellationToken = default, CancellationToken jobCancellationToken = default) {
         throw new NotImplementedException();
     }
 

@@ -132,10 +132,10 @@ public class SettingsPluginsViewModel : ViewModelBase {
                 jobManager.DeleteStep(item.Key, item.Value.Item1);
             }
 
-            foreach(Job job in found.Select(e => e.Key)) {
+            foreach (Job job in found.Select(e => e.Key)) {
                 bool canRun = true;
 
-                foreach(JobStep step in job.Steps) {
+                foreach (JobStep step in job.Steps) {
                     canRun &= (step.IsValid);
                 }
 
@@ -176,7 +176,15 @@ public class SettingsPluginsViewModel : ViewModelBase {
     private void FindPlugins(string assemblyFileName) {
         IAssemblyContext? loadedContext = pluginManager.GetLoadedAssembly(assemblyFileName);
         if (loadedContext is not null) {
-            FoundPlugins = pluginManager.TypeProvider.GetCachedByAttribute<JobStep>([loadedContext]);
+            try {
+                FoundPlugins = pluginManager.TypeProvider.GetCachedByAttribute<JobStep>([loadedContext]);
+            }
+            catch (TypeLoadException ex) {
+                ApplicationHandler.ShowError("Type load error", "Could not load plugin types from assembly - try updating the assembly file");
+            }
+            catch (Exception ex) {
+                ApplicationHandler.ShowError("Plugin load error", ex.Message);
+            }
         }
     }
 }

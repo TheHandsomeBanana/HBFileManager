@@ -25,6 +25,7 @@ public class StepHistoryViewModel : ViewModelBase<StepRun> {
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
+    public bool IsCanceled => Model.State == RunState.Canceled;
 
     public bool ShowTimestamp { get; }
     public bool ShowExplicitLevel { get; }

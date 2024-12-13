@@ -1,5 +1,5 @@
-﻿using FileManager.Core.Jobs.Models;
-using FileManager.Core.Jobs.Models.Copy;
+﻿using FileManager.Core.Jobs.Models.Copy;
+using FileManager.Core.Jobs.Models.Zip;
 using FileManager.Core.JobSteps;
 using FileManager.Domain.JobSteps;
 using HBLibrary.Common.Plugins;

@@ -4,6 +4,7 @@ using FileManager.UI.Models.SettingsModels;
 using FileManager.UI.Services.SettingsService;
 using HBLibrary.DI;
 using HBLibrary.Logging.FlowDocumentTarget;
+using HBLibrary.Wpf.Commands;
 using HBLibrary.Wpf.Extensions;
 using HBLibrary.Wpf.Logging;
 using HBLibrary.Wpf.ViewModels;
@@ -34,6 +35,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
     public bool IsSuccess => Model.State == RunState.Success;
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
+    public bool IsCanceled => Model.State == RunState.Canceled;
 
 
     public bool ShowTimestamp { get; }
@@ -41,8 +43,12 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
     public bool ShowCategory { get; }
 
 
+    private bool isCanceling = false;
+    public AsyncRelayCommand CancelStepCommand { get; }
 
     public RunningStepViewModel(StepRun model) : base(model) {
+        CancelStepCommand = new AsyncRelayCommand(CancelStep, _ => IsRunning && !isCanceling, OnCancelException);
+
         model.OnStepStarting += Model_OnStepStarting;
         model.OnStepFinished += Model_OnStepFinished;
 
@@ -64,12 +70,26 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
         }
     }
 
+    private void OnCancelException(Exception exception) {
+        ApplicationHandler.ShowError("Canceling error", "Could not cancel step - " + exception.Message);
+    }
+
+    private async Task CancelStep(object? arg) {
+        isCanceling = true;
+        Application.Current.Dispatcher.Invoke(CancelStepCommand.NotifyCanExecuteChanged);
+        await Model.CancellationTokenSource.CancelAsync();
+        isCanceling = false;
+    }
+
     private void Model_OnStepFinished() {
         NotifyPropertyChanged(nameof(State));
         NotifyPropertyChanged(nameof(IsRunning));
         NotifyPropertyChanged(nameof(IsError));
         NotifyPropertyChanged(nameof(IsSuccess));
         NotifyPropertyChanged(nameof(IsWarning));
+        NotifyPropertyChanged(nameof(IsCanceled));
+
+        Application.Current.Dispatcher.Invoke(CancelStepCommand.NotifyCanExecuteChanged);
     }
 
     private void Model_OnStepStarting() {
@@ -78,6 +98,9 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
         NotifyPropertyChanged(nameof(IsError));
         NotifyPropertyChanged(nameof(IsSuccess));
         NotifyPropertyChanged(nameof(IsWarning));
+        NotifyPropertyChanged(nameof(IsCanceled));
+
+        Application.Current.Dispatcher.Invoke(CancelStepCommand.NotifyCanExecuteChanged);
     }
 
     private void DispatcherTimer_Tick(object? sender, EventArgs e) {

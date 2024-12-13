@@ -113,6 +113,12 @@
                                 <Setter Property="Foreground"
                                         Value="{StaticResource VSGreenBrush}" />
                             </DataTrigger>
+
+                            <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Canceled}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSYellowBrush}" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
 
@@ -124,6 +130,17 @@
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding State}"
                                                Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#766a47" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Canceled}" />
                                     <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                                Value="True" />
                                 </MultiDataTrigger.Conditions>
@@ -163,6 +180,17 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="BorderBrush"
                                         Value="#f1c23c" />
+                                <Setter Property="Background"
+                                        Value="#766a47" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Canceled}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
                                 <Setter Property="Background"
                                         Value="#766a47" />
                             </MultiDataTrigger>

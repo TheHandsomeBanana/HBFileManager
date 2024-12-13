@@ -11,7 +11,6 @@ namespace FileManager.Core.Jobs;
 public interface IJobExecutionManager {
     public event Action<JobRun>? OnJobStarting;
     public event Action<ScheduledJob>? OnJobScheduling;
-   
     public JobRun[] GetRunningJobs();
     public Task<JobRun[]> GetCompletedJobsAsync();
     public Task<ScheduledJob[]> GetScheduledJobs();

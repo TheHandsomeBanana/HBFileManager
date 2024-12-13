@@ -30,10 +30,15 @@ public class StepRun {
     [JsonIgnore]
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
+    [JsonIgnore]
+    public CancellationTokenSource CancellationTokenSource { get; set; }
+
     public event Action? OnStepStarting;
+    public event Action? OnStepStarted;
     public event Action? OnStepFinished;
 
     public StepRun(JobStep step, string stepType) {
+        CancellationTokenSource = new CancellationTokenSource();
         this.step = step;
 
         State = RunState.Pending;
@@ -50,7 +55,7 @@ public class StepRun {
         
     }
 
-    public void Start(UnityContainer container) {
+    public void Start(UnityContainer container, CancellationToken jobCancellationToken = default) {
 
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
@@ -59,10 +64,10 @@ public class StepRun {
 
         Logs.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
         Logs.WriteLog(new LogStatement($"{Name} started", Name, LogLevel.Info, DateTime.UtcNow));
-        step.Execute(container);
+        step.Execute(container, CancellationTokenSource.Token, jobCancellationToken);
     }
     
-    public Task StartAsync(UnityContainer container) {
+    public Task StartAsync(UnityContainer container, CancellationToken jobCancellationToken = default) {
         StartedAt = DateTime.UtcNow;
         Stopwatch.Start();
         State = RunState.RunningAsync;
@@ -71,7 +76,7 @@ public class StepRun {
         Logs.WriteLogBlock(LogBlockStatement.CreateSeperationBlock());
         Logs.WriteLog(new LogStatement($"{Name} started asynchronously", Name, LogLevel.Info, DateTime.UtcNow));
 
-        return step.ExecuteAsync(container);
+        return step.ExecuteAsync(container, CancellationTokenSource.Token, jobCancellationToken);
     }
 
     public void EndSuccess() {
@@ -97,6 +102,15 @@ public class StepRun {
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Faulted;
+        OnStepFinished?.Invoke();
+    }
+    
+    public void EndCanceled() {
+        Logs.WriteLog(new LogStatement($"Canceled executing {Name}", Name, LogLevel.Warning, DateTime.UtcNow));
+
+        FinishedAt = DateTime.UtcNow;
+        Stopwatch.Stop();
+        State = RunState.Canceled;
         OnStepFinished?.Invoke();
     }
 }

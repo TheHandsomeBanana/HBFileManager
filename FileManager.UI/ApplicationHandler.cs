@@ -7,6 +7,7 @@ using HBLibrary.Interface.IO.Storage.Entries;
 using HBLibrary.Interface.Workspace;
 using HBLibrary.Wpf.Services.NavigationService;
 using HBLibrary.Wpf.ViewModels;
+using HBLibrary.Wpf.Views;
 using Microsoft.Graph.Models.TermStore;
 using System;
 using System.Collections.Generic;
@@ -204,5 +205,9 @@ public static class ApplicationHandler {
     public static void ExitInstance() {
         mutex?.Dispose();
         mutex = null;
+    }
+
+    public static void ShowError(string title, string message) {
+        HBDarkMessageBox.Show(title, message, MessageBoxButton.OK, MessageBoxImage.Error);
     }
 }
