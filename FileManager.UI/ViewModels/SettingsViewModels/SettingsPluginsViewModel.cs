@@ -101,7 +101,14 @@ public class SettingsPluginsViewModel : ViewModelBase {
     }
 
     private void DeleteAssembly(AssemblyName obj) {
-        PluginType[] types = pluginManager.TypeProvider.GetByAttribute<JobStep>([pluginManager.GetLoadedAssembly(obj.Name!)!]);
+        PluginType[] types = [];
+        bool typesNotLoaded = false;
+        try {
+            types = pluginManager.TypeProvider.GetByAttribute<JobStep>([pluginManager.GetLoadedAssembly(obj.Name!)!]);
+        }
+        catch(TypeLoadException) {
+            typesNotLoaded = true;
+        }
 
         Dictionary<Job, Tuple<JobStep, PluginType>> found = [];
 
@@ -116,18 +123,25 @@ public class SettingsPluginsViewModel : ViewModelBase {
         }
 
         string message;
+        MessageBoxImage msgImage;
         if (found.Count != 0) {
-            message = $"If you delete this plugin, the following Job-Steps will be deleted as well:\n- " +
+            message = $"If you delete this assembly, the following Job-Steps will be deleted as well:\n- " +
             $"{string.Join("\n- ", found.Select(e => $"[Name: {e.Value.Item1.Name} | Type: {e.Value.Item2.ConcreteType}]"))}";
+            msgImage = MessageBoxImage.Warning;
+        }
+        else if(typesNotLoaded) {
+            message = "This assembly does not match the newest version, you need to update the Nuget package for job steps.";
+            msgImage = MessageBoxImage.Information;
         }
         else {
-            message = "No Job-Step is using this plugin, you can remove it safely.";
+            message = "No Job-Step is using any plugins of this assembly, you can remove it safely.";
+            msgImage = MessageBoxImage.Information;
         }
 
 
-        MessageBoxResult result = HBDarkMessageBox.Show("Remove plugin", message, MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        MessageBoxResult result = HBDarkMessageBox.Show("Remove assembly", message, MessageBoxButton.OKCancel, msgImage);
 
-        if (result == MessageBoxResult.Yes) {
+        if (result == MessageBoxResult.OK) {
             foreach (KeyValuePair<Job, Tuple<JobStep, PluginType>> item in found) {
                 jobManager.DeleteStep(item.Key, item.Value.Item1);
             }
@@ -144,8 +158,10 @@ public class SettingsPluginsViewModel : ViewModelBase {
 
             assemblies.Remove(obj);
 
-            // TODO: handle result
             Result res = pluginManager.RemovePluginAssembly(obj);
+
+            res.TapError(e => ApplicationHandler.ShowError("Assembly delete failed", e.Message));
+
             SelectedAssembly = assemblies.FirstOrDefault();
         }
     }

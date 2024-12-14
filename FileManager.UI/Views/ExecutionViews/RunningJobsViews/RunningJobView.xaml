@@ -59,11 +59,16 @@
             </StackPanel>
         </StackPanel>
 
+        <Border Style="{StaticResource ControlBorder}"
+                Grid.Row="0"
+                Grid.ColumnSpan="2"
+                BorderThickness="0 0 0 2" />
+
         <Button Style="{StaticResource AccentButtonRed}"
                 Grid.Column="1"
                 HorizontalContentAlignment="Center"
                 HorizontalAlignment="Left"
-                Height="Auto"
+                Height="40"
                 Width="120"
                 Margin="0 10 0 10"
                 Command="{Binding CancelJobCommand}">

@@ -100,7 +100,7 @@
                     Grid.Column="2"
                     HorizontalContentAlignment="Center"
                     HorizontalAlignment="Left"
-                    Height="Auto"
+                    Height="40"
                     Width="120"
                     Command="{Binding CancelStepCommand}">
                 <Button.Content>
