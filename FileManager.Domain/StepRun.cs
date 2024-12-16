@@ -34,7 +34,6 @@ public class StepRun {
     public CancellationTokenSource CancellationTokenSource { get; set; }
 
     public event Action? OnStepStarting;
-    public event Action? OnStepStarted;
     public event Action? OnStepFinished;
 
     public StepRun(JobStep step, string stepType) {
@@ -53,6 +52,10 @@ public class StepRun {
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
     {
         
+    }
+
+    public bool IsEnabled() {
+        return step.IsEnabled;
     }
 
     public void Start(UnityContainer container, CancellationToken jobCancellationToken = default) {
@@ -111,6 +114,12 @@ public class StepRun {
         FinishedAt = DateTime.UtcNow;
         Stopwatch.Stop();
         State = RunState.Canceled;
+        OnStepFinished?.Invoke();
+    }
+    
+    public void Skip() {
+        Logs.WriteLog(new LogStatement($"This step is not enabled, execution skipped.", Name, LogLevel.Info, DateTime.UtcNow));
+        State = RunState.Skipped;
         OnStepFinished?.Invoke();
     }
 }

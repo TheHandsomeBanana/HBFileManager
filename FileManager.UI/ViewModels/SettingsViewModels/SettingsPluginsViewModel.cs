@@ -195,7 +195,7 @@ public class SettingsPluginsViewModel : ViewModelBase {
             try {
                 FoundPlugins = pluginManager.TypeProvider.GetCachedByAttribute<JobStep>([loadedContext]);
             }
-            catch (TypeLoadException ex) {
+            catch (TypeLoadException) {
                 ApplicationHandler.ShowError("Type load error", "Could not load plugin types from assembly - try updating the assembly file");
             }
             catch (Exception ex) {

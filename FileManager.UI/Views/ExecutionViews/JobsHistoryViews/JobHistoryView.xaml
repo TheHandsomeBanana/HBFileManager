@@ -101,6 +101,12 @@
                            TargetType="TextBlock">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding State}"
+                                         Value="{x:Static jobStepsDomain:RunState.Skipped}">
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource VSBlueBrush}" />
+                            </DataTrigger>
+                            
+                            <DataTrigger Binding="{Binding State}"
                                          Value="{x:Static jobStepsDomain:RunState.CompletedWithWarnings}">
                                 <Setter Property="Foreground"
                                         Value="{StaticResource VSYellowBrush}" />
@@ -174,6 +180,17 @@
                                         Value="#364336" />
                             </MultiDataTrigger>
 
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Skipped}" />
+                                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background"
+                                        Value="#39454f" />
+                            </MultiDataTrigger>
+
                             <!-- MultiDataTriggers for MouseOver with specific RunState -->
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
@@ -223,6 +240,19 @@
                                         Value="#8ae28a" />
                                 <Setter Property="Background"
                                         Value="#364336" />
+                            </MultiDataTrigger>
+
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding State}"
+                                               Value="{x:Static jobStepsDomain:RunState.Skipped}" />
+                                    <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                               Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="BorderBrush"
+                                        Value="#4da5e9" />
+                                <Setter Property="Background"
+                                        Value="#39454f" />
                             </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>

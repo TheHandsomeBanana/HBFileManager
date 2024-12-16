@@ -39,6 +39,7 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
     public bool IsCanceled => Model.State == RunState.Canceled;
+    public bool IsSkipped => Model.State == RunState.Skipped;
 
 
     private RunningStepViewModel? selectedStepRun;
@@ -135,6 +136,8 @@ public sealed class RunningJobViewModel : InitializerViewModelBase<JobRun>, IDis
             NotifyPropertyChanged(nameof(IsError));
             NotifyPropertyChanged(nameof(IsWarning));
             NotifyPropertyChanged(nameof(IsCanceled));
+            NotifyPropertyChanged(nameof(IsSkipped));
+
             CancelJobCommand.NotifyCanExecuteChanged();
         });
     }

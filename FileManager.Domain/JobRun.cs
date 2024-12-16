@@ -50,11 +50,11 @@ public class JobRun {
         OnJobStarted?.Invoke();
     }
 
-    public void End(bool canceled) {
+    public void End(RunState? externalState = null) {
         Stopwatch.Stop();
         FinishedAt = DateTime.UtcNow;
-        if (canceled) {
-            State = RunState.Canceled;
+        if (externalState.HasValue) {
+            State = externalState.Value;
         }
         else {
             foreach (StepRun step in StepRuns) {

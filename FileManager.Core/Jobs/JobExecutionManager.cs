@@ -53,15 +53,23 @@ public class JobExecutionManager : IJobExecutionManager {
 
         List<Task> asyncJobs = [];
         List<IUnityContainer> asyncJobsContainers = [];
-        bool canceled = false;
+
+        RunState? externalRunState = null;
         foreach (StepRun stepRun in jobRun.StepRuns) {
-            if(jobRun.CancellationTokenSource.IsCancellationRequested) {
-                stepRun.EndCanceled();
-                canceled = true;
+            UnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
+            IExtendedLogger logger = tempContainer.Resolve<IExtendedLogger>();
+
+            if(!stepRun.IsEnabled()) {
+                stepRun.Skip();
                 continue;
             }
 
-            UnityContainer tempContainer = CreateTempContainer(stepRun, mainContainer);
+            if(jobRun.CancellationTokenSource.IsCancellationRequested) {
+                stepRun.EndCanceled();
+                externalRunState = RunState.Canceled;
+                continue;
+            }
+
             if (stepRun.IsAsync) {
                 asyncJobs.Add(RunStepAsync(stepRun, tempContainer, jobRun.CancellationTokenSource.Token));
                 asyncJobsContainers.Add(tempContainer);
@@ -73,7 +81,12 @@ public class JobExecutionManager : IJobExecutionManager {
         }
 
         await Task.WhenAll(asyncJobs);
-        jobRun.End(canceled || jobRun.CancellationTokenSource.IsCancellationRequested);
+
+        if (jobRun.CancellationTokenSource.IsCancellationRequested) {
+            externalRunState = RunState.Canceled;
+        }
+
+        jobRun.End(externalRunState);
         runningJobs.Remove(jobRun);
 
         container.AddOrUpdate(jobRun.Id.ToString(), jobRun, StorageEntryContentType.Json);

@@ -36,6 +36,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
     public bool IsError => Model.State == RunState.Faulted;
     public bool IsWarning => Model.State == RunState.CompletedWithWarnings;
     public bool IsCanceled => Model.State == RunState.Canceled;
+    public bool IsSkipped => Model.State == RunState.Skipped;
 
 
     public bool ShowTimestamp { get; }
@@ -88,6 +89,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
         NotifyPropertyChanged(nameof(IsSuccess));
         NotifyPropertyChanged(nameof(IsWarning));
         NotifyPropertyChanged(nameof(IsCanceled));
+        NotifyPropertyChanged(nameof(IsSkipped));
 
         Application.Current.Dispatcher.Invoke(CancelStepCommand.NotifyCanExecuteChanged);
     }
@@ -99,6 +101,7 @@ public class RunningStepViewModel : ViewModelBase<StepRun>, IDisposable {
         NotifyPropertyChanged(nameof(IsSuccess));
         NotifyPropertyChanged(nameof(IsWarning));
         NotifyPropertyChanged(nameof(IsCanceled));
+        NotifyPropertyChanged(nameof(IsSkipped));
 
         Application.Current.Dispatcher.Invoke(CancelStepCommand.NotifyCanExecuteChanged);
     }

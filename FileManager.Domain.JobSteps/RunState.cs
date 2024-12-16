@@ -12,5 +12,6 @@ public enum RunState {
     Faulted,
     Success,
     CompletedWithWarnings,
-    Canceled
+    Canceled,
+    Skipped
 }
